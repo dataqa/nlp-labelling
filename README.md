@@ -35,6 +35,9 @@ Doing this will run a server locally and open a browser window at port `5000`. I
 
 To quit the application, simply do `Ctr-C` in the terminal. To resume the application, type `dataqa run`. Doing so will create a folder at `$HOME/.dataqa_data`.
 
+### Does this tool need an internet connection?
+
+Only the first time you run it, it will need to download a language model from the internet. This is the only time it will need an internet connection. There is ongoing work to remove this constraint, so it can be run locally without any internet.
 
 #### Uploading data
 
