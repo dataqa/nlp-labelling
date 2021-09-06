@@ -8,7 +8,7 @@ With DataQA, you can label unstructured text documents using rule-based distant 
 * label a sample of some documents with an imbalanced class distribution,
 * create a baseline high-precision system for NER or for classification.
 
-Documentation at: [https://dataqa.ai/docs/]().
+Documentation at: [https://dataqa.ai/docs/](https://dataqa.ai/docs/).
 
 # Installation
 
