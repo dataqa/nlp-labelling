@@ -3,6 +3,11 @@
     <img src="dataqa-ui/public/images/protractor.png?raw=true" width="300" height="300">
 </p>
 
+<p align="center">
+    <img src="github_images/books_rule.png?raw=true" width="300" height="300">
+</p>
+
+
 With DataQA, you can label unstructured text documents using rule-based distant supervision. You can use it to:
 * manually label all documents,
 * label a sample of some documents with an imbalanced class distribution,
