@@ -19,10 +19,12 @@ Classify or extract named entities from your text:
     <img src="github_images/labelling_entity_selected.png?raw=true" width="900"/>
 </p>
 
+
 Search and label your data:
 <p align="center">
     <img src="github_images/search_label.png?raw=true" width="900"/>
 </p>
+
 
 Use rules & heuristics to automatically label your documents.
 <p align="center">
