@@ -11,12 +11,12 @@ With DataQA, you can label unstructured text documents using rule-based distant 
 Documentation at: [https://dataqa.ai/docs/](https://dataqa.ai/docs/).
 
 <p align="center">
-    <img src="github_images/labelling_entity_selected.png?raw=true" width="500"/>
+    <img src="github_images/labelling_entity_selected.png?raw=true" width="900"/>
 </p>
 
 <p float="left">
-    <img src="github_images/books_rule.png?raw=true" width="300"/>
-    <img src="github_images/search_label.png?raw=true" width="300"/>
+    <img src="github_images/books_rule.png?raw=true" width="500"/>
+    <img src="github_images/search_label.png?raw=true" width="500"/>
 </p>
 
 # Installation
