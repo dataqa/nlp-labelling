@@ -26,7 +26,7 @@ Search and label your data:
 </p>
 
 
-Use rules & heuristics to automatically label your documents.
+Use rules & heuristics to automatically label your documents:
 <p align="center">
     <img src="github_images/books_rule.png?raw=true" width="500"/>
 </p>
