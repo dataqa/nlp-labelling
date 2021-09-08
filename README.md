@@ -13,19 +13,20 @@ Documentation at: [https://dataqa.ai/docs/](https://dataqa.ai/docs/).
 
 ## Screenshots
 
+Classify or extract named entities from your text:
+
 <p align="center">
     <img src="github_images/labelling_entity_selected.png?raw=true" width="900"/>
-    <em>Classify or extract named entities.</em>
 </p>
 
+Search and label your data:
 <p align="center">
     <img src="github_images/search_label.png?raw=true" width="900"/>
-    <em>Search & label your data.</em>
 </p>
 
+Use rules & heuristics to automatically label your documents.
 <p align="center">
     <img src="github_images/books_rule.png?raw=true" width="500"/>
-    <em>Add rules & heuristics to automatically label documents.</em>
 </p>
 
 # Installation
