@@ -11,3 +11,4 @@ Please mention when applicable:
 * python version
 * OS version
 * browser version
+* version of dataqa
