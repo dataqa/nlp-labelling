@@ -2,8 +2,8 @@ import re
 
 import numpy as np
 from snorkel.labeling import LabelingFunction
-from snorkel.labeling import MajorityLabelVoter
-from snorkel.labeling import LabelModel
+from snorkel.labeling.model import MajorityLabelVoter
+from snorkel.labeling.model import LabelModel
 from snorkel.labeling import PandasLFApplier
 
 import dataqa.ml.sentiment as ml_sentiment

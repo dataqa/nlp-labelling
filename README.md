@@ -35,7 +35,7 @@ Use rules & heuristics to automatically label your documents:
 
 ## Pre-requisites:
 
-* Python 3.6+
+* Python 3.6, 3.7, 3.8 and 3.9
 * (Recommended) start a new python virtual environment
 * Update your pip `pip install -U pip`
 * Tested on backend: MacOSX, Ubuntu. Tested on browser: Chrome.
@@ -45,6 +45,7 @@ Use rules & heuristics to automatically label your documents:
 To install the package from pypi:
 
 * `pip install dataqa`
+* When using python 3.9, need to run `pip install networkx==2.5` (ignore error message complaining about snorkel's dependencies). This is due to an error in snorkel's dependencies.
 
 # Usage
 
@@ -77,8 +78,11 @@ In the terminal:
 
 # Troubleshooting
 
+## Usage 
+
 If the project data does not load, try to go to the homepage and `http://localhost:5000` and navigate to the project from there.
 
+Try running `dataqa test` to get more information about the error, and bug reports are very welcome!
 
 # Development
 
