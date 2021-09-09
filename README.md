@@ -44,7 +44,13 @@ Use rules & heuristics to automatically label your documents:
 
 To install the package from pypi:
 
+### Python versions 3.6, 3.7
+
 * `pip install dataqa`
+
+### Python versions 3.8, 3.9
+
+* This package uses an older version of scikit-learn, which needs to be compiled from source for newer versions of python. On macOS, this fails and so the steps outlined [here](https://scikit-learn.org/stable/developers/advanced_installation.html#macos-compilers-from-homebrew) need to be run, replacing the last line with `pip install scikit-learn==0.21.3`. This only takes a few minutes.
 * When using python 3.9, need to run `pip install networkx==2.5` (ignore error message complaining about snorkel's dependencies). This is due to an error in snorkel's dependencies.
 
 # Usage
