@@ -57,7 +57,13 @@ const Message = (props) => {
 const MainArea = (props) => {
     const { classes } = props;
 
-    console.log("MainArea props", props);
+    const entityColourMap = props.classNames.reduce(function(obj, itm) {
+        obj[itm['id']] = itm['colour'];
+
+        return obj;
+    }, {});
+
+    console.log("MainArea props", props, "entityColourMap", entityColourMap);
     
     if(props.errorFetching){
         return <Message 
@@ -102,6 +108,7 @@ const MainArea = (props) => {
                                 addToDocIndex={props.addToDocIndex}
                                 disableNextDoc={props.disableNextDoc}
                                 disablePrevDoc={props.disablePrevDoc}
+                                entityColourMap={entityColourMap}
                             />
                         </Item>
                         <Item>
@@ -473,6 +480,7 @@ class EDLabelPage extends React.Component{
                     content={this.state.currentDocs[this.state.indexDoc]}
                     textSpans={textSpans}
                     classes={classes}
+                    classNames={this.props.classNames}
                     hasDocs={this.state.currentDocs.length > 0}
                     projectName={this.props.projectName}
                     entityId={entityId}

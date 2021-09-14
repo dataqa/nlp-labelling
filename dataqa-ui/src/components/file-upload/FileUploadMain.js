@@ -200,7 +200,12 @@ class FileUploadMain extends React.Component{
                     console.log("File loaded successfully", today.toLocaleString());
                     this.props.addProjectToList(this.state.projectName,
                                                 projectId);
-                    this.updateStateAfterSuccessfulLoading(fileType, selectedFile.name);                    
+
+                    this.updateStateAfterSuccessfulLoading(fileType, selectedFile.name);   
+
+                    if(fileType==FILE_TYPE_KB){
+                        this.props.setClassNames(jsonData.classNames); 
+                    }                
                 }
             }.bind(this),
             error: function (xmlhttprequest, textstatus, message) {

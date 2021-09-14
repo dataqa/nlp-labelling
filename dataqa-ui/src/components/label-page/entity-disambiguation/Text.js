@@ -63,6 +63,8 @@ class Text extends React.Component{
                         <Typography align='center' component={'span'}>
                             <Highlightable 
                                 ranges={this.state.currentTextSpans || []}
+                                entityColourMap={this.props.entityColourMap}
+                                entityId={0}
                                 id={"myuniqueid"}
                                 text={this.props.content.text}
                                 enabled={false}

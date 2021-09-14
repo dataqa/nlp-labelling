@@ -99,7 +99,7 @@ def upload():
             if project_type in [PROJECT_TYPE_CLASSIFICATION, PROJECT_TYPE_NER]:
                 project_id = create_supervised_project(*input_params, upload_folder)
             else:
-                project_id = create_entity_disambiguation_project(*input_params)
+                project_id, class_names = create_entity_disambiguation_project(*input_params)
 
     if project_id:
         end_time = datetime.now()

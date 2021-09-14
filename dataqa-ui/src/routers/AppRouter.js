@@ -238,6 +238,7 @@ export default class AppRouter extends React.Component {
                                             addProjectToList={this.addProjectToList}
                                             setProjectUploadFinished={this.setProjectUploadFinished}
                                             setFilename={this.setFilename}
+                                            setClassNames={this.setClassNames}
                                             filesUploaded={this.state.filenames}/>} 
                             exact={true}
                         />

@@ -54,6 +54,7 @@ def create_entity_disambiguation_project(session,
     else:
         index_name = f"{project_name_index}_kb_{index_suffix}"
 
+    class_names = None
     try:
         if file_type == FILE_TYPE_DOCUMENTS:
             upload_documents_file(session,
@@ -65,19 +66,19 @@ def create_entity_disambiguation_project(session,
                                   project_type,
                                   column_specs)
         else:
-            upload_kb_file(project,
-                           es_uri,
-                           file,
-                           file_bytes.filename,
-                           index_name,
-                           project_type,
-                           column_specs)
+            class_names = upload_kb_file(project,
+                                         es_uri,
+                                         file,
+                                         file_bytes.filename,
+                                         index_name,
+                                         project_type,
+                                         column_specs)
     except Exception:
         delete_index(es_uri, index_name)
         delete_ent_mapping(session, project_id)
         raise Exception("Error during upload")
 
-    return project_id
+    return project_id, class_names
 
 
 def turn_doc_row_into_es_row(row, mapping_columns):
@@ -187,6 +188,8 @@ def upload_kb_file(project,
         delete_index(es_uri, project.kb_index_name)
 
     df = process_file(file, column_specs)
+    class_names = get_class_names_from_kbs(df)
+
     upload_file(es_uri,
                 index_name,
                 df,
@@ -196,3 +199,5 @@ def upload_kb_file(project,
     project.total_bases = len(df)
     project.kb_index_name = index_name
     project.kb_filename = filename
+
+    return df
