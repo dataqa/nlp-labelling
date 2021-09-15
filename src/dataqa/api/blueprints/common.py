@@ -77,6 +77,8 @@ def upload():
     polling = bool(strtobool(request.form['polling']))
 
     print("Uploading with params", request.form)
+    class_names = None
+
     with session_scope(db) as session:
         es_uri = es.get_es_uri(current_app.config)
         if polling:
@@ -105,7 +107,7 @@ def upload():
         end_time = datetime.now()
         print(f"Upload took {(end_time - start_time).seconds / 60} minutes.")
 
-    return json.dumps({"id": project_id})
+    return json.dumps({"id": project_id, "class_names": class_names})
 
 
 @bp.route('/api/delete-project/<project_name>', methods=['DELETE'])

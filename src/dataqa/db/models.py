@@ -41,6 +41,10 @@ class EntityDisambiguationProject(Project):
     total_entities = Column(Integer)
     total_matched_entities = Column(Integer)
 
+    kbs = relationship("EntityDisambiguationKB",
+                       order_by="EntityDisambiguationKB.id",
+                       cascade="all, delete, delete-orphan")
+
     __mapper_args__ = {
         'polymorphic_identity': 'entity_disambiguation'
     }
@@ -62,6 +66,16 @@ class EntityDisambiguationMapping(Base):
     session_id = Column(String)
 
 
+class EntityDisambiguationKB(Base):
+    __tablename__ = 'entity_disambiguation_kb'
+
+    id = Column(Integer, primary_key=True)  # kb_id
+    project_id = Column(Integer, ForeignKey('project.id'), primary_key=True)
+
+    name = Column(String)
+    colour = Column(String)
+
+
 class SupervisedProject(Project):
     __tablename__ = 'supervised_project'
 
@@ -73,12 +87,14 @@ class SupervisedProject(Project):
     spacy_binary_filepath = Column(String)
 
     # accuracy of merged label across all document classes (classification) or span classes (NER)
-    total_manual_docs = Column(Integer, default=0) # total manually labelled docs (includes next)
+    total_manual_docs = Column(Integer, default=0)  # total manually labelled docs (includes next)
     # needed for label table only
-    total_manual_docs_empty = Column(Integer, default=0) # total number of manually labelled docs with no spans or label
+    total_manual_docs_empty = Column(Integer,
+                                     default=0)  # total number of manually labelled docs with no spans or label
     total_correct = Column(Integer, default=0)  # total correct out of predicted
     total_incorrect = Column(Integer, default=0)  # total incorrect out of predicted
-    total_not_predicted = Column(Integer, default=0)  # NER: total manually labelled spans that were not detected by rules
+    total_not_predicted = Column(Integer,
+                                 default=0)  # NER: total manually labelled spans that were not detected by rules
     # classification: total manually labelled docs (with non-empty class) that got abstain
 
     # computed during rule creation
@@ -177,7 +193,7 @@ class SupervisedClass(Base):
 
     # only applies to classification
     total_ground_truth = Column(Integer)  # total ground-truth instances of this class
-    total_ground_truth_correct = Column(Integer) # total ground-truth correct instances of this class
+    total_ground_truth_correct = Column(Integer)  # total ground-truth correct instances of this class
     ground_truth_precision = Column(Float)
     ground_truth_recall = Column(Float)
 
@@ -194,9 +210,9 @@ class Rule(Base):
     params = Column(Text)
     class_id = Column(Integer)
     class_name = Column(String)
-    coverage = Column(Integer) # in terms of num docs (for entities, num docs with at least 1 entity)
-    overlaps = Column(Integer) # in terms of docs
-    accuracy = Column(String) # in terms of docs for classification, and entities for NER
+    coverage = Column(Integer)  # in terms of num docs (for entities, num docs with at least 1 entity)
+    overlaps = Column(Integer)  # in terms of docs
+    accuracy = Column(String)  # in terms of docs for classification, and entities for NER
 
     __mapper_args__ = {
         'polymorphic_identity': 'rule',
