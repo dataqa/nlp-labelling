@@ -1,4 +1,4 @@
-dataqa-es==0.0.2
+dataqa-es==0.0.3
 bootstrapped>=0.0.2
 Flask>=1.1.1
 intervaltree>=3.1
@@ -6,7 +6,7 @@ marshmallow-sqlalchemy>=0.24.1
 numpy>=1.19.2
 pandas>=1.1.5
 requests>=2.23
-scikit-learn==0.*;python_version>="3.8"
+scikit-learn>=0.22;python_version>="3.8"
 scikit-learn<0.22;python_version<"3.8"
 snorkel==0.9.7;python_version>="3.8"
 snorkel==0.9.6;python_version<"3.8"
