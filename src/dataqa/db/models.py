@@ -26,7 +26,7 @@ class Project(Base):
 
 
 class EntityDisambiguationProject(Project):
-    __tablename__ = 'entity_disambiguation'
+    __tablename__ = 'entity_disambiguation_project'
 
     id = Column(Integer, ForeignKey('project.id'), primary_key=True)
 

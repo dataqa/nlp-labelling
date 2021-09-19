@@ -75,7 +75,8 @@ def label_kb(session, project, entity_id, kb, session_id):
     entity = get_ent_mapping(session, entity_id, project.id)
     if not entity:
         raise Exception("Entity was not found in database.")
+    if entity.kb_id is None:
+        project.total_matched_entities = project.total_matched_entities + 1
     entity.kb_id = kb["label"]
     entity.kb_name = kb["name"]
     entity.session_id = session_id
-    project.total_matched_entities = project.total_matched_entities + 1
