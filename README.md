@@ -66,6 +66,8 @@ To quit the application, simply do `Ctr-C` in the terminal. To resume the applic
 
 Only the first time you run it, it will need to download a language model from the internet. This is the only time it will need an internet connection. There is ongoing work to remove this constraint, so it can be run locally without any internet.
 
+**No data will ever leave your local machine.**
+
 ## Uploading data
 
 The text file needs to be a csv file in utf-8 encoding of up to 30MB with a column named "text" which contains the main text. The other columns will be ignored.
@@ -77,7 +79,7 @@ This step is running some analysis on your text and might take up to 5 minutes.
 
 In the terminal:
 
-* `dataqa uninstall`: this deletes some application files in the home directory in the folder `.dataqa_data`. It will prompt the user before deleting.
+* `dataqa uninstall`: this deletes your local application data in the home directory in the folder `.dataqa_data`. It will prompt the user before deleting.
 * `pip uninstall dataqa` 
 
 
