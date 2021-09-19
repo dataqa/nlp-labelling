@@ -49,6 +49,7 @@ class Text extends React.Component{
     }
 
     render() {
+        console.log("Inside Text ", this.props, this.state);
         return (
             <div style={{ width: '100%' }}>
                 <Box 
@@ -64,7 +65,6 @@ class Text extends React.Component{
                             <Highlightable 
                                 ranges={this.state.currentTextSpans || []}
                                 entityColourMap={this.props.entityColourMap}
-                                entityId={0}
                                 id={"myuniqueid"}
                                 text={this.props.content.text}
                                 enabled={false}

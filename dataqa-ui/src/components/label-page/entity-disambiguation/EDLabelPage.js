@@ -57,11 +57,11 @@ const Message = (props) => {
 const MainArea = (props) => {
     const { classes } = props;
 
-    const entityColourMap = props.classNames.reduce(function(obj, itm) {
+    const entityColourMap = props.classNames? props.classNames.reduce(function(obj, itm) {
         obj[itm['id']] = itm['colour'];
 
         return obj;
-    }, {});
+    }, {}) : [];
 
     console.log("MainArea props", props, "entityColourMap", entityColourMap);
     
@@ -424,7 +424,7 @@ class EDLabelPage extends React.Component{
         }
     }
 
-    formatSuggestion = ( {name, id} ) => {
+    formatSuggestion = ( {name, id, colour} ) => {
         let displayedName = name.trim();
         if(name.length > 10){
             const spaceIndex = displayedName.indexOf(' ');
@@ -433,16 +433,15 @@ class EDLabelPage extends React.Component{
             }
             displayedName = displayedName.substring(0, 10).trim() + '...';
         }
-        return ( {name: displayedName, "label": id}
+        return ( {name: displayedName, "label": id, "colour": colour}
         )
     }
 
     getSuggestions = (suggestions, validatedLabel) => {
         const kbIds = suggestions.map((x) => x.label);
-        if(validatedLabel && (!kbIds.includes(validatedLabel))){
-            suggestions.concat(this.formatSuggestion(validatedLabel))
+        if(validatedLabel && validatedLabel.label && (!kbIds.includes(validatedLabel.label))){
+            suggestions = suggestions.concat(validatedLabel);
         }
-
         return suggestions;
     }
 

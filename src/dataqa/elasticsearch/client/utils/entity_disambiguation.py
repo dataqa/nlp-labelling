@@ -5,7 +5,7 @@ from dataqa.constants import SINGLE_ENTITY_DOCS_PAGE_SIZE
 from dataqa.elasticsearch.client.queries import top_docs_per_entity_query
 from dataqa.elasticsearch.client.utils.common import QueryResults
 
-KbSuggestion = namedtuple('KbSuggestion', ['name', 'id'])
+KbSuggestion = namedtuple('KbSuggestion', ['name', 'id', 'colour'])
 
 
 def get_kb(es_uri,
@@ -86,7 +86,7 @@ def get_suggestions(es_uri, kb_index_name, entities):
                 }
             },
             "size": 5,
-            "_source": ["name", "id"]
+            "_source": ["name", "id", "colour"]
         }
         response = requests.get(f"{es_uri}/{kb_index_name}/_search",
                                 headers={"Content-type": "application/json"},
@@ -94,7 +94,8 @@ def get_suggestions(es_uri, kb_index_name, entities):
         response_json = response.json()
         hits = response_json["hits"]["hits"]
         entity_suggestions = [KbSuggestion(name=x["_source"]["name"],
-                                           id=x["_source"]["id"]) for x in hits]
+                                           id=x["_source"]["id"],
+                                           colour=x["_source"]["colour"]) for x in hits]
         suggestions.append(entity_suggestions)
 
     return suggestions

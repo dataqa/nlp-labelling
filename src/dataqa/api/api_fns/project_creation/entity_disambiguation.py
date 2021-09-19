@@ -94,6 +94,7 @@ def turn_doc_row_into_es_row(row, mapping_columns):
 def turn_kb_row_into_es_row(row, mapping_columns):
     new_row = dict((value, row[key]) for key, value in mapping_columns.items())
     new_row["id"] = row["id"]
+    new_row["colour"] = row["colour"]
     return new_row
 
 
@@ -180,8 +181,11 @@ def upload_documents_file(session,
 
 def get_class_names_from_kbs(df):
     class_names = []
+    colours = []
     for (_, row), colour in zip(df.iterrows(), cycle(COLOURS)):
         class_names.append({"id": row["id"], "name": row["name"], "colour": colour})
+        colours.append(colour)
+    df["colour"] = colours
     return class_names
 
 

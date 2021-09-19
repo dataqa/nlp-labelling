@@ -113,7 +113,8 @@ MAPPING_KB = {
                          "type": "keyword"
                      }
                  }},
-        "id": {"type": "integer"}
+        "id": {"type": "integer"},
+        "colour": {"type": "keyword"}
     }
 }
 
