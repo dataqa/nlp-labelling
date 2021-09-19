@@ -17,7 +17,8 @@ def bulk_load_documents(es_uri, index_name, list_docs, start_doc_ind):
     for doc in list_docs:
         json_data.append(json.dumps({"index": {"_index": index_name,
                                                "_id": start_doc_ind + num_docs}}))
-        doc["id"] = start_doc_ind + num_docs
+        if "id" not in doc:
+            doc["id"] = start_doc_ind + num_docs
         json_data.append(json.dumps(doc))
         num_docs += 1
     request_body = "\n".join(json_data) + "\n"

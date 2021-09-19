@@ -1,4 +1,5 @@
 from collections import Counter
+from itertools import cycle
 import json
 import sys
 
@@ -7,12 +8,14 @@ from dataqa.api.api_fns.project_creation.common import (check_file,
                                                         sanitise_string,
                                                         index_df,
                                                         process_file)
-from dataqa.constants import (FILE_TYPE_DOCUMENTS,
+from dataqa.constants import (COLOURS,
+                              FILE_TYPE_DOCUMENTS,
                               FILE_TYPE_KB,
                               INPUT_FILE_SPECS,
                               MENTIONS_COLUMN_NAME,
                               TEXT_COLUMN_NAME,
                               MAPPINGS)
+import dataqa.db.models as models
 from dataqa.db.ops.common import get_project
 from dataqa.db.ops.entity_disambiguation import (add_ent_dis_project_to_db,
                                                  add_ent_mapping_to_db,
@@ -54,6 +57,7 @@ def create_entity_disambiguation_project(session,
     else:
         index_name = f"{project_name_index}_kb_{index_suffix}"
 
+    class_names = None
     try:
         if file_type == FILE_TYPE_DOCUMENTS:
             upload_documents_file(session,
@@ -65,19 +69,19 @@ def create_entity_disambiguation_project(session,
                                   project_type,
                                   column_specs)
         else:
-            upload_kb_file(project,
-                           es_uri,
-                           file,
-                           file_bytes.filename,
-                           index_name,
-                           project_type,
-                           column_specs)
+            class_names = upload_kb_file(project,
+                                         es_uri,
+                                         file,
+                                         file_bytes.filename,
+                                         index_name,
+                                         project_type,
+                                         column_specs)
     except Exception:
         delete_index(es_uri, index_name)
         delete_ent_mapping(session, project_id)
         raise Exception("Error during upload")
 
-    return project_id
+    return project_id, class_names
 
 
 def turn_doc_row_into_es_row(row, mapping_columns):
@@ -89,6 +93,8 @@ def turn_doc_row_into_es_row(row, mapping_columns):
 
 def turn_kb_row_into_es_row(row, mapping_columns):
     new_row = dict((value, row[key]) for key, value in mapping_columns.items())
+    new_row["id"] = row["id"]
+    new_row["colour"] = row["colour"]
     return new_row
 
 
@@ -173,6 +179,16 @@ def upload_documents_file(session,
     add_ent_mapping_to_db(session, project.id, token_dict)
 
 
+def get_class_names_from_kbs(df):
+    class_names = []
+    colours = []
+    for (_, row), colour in zip(df.iterrows(), cycle(COLOURS)):
+        class_names.append({"id": row["id"], "name": row["name"], "colour": colour})
+        colours.append(colour)
+    df["colour"] = colours
+    return class_names
+
+
 def upload_kb_file(project,
                    es_uri,
                    file,
@@ -187,6 +203,9 @@ def upload_kb_file(project,
         delete_index(es_uri, project.kb_index_name)
 
     df = process_file(file, column_specs)
+    df["id"] = df.index
+    class_names = get_class_names_from_kbs(df)
+
     upload_file(es_uri,
                 index_name,
                 df,
@@ -196,3 +215,13 @@ def upload_kb_file(project,
     project.total_bases = len(df)
     project.kb_index_name = index_name
     project.kb_filename = filename
+
+    all_class_names = []
+    for model_class in class_names:
+        all_class_names.append(models.EntityDisambiguationKB(name=model_class["name"],
+                                                             project_id=project.id,
+                                                             id=model_class["id"],
+                                                             colour=model_class["colour"]))
+    project.kbs = all_class_names
+
+    return class_names

@@ -5,6 +5,7 @@ import { Autocomplete } from '@material-ui/lab';
 import { withStyles } from '@material-ui/core/styles';
 
 import $ from 'jquery';
+import _ from 'lodash';
 
 
 const styles = theme => ({
@@ -19,9 +20,30 @@ const styles = theme => ({
 class KbSearch extends React.Component {
 
   state = {
-    initialOptions: [{ "name": "hello" }, { "name": "bye" }],
     options: [],
-    inputValue: ''
+    inputValue: '',
+    value: null
+  }
+
+  componentDidMount = () => {
+    this.onInputChange({}, '', 'input');
+  }
+
+  componentDidUpdate = (prevProps, prevState) => {
+    const prevDisplayedKbs = new Set(prevProps.displayedKbs.map((x, ind) => x.label));
+    const newDisplayedKbs = new Set(this.props.displayedKbs.map((x, ind) => x.label));
+    if(!_.isEqual(prevDisplayedKbs, newDisplayedKbs)){
+      this.onInputChange({}, '', 'input');
+    }
+  }
+
+  removeDisplayedKbsfromOptions = (displayedKbs, options) => {
+    const kbIds = displayedKbs.map((x) => x.label);
+
+    // need to filter out the kbs that are already displayed
+    const displayedOptions = options.filter(x => !kbIds.includes(x.id))
+
+    return displayedOptions;
   }
 
   onInputChange = (event, inputValue, reason) => {
@@ -39,7 +61,10 @@ class KbSearch extends React.Component {
         },
         success: function (data) {
           const options = $.parseJSON(data);
-          this.setState({ options });
+          const displayedOptions = this.removeDisplayedKbsfromOptions(this.props.displayedKbs,
+            options);
+
+          this.setState({ options: displayedOptions });
         }.bind(this),
         error: function (error) {
           console.log("Error in call to server")
@@ -51,7 +76,14 @@ class KbSearch extends React.Component {
   addSuggestion = (event, input, reason) => {
     if(reason == "select-option"){
       this.props.addSuggestion(input);
-      this.setState( {inputValue: ''});
+      const displayedOptions = this.state.options.filter(x => x.id != input.id);
+
+      this.setState( {inputValue: '',
+                      selectedValue: null,
+                      options: displayedOptions});
+    }
+    if(reason == 'clear'){
+        this.setState( {inputValue: ''} );
     }
   }
 
@@ -75,6 +107,7 @@ class KbSearch extends React.Component {
         autoSelect={true}
         inputValue={this.state.inputValue}
         disableClearable={true}
+        value={this.state.value}
       />
     )
   };

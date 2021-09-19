@@ -8,7 +8,7 @@ import { withStyles } from '@material-ui/core/styles';
 import uuid from 'react-uuid';
 import { PROJECT_TYPES, FILE_TYPE_DOCUMENTS, FILE_TYPE_KB } from '../constants';
 import { getSlug } from '../../utils';
-
+import { renameKeysToCamelCase } from '../utils';
 
 const UPLOAD_PARAMS = {
     totalAttempts: 16,
@@ -180,7 +180,7 @@ class FileUploadMain extends React.Component{
             timeout: 60000,
             success : function(data) {
                 var today = new Date();
-                const jsonData = JSON.parse(data);
+                const jsonData = renameKeysToCamelCase(JSON.parse(data));
                 console.log("jsonData", jsonData);
                 const projectId = jsonData.id;
                 if(!projectId){
@@ -200,7 +200,13 @@ class FileUploadMain extends React.Component{
                     console.log("File loaded successfully", today.toLocaleString());
                     this.props.addProjectToList(this.state.projectName,
                                                 projectId);
-                    this.updateStateAfterSuccessfulLoading(fileType, selectedFile.name);                    
+
+                    this.updateStateAfterSuccessfulLoading(fileType, selectedFile.name);   
+
+                    if(fileType==FILE_TYPE_KB){
+                        console.log("jsonData.classNames", jsonData.classNames);
+                        this.props.setClassNames(jsonData.classNames); 
+                    }                
                 }
             }.bind(this),
             error: function (xmlhttprequest, textstatus, message) {

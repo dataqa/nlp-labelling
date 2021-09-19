@@ -62,6 +62,7 @@ class LabelNavigation extends React.Component {
                     <KbSearch
                         projectName={this.props.projectName}
                         addSuggestion={this.addSuggestion}
+                        displayedKbs={this.state.kbSuggestions}
                     />
                 </Item>
             </Container>

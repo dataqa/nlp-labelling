@@ -188,11 +188,21 @@ export default class Highlightable extends Component {
       }
       // const RangeText = letterGroup.map((node) => node.props.children).join('');
 
+      // if range does not have entityId (ED), then assign default color
+      let color, variant;
+      if(!range.entityId){
+        color = colors["grey"][100];
+        variant='outlined';
+      }else{
+        color = colors[this.props.entityColourMap[range.entityId]][200];
+      }
+
       newText.push(<Chip 
                       key={`chip-${textCharIndex}`} 
-                      style={{backgroundColor: colors[this.props.entityColourMap[range.entityId]][200]}}
+                      style={{backgroundColor: color}}
                       label={letterGroup} 
                       onDelete={this.props.onDeleteRange? () => this.props.onDeleteRange(range) : undefined}
+                      variant={variant}
                     />);
     }
 

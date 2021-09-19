@@ -86,7 +86,11 @@ def get_project_list(db):
                                      "project_upload_finished": project.kb_index_name is not None
                                                                 and project.index_name is not None,
                                      "filenames": {FILE_TYPE_DOCUMENTS: project.filename,
-                                                   FILE_TYPE_KB: project.kb_filename}})
+                                                   FILE_TYPE_KB: project.kb_filename},
+                                     "class_names": [{"id": class_name.id,
+                                                      "name": class_name.name,
+                                                      "colour": class_name.colour}
+                                                     for class_name in project.kbs]})
     return all_projects
 
 

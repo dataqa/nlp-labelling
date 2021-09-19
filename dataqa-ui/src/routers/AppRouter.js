@@ -73,6 +73,8 @@ export default class AppRouter extends React.Component {
             const classNames = localStorage.getItem('classNames');
             const projectUploadFinished = localStorage.getItem('projectUploadFinished');
 
+            console.log("Just mounted AppRouter,", projectName, projectType, classNames);
+
             const filenames = localStorage.getItem('filenames');
 
             if (projectName){
@@ -238,6 +240,7 @@ export default class AppRouter extends React.Component {
                                             addProjectToList={this.addProjectToList}
                                             setProjectUploadFinished={this.setProjectUploadFinished}
                                             setFilename={this.setFilename}
+                                            setClassNames={this.setClassNames}
                                             filesUploaded={this.state.filenames}/>} 
                             exact={true}
                         />
