@@ -4,7 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "build": "webpack && cp public/bundle.js ../labelling-app-back-end/src/labelling_app/api/static/",
+    "build": "webpack && cp public/bundle.js ../src/dataqa/api/static/",
     "dev-server": "webpack-dev-server"
   },
   "dependencies": {
