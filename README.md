@@ -44,13 +44,15 @@ Use rules & heuristics to automatically label your documents:
 
 To install the package from pypi:
 
-### Python versions 3.6, 3.7
+### Python versions 3.6, 3.7, 3.8
 
 * `pip install dataqa`
 
-### Python versions 3.8, 3.9
+### Python version 3.9
 
-* When using python 3.8 or 3.9, need to run `pip install networkx==2.5` after installing dataqa (ignore error message complaining about snorkel's dependencies). This is due to an error in snorkel's dependencies.
+* `pip install dataqa --use-deprecated=legacy-resolver`
+
+* This is due to an error in snorkel's dependencies, which uses a low version of the `networkx` package incompatible with python 3.9 ([issue in github](https://github.com/snorkel-team/snorkel/issues/1667)). The latest dependency resolver shipped with pip throws an error when a package has incompatible requirements (read more [here](https://pip.pypa.io/en/latest/user_guide/#changes-to-the-pip-dependency-resolver-in-20-3-2020)).
 
 # Usage
 
