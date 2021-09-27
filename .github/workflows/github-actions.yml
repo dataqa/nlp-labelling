@@ -2,19 +2,19 @@ name: GitHub Actions Demo
 on: [push]
 jobs:
   Explore-GitHub-Actions:
-    runs-on: ubuntu-18.04
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-18.04, ubuntu-20.04, macos-11, macos-10.15]
+        python-version: [ '3.6' ]
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
         with:
-          python-version: '3.6.9' # Version range or exact version of a Python version to use, using SemVer's version range syntax
+          python-version: ${{ matrix.python-version }}
           architecture: 'x64' # optional x64 or x86. Defaults to x64 if not specified
       - run: python --version
       - run: pip --version
-      - run: which pip
-      - run: pip install --upgrade pip==9.0.3
-      - run: pip --version
-      - run: which pip
       - run: pip install dataqa-es==0.0.3
 #      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
 #      - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
