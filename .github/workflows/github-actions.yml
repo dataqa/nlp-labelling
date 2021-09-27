@@ -5,7 +5,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-18.04, ubuntu-20.04, macos-11, macos-10.15]
+#        os: [ubuntu-18.04, ubuntu-20.04, macos-11, macos-10.15]
+        os: [ubuntu-18.04]
         python-version: [ '3.6' ]
     steps:
       - uses: actions/checkout@v2
@@ -45,5 +46,5 @@ jobs:
       - run: pip install dist/dataqa-1.0.6-py3-none-any.whl
       - run: pip show dataqa
       - run: ls /opt/hostedtoolcache/Python/3.6.15/x64/lib/python3.6/site-packages/dataqa/nlp/
-      - run: wget https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-2.3.1/en_core_web_sm-2.3.1.tar.gz -O /opt/hostedtoolcache/Python/3.6.15/x64/lib/python3.6/site-packages/dataqa/nlp/
+      - run: wget https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-2.3.1/en_core_web_sm-2.3.1.tar.gz -O /opt/hostedtoolcache/Python/3.6.15/x64/lib/python3.6/site-packages/dataqa/nlp/en_core_web_sm-2.3.1.tar.gz
       - run: dataqa test
