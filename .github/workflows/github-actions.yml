@@ -1,8 +1,9 @@
 name: GitHub Actions Demo
 on: [push]
 env:
-  languageModelPath: https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-2.3.1/en_core_web_sm-2.3.1.tar.gz
-  packageVersion: $(python setup.py --version)
+  SPACY_LANGUAGE_MODEL_NAME: en_core_web_sm-2.3.1
+  SPACY_LANGUAGE_MODEL_URL: https://github.com/explosion/spacy-models/releases/download/${{ env.SPACY_LANGUAGE_MODEL_NAME }}/${{ env.SPACY_LANGUAGE_MODEL_NAME }}.tar.gz
+  PACKAGE_VERSION: $(python setup.py --version)
 jobs:
   Run-tests:
     runs-on: ${{ matrix.os }}
@@ -46,10 +47,10 @@ jobs:
       - run: pip --version
       - run: pip install wheel
       - run: python setup.py bdist_wheel
-      - run: pip install dist/dataqa-${{ env.packageVersion }}-py3-none-any.whl
+      - run: pip install dist/dataqa-${{ env.PACKAGE_VERSION }}-py3-none-any.whl
       - run: pip show dataqa
       - run: |
           SITE_PACKAGES=$(python -c 'import site; print(site.getsitepackages()[0])')
           ls ${SITE_PACKAGES}/dataqa/nlp/
-          wget ${{ env.languageModelPath }} -O ${SITE_PACKAGES}/dataqa/nlp/en_core_web_sm-2.3.1.tar.gz
+          wget ${{ env.SPACY_LANGUAGE_MODEL_URL }} -O ${SITE_PACKAGES}/dataqa/nlp/en_core_web_sm-2.3.1.tar.gz
       - run: dataqa test
