@@ -7,7 +7,7 @@ jobs:
       matrix:
 #        os: [ubuntu-18.04, ubuntu-20.04, macos-11, macos-10.15]
         os: [ubuntu-18.04]
-        python-version: [ '3.6' ]
+        python-version: [ '3.6', '3.7', '3.8', '3.9']
     steps:
       - uses: actions/checkout@v2
       - uses: kenchan0130/actions-system-info@master
@@ -48,5 +48,5 @@ jobs:
       - run: |
           SITE_PACKAGES=$(python -c 'import site; print(site.getsitepackages()[0])')
           ls ${SITE_PACKAGES}/dataqa/nlp/
-      - run: wget https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-2.3.1/en_core_web_sm-2.3.1.tar.gz -O /opt/hostedtoolcache/Python/3.6.15/x64/lib/python3.6/site-packages/dataqa/nlp/en_core_web_sm-2.3.1.tar.gz
+          wget https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-2.3.1/en_core_web_sm-2.3.1.tar.gz -O ${SITE_PACKAGES}/dataqa/nlp/en_core_web_sm-2.3.1.tar.gz
       - run: dataqa test
