@@ -46,7 +46,7 @@ jobs:
       - run: pip --version
       - run: pip install wheel
       - run: python setup.py bdist_wheel
-      - run: pip install dist/dataqa-${{ packageVersion }}-py3-none-any.whl
+      - run: pip install dist/dataqa-${{ env.packageVersion }}-py3-none-any.whl
       - run: pip show dataqa
       - run: |
           SITE_PACKAGES=$(python -c 'import site; print(site.getsitepackages()[0])')
