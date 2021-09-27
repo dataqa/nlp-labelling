@@ -9,6 +9,8 @@ jobs:
         python-version: [ '3.6' ]
     steps:
       - uses: actions/checkout@v2
+      - uses: kenchan0130/actions-system-info@master
+        id: system-info
       - uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
