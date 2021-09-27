@@ -45,6 +45,8 @@ jobs:
       - run: python setup.py bdist_wheel
       - run: pip install dist/dataqa-1.0.6-py3-none-any.whl
       - run: pip show dataqa
-      - run: ls /opt/hostedtoolcache/Python/3.6.15/x64/lib/python3.6/site-packages/dataqa/nlp/
+      - run: |
+          SITE_PACKAGES=$(python -c 'import site; print(site.getsitepackages()[0])')
+          ls ${SITE_PACKAGES}/dataqa/nlp/
       - run: wget https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-2.3.1/en_core_web_sm-2.3.1.tar.gz -O /opt/hostedtoolcache/Python/3.6.15/x64/lib/python3.6/site-packages/dataqa/nlp/en_core_web_sm-2.3.1.tar.gz
       - run: dataqa test
