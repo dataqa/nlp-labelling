@@ -48,7 +48,7 @@ jobs:
       - run: pip install wheel
       - run: python setup.py bdist_wheel
       - run: |
-          if [${{ matrix.python-version }} == 3.9]
+          if [ ${{ matrix.python-version }} == '3.9' ];
           then
             pip install dist/dataqa-${{ env.PACKAGE_VERSION }}-py3-none-any.whl --use-deprecated=legacy-resolver
           else
