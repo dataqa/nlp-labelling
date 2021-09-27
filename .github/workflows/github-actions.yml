@@ -40,6 +40,7 @@ jobs:
           fi
       - run: python --version
       - run: pip --version
+      - run: pip install wheel
       - run: python setup.py bdist_wheel
       - run: pip install dist/dataqa-1.0.6-py3-none-any.whl
       - run: dataqa test
