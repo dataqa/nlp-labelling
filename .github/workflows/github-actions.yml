@@ -10,6 +10,7 @@ jobs:
           python-version: '3.6.9' # Version range or exact version of a Python version to use, using SemVer's version range syntax
           architecture: 'x64' # optional x64 or x86. Defaults to x64 if not specified
       - run: python --version
+      - run: pip install dataqa==1.0.6
 #      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
 #      - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
 #      - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
