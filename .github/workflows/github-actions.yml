@@ -1,16 +1,16 @@
 name: GitHub Actions Demo
 on: [push]
+env:
+  languageModelPath: https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-2.3.1/en_core_web_sm-2.3.1.tar.gz
+  packageVersion: 1.0.6
 jobs:
-  Explore-GitHub-Actions:
+  Run-tests:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
 #        os: [ubuntu-18.04, ubuntu-20.04, macos-11, macos-10.15]
         os: [ubuntu-18.04]
         python-version: [ '3.6']
-    env:
-      languageModelPath: https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-2.3.1/en_core_web_sm-2.3.1.tar.gz
-      packageVersion: 1.0.6
     steps:
       - uses: actions/checkout@v2
       - uses: kenchan0130/actions-system-info@master
