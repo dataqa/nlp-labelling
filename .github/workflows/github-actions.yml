@@ -2,7 +2,7 @@ name: GitHub Actions Demo
 on: [push]
 env:
   languageModelPath: https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-2.3.1/en_core_web_sm-2.3.1.tar.gz
-  packageVersion: 1.0.6
+  packageVersion: $(python setup.py --version)
 jobs:
   Run-tests:
     runs-on: ${{ matrix.os }}
