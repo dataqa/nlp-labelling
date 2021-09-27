@@ -11,7 +11,7 @@ jobs:
       matrix:
 #        os: [ubuntu-18.04, ubuntu-20.04, macos-11, macos-10.15]
         os: [ubuntu-18.04]
-        python-version: [ '3.6']
+        python-version: [ '3.6', '3.9']
     steps:
       - uses: actions/checkout@v2
       - uses: kenchan0130/actions-system-info@master
@@ -47,7 +47,13 @@ jobs:
       - run: pip --version
       - run: pip install wheel
       - run: python setup.py bdist_wheel
-      - run: pip install dist/dataqa-${{ env.PACKAGE_VERSION }}-py3-none-any.whl
+      - run: |
+          if [${{ matrix.python-version }} == '3.9']
+          then
+            pip install dist/dataqa-${{ env.PACKAGE_VERSION }}-py3-none-any.whl --use-deprecated=legacy-resolver
+          else
+            pip install dist/dataqa-${{ env.PACKAGE_VERSION }}-py3-none-any.whl
+          fi
       - run: pip show dataqa
       - run: |
           SITE_PACKAGES=$(python -c 'import site; print(site.getsitepackages()[0])')
