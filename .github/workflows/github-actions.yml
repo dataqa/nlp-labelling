@@ -13,9 +13,33 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
           architecture: 'x64' # optional x64 or x86. Defaults to x64 if not specified
+      - name: Check outputs
+        run: |
+          OUTPUTS=(
+            "CPU Core: ${{ steps.system-info.outputs.cpu-core }}"
+            "CPU Model: ${{ steps.system-info.outputs.cpu-model }}"
+            "Hostname: ${{ steps.system-info.outputs.hostname }}"
+            "Kernel release: ${{ steps.system-info.outputs.kernel-release }}"
+            "Name: ${{ steps.system-info.outputs.name }}"
+            "Platform: ${{ steps.system-info.outputs.platform }}"
+            "Release: ${{ steps.system-info.outputs.release }}"
+            "Total memory bytes: ${{ steps.system-info.outputs.totalmem }}"
+          )
+          IS_EMPTY_OUTOUT=false
+          for OUTPUT in "${OUTPUTS[@]}";do
+            echo "${OUTPUT}"
+            OUT=$(echo ${OUTPUT} | cut -d ':' -f2- | xargs)
+            if [[ -z "${OUT}" ]];then
+              IS_EMPTY_OUTOUT=true
+            fi
+          done
+          if "$IS_EMPTY_OUTOUT";then
+            exit 1
+          fi
       - run: python --version
       - run: pip --version
-      - run: pip install dataqa-es==0.0.3
+      - run: pip install dataqa==latest
+      - run: dataqa test
 #      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
 #      - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
 #      - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
