@@ -4,8 +4,8 @@
 </div>
 
 <div align="center">
-    ![PyPI](https://img.shields.io/pypi/v/dataqa)
-    ![GitHub](https://img.shields.io/github/license/dataqa/dataqa)
+    <img src="https://img.shields.io/pypi/pyversions/dataqa"/>
+    <img src="https://img.shields.io/github/license/dataqa/dataqa?color=success"/>
 </div>
 
 With DataQA, you can label unstructured text documents using rule-based distant supervision. You can use it to:
