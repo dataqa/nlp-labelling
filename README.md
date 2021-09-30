@@ -1,4 +1,4 @@
-<p align="center">
+<p align="center" padding-left="10px">
     <img src="dataqa-ui/public/images/protractor.png?raw=true" width="200" height="200">
 </p>
 
