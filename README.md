@@ -1,6 +1,8 @@
 <div align="center">
-    <h1 align="center">DataQA</h1>
-    <img src="dataqa-ui/public/images/protractor.png?raw=true" width="200" height="200"/>
+    <div style="display: flex;">
+        <img src="dataqa-ui/public/images/protractor.png?raw=true" width="200" height="200"/>
+        <h1 align="center">DataQA</h1>
+    </div>
 <div>
 
 With DataQA, you can label unstructured text documents using rule-based distant supervision. You can use it to:
