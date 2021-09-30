@@ -21,23 +21,11 @@ Documentation at: [https://dataqa.ai/docs/](https://dataqa.ai/docs/).
 
 ![Alt Text](github_images/constrained_labelling_2.gif)
 
-Classify or extract named entities from your text:
+![Alt Text](github_images/search.gif)
 
-<p align="center">
-    <img src="github_images/labelling_entity_selected.png?raw=true" width="900"/>
-</p>
+![Alt Text](github_images/rule_creation.gif)
 
-
-Search and label your data:
-<p align="center">
-    <img src="github_images/search_label.png?raw=true" width="900"/>
-</p>
-
-
-Use rules & heuristics to automatically label your documents:
-<p align="center">
-    <img src="github_images/books_rule.png?raw=true" width="500"/>
-</p>
+![Alt Text](github_images/ner_rule.gif)
 
 # Installation
 
