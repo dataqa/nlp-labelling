@@ -6,6 +6,7 @@
 <div align="center">
     <img src="https://img.shields.io/github/license/dataqa/dataqa?color=success"/>
     <img src="https://img.shields.io/pypi/v/dataqa.svg?label=PyPI&logo=PyPI&logoColor=white&color=success"/>
+    <img src="https://github.com/dataqa/dataqa/actions/workflows/github-actions/badge.svg"/>
 </div>
 
 With DataQA, you can label unstructured text documents using rule-based distant supervision. You can use it to:
