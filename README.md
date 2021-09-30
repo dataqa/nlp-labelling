@@ -23,6 +23,10 @@ Classify or extract named entities from your text:
 
 ![Alt Text](github_images/classification.gif)
 
+&nbsp;
+
+![Alt Text](github_images/ner_labelling.gif)
+
 Search and label your data:
 
 ![Alt Text](github_images/search.gif)
