@@ -21,7 +21,7 @@ Documentation at: [https://dataqa.ai/docs/](https://dataqa.ai/docs/).
 
 Classify or extract named entities from your text:
 
-![Alt Text](github_images/constrained_labelling_2.gif)
+![Alt Text](github_images/classification.gif)
 
 Search and label your data:
 
