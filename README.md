@@ -1,9 +1,3 @@
-<p align="center">
-    <img src="dataqa-ui/public/images/protractor.png?raw=true" width="200" height="200">
-</p>
-
-<h1 align="center">DataQA</h1>
-
 <div align="center">
     <table>
       <tr>
