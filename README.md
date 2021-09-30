@@ -9,6 +9,8 @@
     <img src="https://github.com/dataqa/dataqa/actions/workflows/github-actions.yml/badge.svg?&color=success"/>
 </div>
 
+&nbsp;
+
 With DataQA, you can label unstructured text documents using rule-based distant supervision. You can use it to:
 * manually label all documents,
 * use a search engine to explore your data and label at the same time,

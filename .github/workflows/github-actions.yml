@@ -1,4 +1,4 @@
-name: GitHub Actions Demo
+name: GitHub CI
 on: [pull_request]
 env:
   SPACY_LANGUAGE_MODEL_NAME: en_core_web_sm-2.3.1
