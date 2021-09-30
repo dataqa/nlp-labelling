@@ -7,8 +7,8 @@
 <p align="center">
     <table>
       <tr>
-        <td halign="centre"><h1 align="center">DataQA</h1></td>
-        <td halign="centre"><img src="dataqa-ui/public/images/protractor.png?raw=true" width="200" height="200"/></td>
+        <td halign="center"><h1 align="center">DataQA</h1></td>
+        <td halign="center"><img src="dataqa-ui/public/images/protractor.png?raw=true" width="200" height="200"/></td>
       </tr>
     </table>
 </p>
