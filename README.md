@@ -116,4 +116,7 @@ To create the wheel file:
 
 # Contact
 
-For any feedback, please contact us at contact@dataqa.ai.
+For any feedback, please contact us at contact@dataqa.ai. Also follow me on Twitter for more updates and content around ML and labelling.
+
+[1.1]: https://i.imgur.com/tXSoThF.png
+[1]: https://www.twitter.com/DataqaAi
