@@ -19,7 +19,7 @@ With DataQA, you can label unstructured text documents using rule-based distant 
 
 Documentation at: [https://dataqa.ai/docs/](https://dataqa.ai/docs/).
 
-## Screenshots
+![Alt Text](github_images/constrained_labelling_2.gif)
 
 Classify or extract named entities from your text:
 
