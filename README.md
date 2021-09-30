@@ -1,5 +1,5 @@
 <p align="center">
-    <img src="dataqa-ui/public/images/protractor.png?raw=true" width="300" height="300">
+    <img src="dataqa-ui/public/images/protractor.png?raw=true" width="150" height="150">
 </p>
 
 <h1 align="center">
