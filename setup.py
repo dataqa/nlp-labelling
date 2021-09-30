@@ -39,5 +39,11 @@ setuptools.setup(
     packages=setuptools.find_packages(where='src'),
     package_data={"dataqa": extra_files},
     entry_points={'console_scripts': 'dataqa=dataqa.entry_points.run_app:main'},
-    data_files=[('.', ["requirements.txt"])]
+    data_files=[('.', ["requirements.txt"])],
+    classifiers=[
+        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9"
+    ],
 )
