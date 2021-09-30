@@ -1,7 +1,10 @@
-# Welcome to the DataQA platform
 <p align="center">
     <img src="dataqa-ui/public/images/protractor.png?raw=true" width="300" height="300">
 </p>
+
+<h1 align="center">
+    DataQA
+</h1>
 
 With DataQA, you can label unstructured text documents using rule-based distant supervision. You can use it to:
 * manually label all documents,
