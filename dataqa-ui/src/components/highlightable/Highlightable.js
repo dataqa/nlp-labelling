@@ -190,7 +190,7 @@ export default class Highlightable extends Component {
 
       // if range does not have entityId (ED), then assign default color
       let color, variant;
-      if(!range.entityId){
+      if(typeof range.entityId === undefined){
         color = colors["grey"][100];
         variant='outlined';
       }else{

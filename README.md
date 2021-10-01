@@ -1,7 +1,15 @@
-# Welcome to the DataQA platform
-<p align="center">
-    <img src="dataqa-ui/public/images/protractor.png?raw=true" width="300" height="300">
-</p>
+<div align="center">
+    <img src="dataqa-ui/public/images/protractor.png?raw=true" width="200" height="200"/>
+    <h1 align="center">DataQA</h1>
+</div>
+
+<div align="center">
+    <img src="https://img.shields.io/github/license/dataqa/dataqa?color=success"/>
+    <img src="https://img.shields.io/pypi/v/dataqa.svg?label=PyPI&logo=PyPI&logoColor=white&color=success"/>
+    <img src="https://github.com/dataqa/dataqa/actions/workflows/github-actions.yml/badge.svg?&color=success"/>
+</div>
+
+&nbsp;
 
 With DataQA, you can label unstructured text documents using rule-based distant supervision. You can use it to:
 * manually label all documents,
@@ -11,25 +19,26 @@ With DataQA, you can label unstructured text documents using rule-based distant 
 
 Documentation at: [https://dataqa.ai/docs/](https://dataqa.ai/docs/).
 
-## Screenshots
-
 Classify or extract named entities from your text:
 
-<p align="center">
-    <img src="github_images/labelling_entity_selected.png?raw=true" width="900"/>
-</p>
+![Alt Text](github_images/classification.gif)
 
+&nbsp;
+
+![Alt Text](github_images/ner_labelling.gif)
 
 Search and label your data:
-<p align="center">
-    <img src="github_images/search_label.png?raw=true" width="900"/>
-</p>
 
+![Alt Text](github_images/search.gif)
 
 Use rules & heuristics to automatically label your documents:
-<p align="center">
-    <img src="github_images/books_rule.png?raw=true" width="500"/>
-</p>
+
+![Alt Text](github_images/rule_creation.gif)
+
+&nbsp;
+
+![Alt Text](github_images/ner_rule.gif)
+
 
 # Installation
 
@@ -108,4 +117,7 @@ To create the wheel file:
 
 # Contact
 
-For any feedback, please contact us at contact@dataqa.ai.
+For any feedback, please contact us at contact@dataqa.ai. Also follow me on [![alt text][1.1]][1] for more updates and content around ML and labelling.
+
+[1.1]: https://i.imgur.com/wWzX9uB.png 
+[1]: https://www.twitter.com/DataqaAi
