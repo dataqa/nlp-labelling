@@ -29,7 +29,7 @@ extra_files.extend(["api/static/bundle.js",
 
 setuptools.setup(
     name="dataqa",
-    version="1.0.6",
+    version="1.0.7",
     author="DataQA.AI",
     author_email="contact@dataqa.ai",
     description="Package to search and label documents",
