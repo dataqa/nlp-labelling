@@ -44,7 +44,8 @@ def main(no_browser=False, no_es=False, auto_reload_flask=False):
     application.config.from_mapping(config.items("DEFAULT"))
 
     application.run(debug=auto_reload_flask,
-                    port=flask_port)
+                    port=flask_port,
+                    host='0.0.0.0')
 
 
 if __name__ == "__main__":
