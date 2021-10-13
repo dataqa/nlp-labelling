@@ -64,6 +64,11 @@ To install the package from pypi:
 
 * This is due to an error in snorkel's dependencies, which uses a low version of the `networkx` package incompatible with python 3.9 ([issue in github](https://github.com/snorkel-team/snorkel/issues/1667)). The latest dependency resolver shipped with pip throws an error when a package has incompatible requirements (read more [here](https://pip.pypa.io/en/latest/user_guide/#changes-to-the-pip-dependency-resolver-in-20-3-2020)).
 
+### To run with Docker:
+* 
+* `docker build . -t dataqa`
+* `docker run -p 5000:5000 dataqa`
+
 ## Usage
 
 In the terminal, type `dataqa run`. Wait a few minutes initially, as it takes some minutes to start everything up.
