@@ -4,6 +4,7 @@
 </div>
 
 <div align="center">
+    <img src="https://img.shields.io/pypi/pyversions/dataqa"/>
     <img src="https://img.shields.io/github/license/dataqa/dataqa?color=success"/>
     <img src="https://img.shields.io/pypi/v/dataqa.svg?label=PyPI&logo=PyPI&logoColor=white&color=success"/>
     <img src="https://github.com/dataqa/dataqa/actions/workflows/github-actions.yml/badge.svg?&color=success"/>
