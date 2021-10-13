@@ -4,6 +4,7 @@
 </div>
 
 <div align="center">
+    <img src="https://img.shields.io/pypi/pyversions/dataqa"/>
     <img src="https://img.shields.io/github/license/dataqa/dataqa?color=success"/>
     <img src="https://img.shields.io/pypi/v/dataqa.svg?label=PyPI&logo=PyPI&logoColor=white&color=success"/>
     <img src="https://github.com/dataqa/dataqa/actions/workflows/github-actions.yml/badge.svg?&color=success"/>
@@ -63,6 +64,11 @@ To install the package from pypi:
 * `pip install dataqa --use-deprecated=legacy-resolver`
 
 * This is due to an error in snorkel's dependencies, which uses a low version of the `networkx` package incompatible with python 3.9 ([issue in github](https://github.com/snorkel-team/snorkel/issues/1667)). The latest dependency resolver shipped with pip throws an error when a package has incompatible requirements (read more [here](https://pip.pypa.io/en/latest/user_guide/#changes-to-the-pip-dependency-resolver-in-20-3-2020)).
+
+### To run with Docker:
+
+* `docker build . -t dataqa`
+* `docker run -p 5000:5000 dataqa`
 
 ## Usage
 
