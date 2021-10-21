@@ -10,7 +10,7 @@ import FileDownloadButton from '../common/FileDownloadButton';
 import ExportRulesButton from './ExportRulesButton';
 import uuid from 'react-uuid';
 import { renameKeysToCamelCase } from '../../utils';
-import { DeleteProjectButton } from '../common/DeleteProjectButton';
+import DeleteProjectButton from '../common/DeleteProjectButton';
 
 
 const RULE_UPDATE_PARAMS = {
