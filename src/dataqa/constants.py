@@ -105,7 +105,8 @@ MAPPING_MENTIONS = {
 
 MAPPING_KB = {
     "properties": {
-        ES_TEXT_FIELD_NAME: {"type": "text"},
+        ES_TEXT_FIELD_NAME: {"type": "text",
+                             "analyzer": "stem_analyzer"},
         "name": {"type": "text",
                  "analyzer": "stem_analyzer",
                  "fields": {
@@ -122,7 +123,7 @@ SETTINGS_KB = {
     "analysis": {
         "analyzer": {
             "stem_analyzer": {
-                "tokenizer": "whitespace",
+                "tokenizer": "standard", # tried whitespace and gave weird results
                 "filter": [
                     "lowercase",
                     "porter_stem"

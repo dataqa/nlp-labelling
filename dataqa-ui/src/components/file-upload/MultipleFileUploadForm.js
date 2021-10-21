@@ -6,6 +6,13 @@ import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
 import Grid from '@material-ui/core/Grid';
+
+import Radio from '@material-ui/core/Radio';
+import RadioGroup from '@material-ui/core/RadioGroup';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import FormControl from '@material-ui/core/FormControl';
+import FormLabel from '@material-ui/core/FormLabel';
+
 import { DOCS_KB_FILE_FORMAT, 
         DOCS_MENTIONS_FILE_FORMAT, 
         FILE_TYPE_DOCUMENTS, 
@@ -107,10 +114,10 @@ const UploadForm = (props) => {
 const TextWithMentionsUpload = (props) => {
     let Description;
     if(props.hasBeenUploaded){
-        Description = <Typography variant="body2">{`Successfully uploaded file with mentions ${props.filename}`}</Typography>
+        Description = <Typography variant="body1">{`Successfully uploaded file with mentions ${props.filename}`}</Typography>
     }
     else{
-        Description = <Typography variant="body2">File with text and entity mentions. Read more in the <a  href={DOCS_MENTIONS_FILE_FORMAT} target="_blank"> documentation</a>.
+        Description = <Typography variant="body1">File with text and entity mentions. Read more in the <a  href={DOCS_MENTIONS_FILE_FORMAT} target="_blank"> documentation</a>.
         </Typography>
     }
 
@@ -131,10 +138,10 @@ const TextWithMentionsUpload = (props) => {
 const KbUpload = (props) => {
     let Description;
     if(props.hasBeenUploaded){
-        Description = <Typography variant="body2">{`Successfully uploaded file with mentions ${props.filename}`}</Typography>
+        Description = <Typography variant="body1">{`Successfully uploaded file with mentions ${props.filename}`}</Typography>
     }
     else{
-        Description = <Typography variant="body2">File with knowledge bases. Read more in the <a  href={DOCS_KB_FILE_FORMAT} target="_blank"> documentation</a>.
+        Description = <Typography variant="body1">File with knowledge bases. Read more in the <a  href={DOCS_KB_FILE_FORMAT} target="_blank"> documentation</a>.
                             </Typography>
     }
 
@@ -149,6 +156,19 @@ const KbUpload = (props) => {
             target="_blank"
             onChange={(e) => {props.createProject(e, "kb")}}
         />
+    )
+}
+
+const RadioButtonGroup = () => {
+    return (
+
+        <FormControl component="fieldset">
+            <FormLabel component="legend">Matching type</FormLabel>
+            <RadioGroup aria-label="match-type" name="matching" value="same">
+                <FormControlLabel value="same" control={<Radio />} label="Mentions that are the same match the same knowledge base, e.g. if we see 'headache' twice, it will match the same base." />
+                <FormControlLabel value="unique" disabled control={<Radio />} label="Each mention is a different base, e.g. if we see 'John' twice, it will match different bases (coming soon)." />
+            </RadioGroup>
+        </FormControl>
     )
 }
 
@@ -168,7 +188,7 @@ const MultipleFileUploadForm = (props) => {
                     disableChangeProjectName={props.disableChangeProjectName}
                 />
 
-                <div style={{marginTop: 30}}>
+                <div style={{marginTop: 30, marginBottom: 30}}>
                     <TextWithMentionsUpload
                         createProject={props.createProject}
                         classes={classes}
@@ -187,6 +207,8 @@ const MultipleFileUploadForm = (props) => {
                         filename={filesUploaded[FILE_TYPE_KB] || ""}
                     />
                 </div>
+
+                <RadioButtonGroup/>
             </div>
         )
 }

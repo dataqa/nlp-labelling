@@ -45,6 +45,9 @@ class EntityDisambiguationProject(Project):
                        order_by="EntityDisambiguationKB.id",
                        cascade="all, delete, delete-orphan")
 
+    mapping = relationship("EntityDisambiguationMapping",
+                           cascade="all, delete, delete-orphan")
+
     __mapper_args__ = {
         'polymorphic_identity': 'entity_disambiguation'
     }

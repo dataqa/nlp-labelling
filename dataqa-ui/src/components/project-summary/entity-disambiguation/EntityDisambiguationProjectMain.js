@@ -13,16 +13,19 @@ import TouchAppIcon from '@material-ui/icons/TouchApp';
 import IconButton from '@material-ui/core/IconButton';
 import Tooltip from '@material-ui/core/Tooltip';
 import $ from 'jquery';
-import { Redirect } from 'react-router-dom';
-import { withRouter } from "react-router-dom";
 import { compose } from 'recompose'
+import FileDownloadButton from '../common/FileDownloadButton';
+import { Redirect } from 'react-router-dom';
+import DeleteProjectButton from '../common/DeleteProjectButton';
 
 
 const styles = theme => ({
     container: {display: 'flex'},
     main_content: {margin: '20px',
                     width: "100%"},
-    table: {fontSize: "1.2em"}
+    table: {fontSize: "1.2em"},
+    button: {marginTop: "20px",
+            marginLeft: "10px"}
   });
 
 
@@ -74,7 +77,8 @@ class EntityDisambiguationProjectMain extends React.Component{
     state = {
         projectData: {},
         goToMatchedEntities: false,
-        goToUnmatchedEntities: false
+        goToUnmatchedEntities: false,
+        toProjects: false
     }
 
     setGoToMatchedEntities = () => {
@@ -114,8 +118,29 @@ class EntityDisambiguationProjectMain extends React.Component{
         this.updateProject();
     }
 
+    deleteProject = (e) => {
+        console.log(`Delete project ${this.props.projectName}`);
+
+        $.ajax({
+            url : `/api/delete-project/${this.props.projectName}`,
+            type : 'DELETE',
+            success : function(data) {
+                // const json = $.parseJSON(data);
+                this.props.deleteProject(this.props.projectName);
+                this.setState({toProjects: true});
+            }.bind(this),
+            error: function (error) {
+                alert(error);
+            }
+        });
+    }
+
     render() {
         const { classes } = this.props;
+
+        if(this.state.toProjects){
+            return <Redirect to={{pathname: "/projects"}}/>
+        }
 
         return(
             <div className={classes.container}>
@@ -128,13 +153,18 @@ class EntityDisambiguationProjectMain extends React.Component{
                         setGoToUnmatchedEntities={this.setGoToUnmatchedEntities}
                         {...this.state.projectData}
                     />
+                    <FileDownloadButton 
+                        projectName={this.props.projectName}
+                        projectType={this.props.projectType}
+                    />
+                    <DeleteProjectButton 
+                        deleteProject={this.deleteProject}
+                        classes={classes}
+                    />
                 </div>
             </div>
         )
     }
 }
 
-export default compose(
-    withStyles(styles),
-    withRouter,
-  )(EntityDisambiguationProjectMain);
+export default withStyles(styles)(EntityDisambiguationProjectMain);
