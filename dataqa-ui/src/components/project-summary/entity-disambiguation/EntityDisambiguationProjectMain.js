@@ -17,7 +17,7 @@ import { compose } from 'recompose'
 import FileDownloadButton from '../common/FileDownloadButton';
 import { Redirect } from 'react-router-dom';
 import DeleteProjectButton from '../common/DeleteProjectButton';
-import { withRouter } from "react-router";
+import { withRouter } from "react-router-dom";
 
 
 const styles = theme => ({
