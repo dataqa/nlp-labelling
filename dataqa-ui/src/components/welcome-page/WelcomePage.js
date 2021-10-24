@@ -26,8 +26,8 @@ const projectTypes = [
     'explanation': 'I want to do text classification (e.g. sentiment analysis)'},
     {'type': 'ner',
     'explanation': 'I want to find mentions of an entity (e.g. drug names)'},
-    // {'type': 'entity_disambiguation',
-    // 'explanation': 'I want to disambiguate entities.'}
+    {'type': 'entity_disambiguation',
+    'explanation': 'I want to disambiguate entities.'}
 ];
 
 const Container = (props) => {

@@ -60,6 +60,19 @@ class FileDownloadButton extends React.Component{
         });
     }
 
+    selectButtonLabel(projectType){
+        switch(projectType) {
+            case PROJECT_TYPES.classification:
+                return 'Download labels';
+            case PROJECT_TYPES.ner:
+                return 'Download spans';
+            case PROJECT_TYPES.entity_disambiguation:
+                return 'Download labels';
+            default:
+                return 'Download labels'
+          }
+    }
+
     render() {
         const { classes } = this.props;
 
@@ -71,8 +84,7 @@ class FileDownloadButton extends React.Component{
                     onClick={(e) => {this.downloadLabels(this.props.projectName)}}
                     className={classes.button}
                 >
-                    {this.props.projectType == PROJECT_TYPES.classification? 
-                    'Download labels': 'Download spans'}
+                    {this.selectButtonLabel(this.props.projectType)}
                 </Button>)
         }
         else{

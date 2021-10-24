@@ -8,7 +8,8 @@ from flask import (current_app,
                    Blueprint)
 
 from dataqa.api.api_fns.delete_project.supervised import delete_project_files
-from dataqa.api.api_fns.export_results.supervised import export_labels
+from dataqa.api.api_fns.export_results import (supervised as supervised_export,
+                                               entity_disambiguation as ed_export)
 from dataqa.api.api_fns.project_creation.common import (check_upload_finished,
                                                         get_upload_key)
 
@@ -19,6 +20,7 @@ from dataqa.api.api_fns.label.entity_disambiguation import label_kb
 from dataqa.db.connection import DB
 from dataqa.constants import (ALL_PROJECT_TYPES,
                               PROJECT_TYPE_CLASSIFICATION,
+                              PROJECT_TYPE_ED,
                               PROJECT_TYPE_NER)
 from dataqa.db.ops.common import (get_project, get_project_list, session_scope)
 import dataqa.elasticsearch.client.utils.common as es
@@ -120,8 +122,11 @@ def delete_project(project_name):
         project = get_project(session, project_name)
         # delete index
         es.delete_index(es_uri, project.index_name)
+        if project.type == PROJECT_TYPE_ED:
+            es.delete_index(es_uri, project.kb_index_name)
         # delete files
-        delete_project_files(project)
+        if project.type in [PROJECT_TYPE_CLASSIFICATION, PROJECT_TYPE_NER]:
+            delete_project_files(project)
         # delete project in db
         session.delete(project)
 
@@ -157,7 +162,11 @@ def export_labels_api():
     with session_scope(db) as session:
         es_uri = es.get_es_uri(current_app.config)
         project = get_project(session, project_name)
-        data = export_labels(project, es_uri)
+
+        if project.type in [PROJECT_TYPE_CLASSIFICATION, PROJECT_TYPE_NER]:
+            data = supervised_export.export_labels(project, es_uri)
+        else:
+            data = ed_export.export_labels(project, session)
     return data.getvalue()
 
 

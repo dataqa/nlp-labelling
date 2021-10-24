@@ -1,15 +1,16 @@
 import React from 'react';
-import Button from '@material-ui/core/Button';;
+;
 import { Redirect } from 'react-router-dom';
 import $ from 'jquery';
 import SideBar from '../../SideBar';
 import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import ProjectDataDrawers from './ProjectDataDrawers';
-import FileDownloadButton from './FileDownloadButton';
+import FileDownloadButton from '../common/FileDownloadButton';
 import ExportRulesButton from './ExportRulesButton';
 import uuid from 'react-uuid';
 import { renameKeysToCamelCase } from '../../utils';
+import DeleteProjectButton from '../common/DeleteProjectButton';
 
 
 const RULE_UPDATE_PARAMS = {
@@ -33,19 +34,6 @@ const styles = theme => ({
                 justifyContent: 'center', 
                 height: '100%'}
   });
-
-const DeleteProjectButton = (props) => {
-    return (
-        <Button 
-            variant="contained" 
-            color="primary"
-            onClick={props.deleteProject}
-            className={props.classes.button}
-        >
-        Delete project
-        </Button>
-    )
-}
 
 class SupervisedProjectMain extends React.Component{
     constructor(props) {

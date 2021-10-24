@@ -12,6 +12,7 @@ import queryString from 'query-string';
 
 
 const PAGESIZE = 10;
+const TRUNCATED_BUTTON_TEXT = 100;
 
 
 const styles = theme => ({
@@ -426,12 +427,12 @@ class EDLabelPage extends React.Component{
 
     formatSuggestion = ( {name, id, colour} ) => {
         let displayedName = name.trim();
-        if(name.length > 10){
+        if(name.length > TRUNCATED_BUTTON_TEXT){
             const spaceIndex = displayedName.indexOf(' ');
-            if((spaceIndex > 3) & (spaceIndex<10)){
+            if((spaceIndex > 3) & (spaceIndex < TRUNCATED_BUTTON_TEXT)){
                 displayedName = displayedName.substring(0, spaceIndex) + '...';
             }
-            displayedName = displayedName.substring(0, 10).trim() + '...';
+            displayedName = displayedName.substring(0, TRUNCATED_BUTTON_TEXT).trim() + '...';
         }
         return ( {name: displayedName, "label": id, "colour": colour}
         )
