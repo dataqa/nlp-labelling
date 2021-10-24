@@ -116,13 +116,13 @@ def upload_file(es_uri,
         raise
 
 
-def add_entity_ids(df, max_id):
+def add_entity_ids(df):
     df["mentions"] = df["mentions"].apply(json.loads)
 
     count_tokens = Counter()
     token_ids = Counter()
     total_mentions = 0
-    entity_id = max_id + 1
+    entity_id =  1
     for mentions in df["mentions"]:
         total_mentions += len(mentions)
         for mention in mentions:
@@ -159,8 +159,8 @@ def upload_documents_file(session,
     df = process_file(file, column_specs)
 
     # get the normalised_text, normalised_id
-    max_id = get_top_entity_id(session, project.id)
-    df, token_dict = add_entity_ids(df, max_id)
+    # max_id = get_top_entity_id(session, project.id)
+    df, token_dict = add_entity_ids(df)
 
     upload_file(es_uri,
                 index_name,

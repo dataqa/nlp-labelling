@@ -17,6 +17,7 @@ import { compose } from 'recompose'
 import FileDownloadButton from '../common/FileDownloadButton';
 import { Redirect } from 'react-router-dom';
 import DeleteProjectButton from '../common/DeleteProjectButton';
+import { withRouter } from "react-router";
 
 
 const styles = theme => ({
@@ -167,4 +168,7 @@ class EntityDisambiguationProjectMain extends React.Component{
     }
 }
 
-export default withStyles(styles)(EntityDisambiguationProjectMain);
+export default compose(
+    withStyles(styles),
+    withRouter,
+  )(EntityDisambiguationProjectMain);
