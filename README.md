@@ -18,6 +18,11 @@ With DataQA, you can label unstructured text documents using rule-based distant 
 * you can label documents that have an imbalanced class distribution by upsampling your minority classes,
 * and much more!
 
+Currently these are the main projects supported:
+* multiclass classification,
+* named entity recognition,
+* named entity disambiguation.
+
 In addition to this, DataQA ships with a search engine that you can use the explore and label your data at the same time.
 
 #### Classify or extract named entities from your text
@@ -26,6 +31,12 @@ In addition to this, DataQA ships with a search engine that you can use the expl
     <img src="github_images/classification.gif" width="800" align="center"/>
     <p>&nbsp;</p>
     <img src="github_images/ner_labelling.gif" width="800" align="center"/>
+</div>
+
+#### Link entities to knowledge bases in large ontologies
+
+<div align="center">
+    <img src="github_images/ned.gif" width="800" align="center"/>
 </div>
 
 #### Search and label your data
