@@ -1,11 +1,10 @@
 import React from 'react';
-import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
-import CircularProgress from '@material-ui/core/CircularProgress';
 import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
 import Grid from '@material-ui/core/Grid';
+import { UploadFileButton } from './UploadFileButton';
 
 import Radio from '@material-ui/core/Radio';
 import RadioGroup from '@material-ui/core/RadioGroup';
@@ -43,30 +42,6 @@ const Container = (props) => {
 const Item = props => {
     return(<Grid item 
                     {...props}/>)
-}
-
-
-const UploadFileButton = (props) => {
-    if(!props.loading){
-        return (
-            <Button 
-                variant="contained" 
-                color="primary" 
-                component="label"
-                htmlFor={props.htmlFor}
-                className={props.className}
-                disabled={props.disableLoading}
-            >
-                {props.text}
-            </Button> 
-        )
-    }else{
-        return (
-            <CircularProgress 
-                className={props.className}
-            />
-        )
-    }
 }
 
 const ProjectNameTextField = (props) => {
@@ -193,7 +168,7 @@ const MultipleFileUploadForm = (props) => {
                         createProject={props.createProject}
                         classes={classes}
                         loading={props.loading[FILE_TYPE_DOCUMENTS]}
-                        disableLoading={props.loading[FILE_TYPE_KB]}
+                        disableLoading={props.loading[FILE_TYPE_KB] || !props.projectName}
                         hasBeenUploaded={!!filesUploaded[FILE_TYPE_DOCUMENTS]}
                         filename={filesUploaded[FILE_TYPE_DOCUMENTS] || ""}
                     />
@@ -202,7 +177,7 @@ const MultipleFileUploadForm = (props) => {
                         createProject={props.createProject}
                         classes={classes}
                         loading={props.loading[FILE_TYPE_KB]}
-                        disableLoading={props.loading[FILE_TYPE_DOCUMENTS]}
+                        disableLoading={props.loading[FILE_TYPE_DOCUMENTS] || !props.projectName}
                         hasBeenUploaded={!!filesUploaded[FILE_TYPE_KB]}
                         filename={filesUploaded[FILE_TYPE_KB] || ""}
                     />

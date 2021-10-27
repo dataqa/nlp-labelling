@@ -235,6 +235,7 @@ export default class AppRouter extends React.Component {
                         <Route 
                             path="/upload" 
                             render={() => <FileUploadMain
+                                            existingProjectSlugs={this.state.projects.map((x) => x.projectNameSlug)}
                                             projectName={this.state.projectName}
                                             projectType={this.state.projectType}
                                             addProjectToList={this.addProjectToList}

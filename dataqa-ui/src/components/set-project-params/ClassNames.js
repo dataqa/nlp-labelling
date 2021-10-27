@@ -3,10 +3,10 @@ import $ from 'jquery';
 import { Redirect } from 'react-router-dom';
 import { withStyles } from '@material-ui/core/styles';
 import SideBar from '../SideBar';
-import Box from '@material-ui/core/Box';
-import Typography from '@material-ui/core/Typography';
-import Container from '@material-ui/core/Container';
-import { UploadFileButton } from '../file-upload/SingleFileUploadForm';
+import SingleFileUploadForm from '../file-upload/SingleFileUploadForm';
+import { DEFAULT_CLASS_NAME_COLUMN } from  '../constants';
+import Papa from 'papaparse';
+import _ from 'lodash';
 
 
 const styles = theme => ({
@@ -17,14 +17,15 @@ class ClassNames extends React.Component{
 
     state = {
         toRules: false,
-        loading: false
+        loading: false,
+        selectedInputColumn: undefined, 
+        candidateInputColumnNames: undefined,
+        fileUploaded: undefined
     };
 
-    submitClassNames = (event) => {
-        event.preventDefault();
-
+    submitClassNames = (selectedFile, columnName) => {
+        
         console.log('Inside submitClassNames');
-        const selectedFile = event.target.files[0];
 
         if(!selectedFile){
             alert("Need to select file!");
@@ -36,6 +37,7 @@ class ClassNames extends React.Component{
 
         const data = new FormData();
         data.append('project_name', this.props.projectName);
+        data.append('column_name', columnName);
         data.append('file', selectedFile);
 
         $.ajax({
@@ -50,7 +52,8 @@ class ClassNames extends React.Component{
                 if(jsonData){
                     console.log("Classes set correctly to: ", jsonData);
 
-                    this.setState( {toRules: true} );
+                    this.setState( {loading: false,
+                                    fileUploaded: selectedFile.name} );
                     this.props.setProjectParams(jsonData);
                 }
             }.bind(this),
@@ -64,6 +67,45 @@ class ClassNames extends React.Component{
         
     }
 
+    updateCandidateInputColumnNames = (candidateInputColumnNames) => {
+        this.setState({ candidateInputColumnNames });
+    }
+
+    updateSelectedInputColumn = (selectedInputColumn) => {
+        this.setState({ selectedInputColumn });
+    }
+
+    validateColumnsAndUpload = (selectedFile, columns) => {
+        console.log("Inside validateColumnsAndUpload", DEFAULT_CLASS_NAME_COLUMN,
+        columns, _.includes(columns, DEFAULT_CLASS_NAME_COLUMN))
+        if(_.includes(columns, DEFAULT_CLASS_NAME_COLUMN)){
+            this.submitClassNames(selectedFile, DEFAULT_CLASS_NAME_COLUMN);
+        }else{
+            this.updateCandidateInputColumnNames(columns);
+        }
+    }
+
+    uploadFile = (selectedFile) => {
+        console.log("Inside uploadFile", this.props);
+
+        const selectedColumn = this.state.selectedInputColumn;
+        if(typeof selectedColumn === 'undefined'){
+            var results = Papa.parse(selectedFile, 
+                {header: true,
+                preview: 1,
+                complete: function(results) {
+                        this.validateColumnsAndUpload(selectedFile, results.meta.fields);
+                    }.bind(this)
+                });
+        }else{
+            this.submitClassNames(selectedFile, this.state.candidateInputColumnNames[selectedColumn]);
+        }
+    }
+
+    setToNextPage = () => {
+        this.setState({toRules: true});
+    }
+
     render() {
         const { classes } = this.props;
 
@@ -74,7 +116,20 @@ class ClassNames extends React.Component{
         return (
             <div className={classes.container}>
                 <SideBar/>
-                <Container>
+
+                <SingleFileUploadForm 
+                    defaultColumnName={DEFAULT_CLASS_NAME_COLUMN}
+                    createProject={this.uploadFile}
+                    projectName={this.props.projectName}
+                    loading={this.state.loading}
+                    candidateInputColumnNames={this.state.candidateInputColumnNames}
+                    updateSelectedInputColumn={this.updateSelectedInputColumn}
+                    selectedInputColumn={this.state.selectedInputColumn}
+                    fileUploaded={this.state.fileUploaded}
+                    setToNextPage={this.setToNextPage}
+                />
+
+                {/* <Container>
                     <Box my={2}>
                         <Typography variant="h6">Upload a csv file with the class names.</Typography>
                     </Box>
@@ -92,7 +147,7 @@ class ClassNames extends React.Component{
                             className={classes.button}
                         />
                     </form>
-                </Container>
+                </Container> */}
             </div>
         )
     }
