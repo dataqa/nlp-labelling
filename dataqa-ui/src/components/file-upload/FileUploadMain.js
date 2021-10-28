@@ -6,7 +6,13 @@ import { Redirect } from 'react-router-dom';
 import SideBar from '../SideBar';
 import { withStyles } from '@material-ui/core/styles';
 import uuid from 'react-uuid';
-import { PROJECT_TYPES, FILE_TYPE_DOCUMENTS, FILE_TYPE_KB, DEFAULT_TEXT_COLUMN } from '../constants';
+import { PROJECT_TYPES, 
+        FILE_TYPE_DOCUMENTS, 
+        FILE_TYPE_KB, 
+        DEFAULT_TEXT_COLUMN,
+        DEFAULT_MENTIONS_COLUMNS,
+        DEFAULT_KB_COLUMNS,
+        DOCS_TEXT_FILE_FORMAT} from '../constants';
 import { getSlug } from '../../utils';
 import { renameKeysToCamelCase } from '../utils';
 import Papa from 'papaparse';
@@ -18,7 +24,11 @@ const UPLOAD_PARAMS = {
 }
 
 const styles = theme => ({
-    container: {display: 'flex'}
+    container: {display: 'flex'},
+    root: {
+        maxWidth: 'sm',
+        paddingLeft: 16
+    }
   });
 
 
@@ -38,19 +48,23 @@ const FileUploadForm = (props) => {
                 updateSelectedInputColumns={props.updateSelectedInputColumns}
                 selectedInputColumns={props.selectedInputColumns}
                 setToNextPage={props.setToNextPage}
+                uploadFinished={props.uploadFinished}
             />
         )
     }else{
         return (
             <SingleFileUploadForm 
-                defaultColumnName={DEFAULT_TEXT_COLUMN}
+                rootClassName={props.classes.root}
+                id={"contained-button-file"}
+                instructionText={"Load a csv file with the documents."}
+                helpText={<p>No column {DEFAULT_TEXT_COLUMN} found in file. Read more in the <a  href={DOCS_TEXT_FILE_FORMAT} target="_blank"> documentation</a>. Please select columns:</p>}
                 createProject={props.createProject}
                 setProjectName={props.setProjectName}
                 projectName={props.projectName}
                 loading={props.loading[FILE_TYPE_DOCUMENTS]}
                 candidateInputColumnNames={props.candidateInputColumnNames[FILE_TYPE_DOCUMENTS]}
-                updateSelectedInputColumn={(columnName) => props.updateSelectedInputColumns(FILE_TYPE_DOCUMENTS, columnName)}
-                selectedInputColumn={props.selectedInputColumns[FILE_TYPE_DOCUMENTS]}
+                updateSelectedInputColumns={(columnIndex, columnType) => props.updateSelectedInputColumns(FILE_TYPE_DOCUMENTS, columnIndex, columnType)}
+                selectedInputColumns={props.selectedInputColumns[FILE_TYPE_DOCUMENTS]}
                 fileUploaded={props.filesUploaded[FILE_TYPE_DOCUMENTS]}
                 setToNextPage={props.setToNextPage}
             />
@@ -91,14 +105,23 @@ const initialiseSelectedColumns = (projectType) => {
     var columnNames = {};
     switch(projectType){
         case PROJECT_TYPES.classification: 
-            columnNames[FILE_TYPE_DOCUMENTS] = undefined;
+            columnNames[FILE_TYPE_DOCUMENTS] = {};
+            columnNames[FILE_TYPE_DOCUMENTS][DEFAULT_TEXT_COLUMN] = undefined;
             return columnNames;
         case PROJECT_TYPES.ner:
-            columnNames[FILE_TYPE_DOCUMENTS] = undefined;
+            columnNames[FILE_TYPE_DOCUMENTS] = {};
+            columnNames[FILE_TYPE_DOCUMENTS][DEFAULT_TEXT_COLUMN] = undefined;
             return columnNames;
         default:
-            columnNames[FILE_TYPE_DOCUMENTS] = undefined;
-            columnNames[FILE_TYPE_KB] = undefined;
+            columnNames[FILE_TYPE_DOCUMENTS] = {};
+            for(const val in DEFAULT_MENTIONS_COLUMNS){
+                columnNames[FILE_TYPE_DOCUMENTS][DEFAULT_MENTIONS_COLUMNS[val]] = undefined;
+            }
+
+            columnNames[FILE_TYPE_KB] = {};
+            for(const val in DEFAULT_KB_COLUMNS){
+                columnNames[FILE_TYPE_KB][DEFAULT_KB_COLUMNS[val]] = undefined;
+            }
             return columnNames;
     }
 
@@ -129,8 +152,16 @@ const initialiseNextPage = (projectType, projectName) => {
     if(projectType == PROJECT_TYPES.classification || projectType == PROJECT_TYPES.ner){
         return"/select";
     }else{
+        const projectNameSlug = getSlug(projectName);
         return `/projects/${projectNameSlug}`;
     }
+}
+
+const hasUploadFinished = (totalFilesToUpload, filesUploaded) => {
+    if(Object.keys(filesUploaded).length == totalFilesToUpload){
+        return true;
+    }
+    return false;
 }
 
 
@@ -139,29 +170,44 @@ class FileUploadMain extends React.Component{
     constructor(props) {
         console.log("Constructing FileUploadMain", props);
         super(props);
+
+        const totalFilesToUpload = getTotalFilesToUpload(props.projectType);
+
         this.state = {
             projectName: (props.projectName || ""),
             loading: initialiseLoading(props.projectType),
             toNextPage: false,
             nextPage: initialiseNextPage(props.projectType, props.projectName),
-            totalFilesToUpload: getTotalFilesToUpload(props.projectType),
+            totalFilesToUpload: totalFilesToUpload,
             disableChangeProjectName: !!props.projectName,
             selectedInputColumns: initialiseSelectedColumns(props.projectType),
             candidateInputColumnNames: initialiseCandidateColumnNames(props.projectType),
+            uploadFinished: hasUploadFinished(totalFilesToUpload, this.props.filesUploaded)
         }
     }
 
     componentDidUpdate(prevProps, prevState) {
         if(prevProps.projectName != this.props.projectName){
-            this.setState( {projectName: this.props.projectName} );
+            this.setState( {
+                projectName: this.props.projectName,
+                disableChangeProjectName: !!this.props.projectName
+            } );
         }
         if(prevProps.projectType != this.props.projectType){
+
+            const totalFilesToUpload = getTotalFilesToUpload(this.props.projectType);
+
             this.setState( {
                 loading: initialiseLoading(this.props.projectType),
                 selectedInputColumns: initialiseSelectedColumns(this.props.projectType),
                 candidateInputColumnNames: initialiseCandidateColumnNames(this.props.projectType),
-                totalFilesToUpload: getTotalFilesToUpload(this.props.projectType),
-                nextPage: initialiseNextPage(this.props.projectType, this.props.projectName)} );
+                totalFilesToUpload: totalFilesToUpload,
+                nextPage: initialiseNextPage(this.props.projectType, this.props.projectName),
+                uploadFinished: hasUploadFinished(totalFilesToUpload, this.props.filesUploaded)} );
+        }
+
+        if(prevProps.filesUploaded.length != this.props.filesUploaded.length){
+            this.setState( {uploadFinished: hasUploadFinished(this.state.totalFilesToUpload, this.props.filesUploaded)} );
         }
     }
 
@@ -182,7 +228,7 @@ class FileUploadMain extends React.Component{
 
         if(this.props.projectType == PROJECT_TYPES.classification || this.props.projectType == PROJECT_TYPES.ner){
             this.setState( {projectName,
-                                nextPage: "/select"} );
+                            nextPage: "/select"} );
         }else{
             this.setState( {projectName,
                             nextPage: `/projects/${projectNameSlug}`} );
@@ -208,10 +254,10 @@ class FileUploadMain extends React.Component{
         })
     }
 
-    updateSelectedInputColumns = (fileType, columnIndex) => {
+    updateSelectedInputColumns = (fileType, columnIndex, columnType='text') => {
         this.setState((prevState) => {
             const selectedInputColumns = {...prevState.selectedInputColumns};
-            selectedInputColumns[fileType] = columnIndex;
+            selectedInputColumns[fileType][columnType] = columnIndex;
             return { selectedInputColumns };
         })
     }
@@ -234,7 +280,8 @@ class FileUploadMain extends React.Component{
                 const loading = {...prevState.loading};
                 loading[fileType] = false;
 
-                return {loading};
+                return {loading,
+                        uploadFinished: true};
             }else{
                 const loading = {...prevState.loading};
                 loading[fileType] = false;
@@ -333,12 +380,15 @@ class FileUploadMain extends React.Component{
     }
 
 
-    validateColumnsAndUpload = (selectedFile, fileType, columns) => {
-        console.log("Inside validateColumnsAndUpload", DEFAULT_TEXT_COLUMN,
-        columns, _.includes(columns, DEFAULT_TEXT_COLUMN))
-        if(_.includes(columns, DEFAULT_TEXT_COLUMN)){
+    validateColumnsAndUpload = (selectedFile, fileType, defaultColumnNames, columns) => {
+        const allColumnsIncluded = defaultColumnNames.every((val) => _.includes(columns, val));
+
+        console.log("Inside validateColumnsAndUpload", defaultColumnNames,
+        columns, allColumnsIncluded);
+
+        if(allColumnsIncluded){
             this.loadFile(selectedFile, 
-                          DEFAULT_TEXT_COLUMN,
+                          defaultColumnNames,
                           fileType, 
                           uuid(), 
                           0, 
@@ -352,40 +402,71 @@ class FileUploadMain extends React.Component{
         this.setState({toNextPage: true});
     }
 
-    createProject = (selectedFile, fileType="documents") => {
+    formatselectedColumns = (selectedColumnIndices) => {
+        const selectedColumnNames = {};
 
-        console.log("Inside createProject", this.props);
+        for (const columnType in selectedColumnIndices) {
+            selectedColumnNames[columnType] = this.state.candidateInputColumnNames[selectedColumnIndices[columnType]];
+          }
 
-        const validation = this.validateProjectSlug(getSlug(this.state.projectName));
+        return selectedColumnNames
+    }
 
-        if(!validation.isValid){
-            alert(validation.errorMsg);
-            return null;
+    hasAnyColumnBeenSelected = (fileType) => {
+        for(const colType in this.state.selectedInputColumns[fileType]){
+            if(typeof this.state.selectedInputColumns[fileType][colType] !== 'undefined'){
+                return true
+            }
+        } 
+        return false;
+    }
+
+    createProject = (selectedFile, 
+                    fileType="documents", 
+                    defaultColumnNames=[DEFAULT_TEXT_COLUMN]) => {
+
+        console.log("Inside createProject", this.props, this.validateProjectSlug(getSlug(this.state.projectName)));
+
+        if(!this.props.filesUploaded){
+            const validation = this.validateProjectSlug(getSlug(this.state.projectName));
+
+            if(!validation.isValid){
+                alert(validation.errorMsg);
+                return false;
+            }
         }
 
         if(!selectedFile){
             alert("Need to select file!");
+            return false;
         }
+
         if(!this.props.projectType){
             alert("Need to select project type!");
+            return false;
+        }
+
+        if(!this.hasAnyColumnBeenSelected(fileType)){
+            var results = Papa.parse(selectedFile, 
+                {header: true,
+                preview: 1,
+                complete: function(results) {
+                        this.validateColumnsAndUpload(selectedFile, 
+                                                        fileType,
+                                                        defaultColumnNames,
+                                                        results.meta.fields);
+                    }.bind(this)
+                });
+            return true;
         }else{
-            const selectedColumn = this.state.selectedInputColumns[fileType];
-            if(typeof selectedColumn === 'undefined'){
-                var results = Papa.parse(selectedFile, 
-                    {header: true,
-                    preview: 1,
-                    complete: function(results) {
-                            this.validateColumnsAndUpload(selectedFile, fileType, results.meta.fields);
-                        }.bind(this)
-                    });
-            }else{
-                this.loadFile(selectedFile, 
-                                this.state.candidateInputColumnNames[selectedColumn],
-                                fileType, 
-                                uuid(), 
-                                0, 
-                                false);
-            }
+            const selectedColumns = this.state.selectedInputColumns[fileType];
+            this.loadFile(selectedFile, 
+                            this.formatselectedColumns(selectedColumns),
+                            fileType, 
+                            uuid(), 
+                            0, 
+                            false);
+            return true;
         }
     }
 
@@ -401,6 +482,7 @@ class FileUploadMain extends React.Component{
                 <div className={classes.container}>
                     <SideBar/>
                     <FileUploadForm 
+                        classes={classes}
                         projectType={this.props.projectType}
                         selectFile={this.selectFile}
                         createProject={this.createProject}
@@ -413,6 +495,7 @@ class FileUploadMain extends React.Component{
                         selectedInputColumns={this.state.selectedInputColumns}
                         updateSelectedInputColumns={this.updateSelectedInputColumns}
                         setToNextPage={this.setToNextPage}
+                        uploadFinished={this.state.uploadFinished}
                     />
                 </div>
             )

@@ -4,21 +4,29 @@ import { Redirect } from 'react-router-dom';
 import { withStyles } from '@material-ui/core/styles';
 import SideBar from '../SideBar';
 import SingleFileUploadForm from '../file-upload/SingleFileUploadForm';
-import { DEFAULT_CLASS_NAME_COLUMN } from  '../constants';
+import { DEFAULT_CLASS_NAME_COLUMN, DOCS_CLASSNAME_FILE_FORMAT } from  '../constants';
 import Papa from 'papaparse';
 import _ from 'lodash';
 
 
 const styles = theme => ({
-    container: {display: 'flex'}
+    container: {display: 'flex'},
+    top_container: {marginLeft: 10}
   });
+
+
+  const initialiseSelectedColumns = () => {
+    var columnNames = {};
+    columnNames[DEFAULT_CLASS_NAME_COLUMN] = undefined;
+    return columnNames;
+}
 
 class ClassNames extends React.Component{
 
     state = {
         toRules: false,
         loading: false,
-        selectedInputColumn: undefined, 
+        selectedInputColumns: initialiseSelectedColumns(), 
         candidateInputColumnNames: undefined,
         fileUploaded: undefined
     };
@@ -71,8 +79,12 @@ class ClassNames extends React.Component{
         this.setState({ candidateInputColumnNames });
     }
 
-    updateSelectedInputColumn = (selectedInputColumn) => {
-        this.setState({ selectedInputColumn });
+    updateSelectedInputColumns = (columnIndex) => {
+        this.setState((prevState) => {
+            const selectedInputColumns = {...prevState.selectedInputColumns};
+            selectedInputColumns[DEFAULT_CLASS_NAME_COLUMN] = columnIndex;
+            return { selectedInputColumns };
+        })
     }
 
     validateColumnsAndUpload = (selectedFile, columns) => {
@@ -85,10 +97,10 @@ class ClassNames extends React.Component{
         }
     }
 
-    uploadFile = (selectedFile) => {
-        console.log("Inside uploadFile", this.props);
+    uploadClassNamesFile = (selectedFile) => {
+        console.log("Inside uploadClassNamesFile", this.props);
 
-        const selectedColumn = this.state.selectedInputColumn;
+        const selectedColumn = this.state.selectedInputColumns[DEFAULT_CLASS_NAME_COLUMN];
         if(typeof selectedColumn === 'undefined'){
             var results = Papa.parse(selectedFile, 
                 {header: true,
@@ -118,36 +130,20 @@ class ClassNames extends React.Component{
                 <SideBar/>
 
                 <SingleFileUploadForm 
+                    id={"contained-button-file"}
+                    helpText={<p>No column "{DEFAULT_CLASS_NAME_COLUMN}" found in file. Read more in the <a  href={DOCS_CLASSNAME_FILE_FORMAT} target="_blank"> documentation</a>. Please select columns:</p>}
+                    rootClassName={classes.top_container}
+                    instructionText={"Load a csv file with the class names."}
                     defaultColumnName={DEFAULT_CLASS_NAME_COLUMN}
-                    createProject={this.uploadFile}
+                    createProject={this.uploadClassNamesFile}
                     projectName={this.props.projectName}
                     loading={this.state.loading}
                     candidateInputColumnNames={this.state.candidateInputColumnNames}
-                    updateSelectedInputColumn={this.updateSelectedInputColumn}
-                    selectedInputColumn={this.state.selectedInputColumn}
+                    updateSelectedInputColumns={this.updateSelectedInputColumns}
+                    selectedInputColumns={this.state.selectedInputColumns}
                     fileUploaded={this.state.fileUploaded}
                     setToNextPage={this.setToNextPage}
                 />
-
-                {/* <Container>
-                    <Box my={2}>
-                        <Typography variant="h6">Upload a csv file with the class names.</Typography>
-                    </Box>
-                    <form encType="multipart/form-data;" acceptCharset="utf-8">
-                        <input
-                            accept=".csv"
-                            style={{ display: 'none' }}
-                            id="contained-button-file"
-                            type="file"
-                            onChange={this.submitClassNames}
-                        />
-                        <UploadFileButton 
-                            htmlFor="contained-button-file"
-                            loading={this.state.loading}
-                            className={classes.button}
-                        />
-                    </form>
-                </Container> */}
             </div>
         )
     }

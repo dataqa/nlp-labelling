@@ -3,6 +3,7 @@ import Button from '@material-ui/core/Button';
 import CircularProgress from '@material-ui/core/CircularProgress';
 
 export const UploadFileButton = (props) => {
+    console.log("Inside UploadFileButton", props);
     if(!props.loading){
         return (
             <Button 
