@@ -5,10 +5,12 @@ import NotFoundPage from '../components/NotFoundPage';
 
 
 class ProjectStartPage extends React.Component {
-    // console.log("Inside ProjectStartPage", this.props);
+    
     constructor(props){
         super(props);
         this.props.setAllProjectVars(this.props.uri);
+
+        console.log("Inside ProjectStartPage", this.props);
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -22,7 +24,6 @@ class ProjectStartPage extends React.Component {
 
         if(this.props.projectUploadFinished){
             return <ProjectMain
-                        projectUploadFinished={this.props.projectUploadFinished}
                         projectName={this.props.projectName}
                         projectNameSlug={this.props.projectNameSlug}
                         projectType={this.props.projectType}
@@ -38,7 +39,7 @@ class ProjectStartPage extends React.Component {
                         setProjectUploadFinished={this.props.setProjectUploadFinished}
                         setFilename={this.props.setFilename}
                         filesUploaded={this.props.filenames}
-                        setProjectUploadFinished={this.props.setProjectUploadFinished}
+                        setClassNames={this.props.setClassNames}
                     />
         }
     }

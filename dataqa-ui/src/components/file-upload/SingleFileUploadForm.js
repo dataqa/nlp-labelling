@@ -80,7 +80,7 @@ const NextButton = (props) => {
             variant="contained" 
             color="primary" 
             component="label"
-            onClick={props.setToNextPage}
+            onClick={() => {props.setProjectUploadFinished(); props.setToNextPage()}}
             className={props.className}
         >
             {"Next"}
@@ -92,13 +92,14 @@ const SuccessfulUpload = (props) => {
     if(!!props.setToNextPage){
         return (
             <ColumnContainer className={props.classes.container}>
-                <Item xs={6}>
+                <Item style={{marginRight: 10}}>
                     <Alert severity="success">Successfully uploaded file {props.fileUploaded}.</Alert>
                 </Item>   
 
                 <Item>
                     <NextButton 
                         setToNextPage={props.setToNextPage}
+                        setProjectUploadFinished={props.setProjectUploadFinished}
                         className={props.classes.nextButton}
                     />
                 </Item>   
@@ -113,12 +114,13 @@ const SuccessfulUpload = (props) => {
 
 const FormButton = (props) => {
     console.log("Inside FormButton", props);
-    if(typeof props.fileUploaded !== 'undefined'){
+    if(props.fileUploaded){
         return (
             <SuccessfulUpload
                 classes={props.classes}
                 fileUploaded={props.fileUploaded}
                 setToNextPage={props.setToNextPage}
+                setProjectUploadFinished={props.setProjectUploadFinished}
             /> 
         )   
             
@@ -204,7 +206,7 @@ class SingleFileUploadForm extends React.Component{
         if(selectedFile){
             this.setState( {selectedFile } );
         }
-        const flag = this.props.createProject(selectedFile);
+        const flag = this.props.createProject(selectedFile, this.props.defaultColumnNames);
         console.log("flag is ", flag, flag && this.props.setSelectedFile);
 
         if(flag && this.props.setSelectedFile){
@@ -267,6 +269,7 @@ class SingleFileUploadForm extends React.Component{
                         selectedInputColumns={this.props.selectedInputColumns}
                         uploadFile={() => this.uploadFile(this.state.selectedFile)}
                         uploadButtonText={this.props.uploadButtonText}
+                        setProjectUploadFinished={this.props.setProjectUploadFinished}
                     />
                 </form>
             </ColumnContainer>

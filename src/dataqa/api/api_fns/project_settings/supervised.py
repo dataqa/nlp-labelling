@@ -20,24 +20,25 @@ def add_class_colours(class_names):
         class_item['colour'] = class_colour
 
 
-def get_class_names(file_bytes):
+def get_class_names(file_bytes, column_name):
     file = get_decoded_stream(file_bytes)
     check_file_size(file)
     check_num_columns(file)
 
     class_names = []
-    reader = csv.reader(file)
+    reader = csv.DictReader(file)
     for line_ind, line in enumerate(reader):
-        if len(line) == 0:
+        class_name = line[column_name]
+        if len(class_name) == 0:
             raise Exception(f"There is an empty class name on line {line_ind + 1}.")
-        class_names.append({"id": line_ind, "name": line[0]})
+        class_names.append({"id": line_ind, "name": class_name})
 
     add_class_colours(class_names)
     return class_names
 
 
-def set_class_names(project, file_bytes, es_uri):
-    class_names = get_class_names(file_bytes)
+def set_class_names(project, file_bytes, es_uri, column_name):
+    class_names = get_class_names(file_bytes, column_name)
     add_class_names(project, class_names)
     if project.supervised_type == "classification" and project.has_ground_truth_labels:
         class_mapping = dict((x["name"], x["id"]) for x in class_names)

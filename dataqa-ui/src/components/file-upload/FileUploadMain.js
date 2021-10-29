@@ -48,7 +48,7 @@ const FileUploadForm = (props) => {
                 updateSelectedInputColumns={props.updateSelectedInputColumns}
                 selectedInputColumns={props.selectedInputColumns}
                 setToNextPage={props.setToNextPage}
-                uploadFinished={props.uploadFinished}
+                setProjectUploadFinished={props.setProjectUploadFinished}
             />
         )
     }else{
@@ -59,6 +59,7 @@ const FileUploadForm = (props) => {
                 instructionText={"Load a csv file with the documents."}
                 helpText={<p>No column {DEFAULT_TEXT_COLUMN} found in file. Read more in the <a  href={DOCS_TEXT_FILE_FORMAT} target="_blank"> documentation</a>. Please select columns:</p>}
                 createProject={props.createProject}
+                defaultColumnNames={[DEFAULT_TEXT_COLUMN]}
                 setProjectName={props.setProjectName}
                 projectName={props.projectName}
                 loading={props.loading[FILE_TYPE_DOCUMENTS]}
@@ -67,6 +68,7 @@ const FileUploadForm = (props) => {
                 selectedInputColumns={props.selectedInputColumns[FILE_TYPE_DOCUMENTS]}
                 fileUploaded={props.filesUploaded[FILE_TYPE_DOCUMENTS]}
                 setToNextPage={props.setToNextPage}
+                setProjectUploadFinished={props.setProjectUploadFinished}
             />
         )
     }
@@ -157,14 +159,6 @@ const initialiseNextPage = (projectType, projectName) => {
     }
 }
 
-const hasUploadFinished = (totalFilesToUpload, filesUploaded) => {
-    if(Object.keys(filesUploaded).length == totalFilesToUpload){
-        return true;
-    }
-    return false;
-}
-
-
 class FileUploadMain extends React.Component{
 
     constructor(props) {
@@ -181,8 +175,7 @@ class FileUploadMain extends React.Component{
             totalFilesToUpload: totalFilesToUpload,
             disableChangeProjectName: !!props.projectName,
             selectedInputColumns: initialiseSelectedColumns(props.projectType),
-            candidateInputColumnNames: initialiseCandidateColumnNames(props.projectType),
-            uploadFinished: hasUploadFinished(totalFilesToUpload, this.props.filesUploaded)
+            candidateInputColumnNames: initialiseCandidateColumnNames(props.projectType)
         }
     }
 
@@ -202,12 +195,7 @@ class FileUploadMain extends React.Component{
                 selectedInputColumns: initialiseSelectedColumns(this.props.projectType),
                 candidateInputColumnNames: initialiseCandidateColumnNames(this.props.projectType),
                 totalFilesToUpload: totalFilesToUpload,
-                nextPage: initialiseNextPage(this.props.projectType, this.props.projectName),
-                uploadFinished: hasUploadFinished(totalFilesToUpload, this.props.filesUploaded)} );
-        }
-
-        if(prevProps.filesUploaded.length != this.props.filesUploaded.length){
-            this.setState( {uploadFinished: hasUploadFinished(this.state.totalFilesToUpload, this.props.filesUploaded)} );
+                nextPage: initialiseNextPage(this.props.projectType, this.props.projectName)} );
         }
     }
 
@@ -255,6 +243,8 @@ class FileUploadMain extends React.Component{
     }
 
     updateSelectedInputColumns = (fileType, columnIndex, columnType='text') => {
+        console.log("Inside updateSelectedInputColumns", fileType, columnIndex, columnType);
+
         this.setState((prevState) => {
             const selectedInputColumns = {...prevState.selectedInputColumns};
             selectedInputColumns[fileType][columnType] = columnIndex;
@@ -269,10 +259,6 @@ class FileUploadMain extends React.Component{
         console.log("Inside updateStateAfterSuccessfulLoading",
         Object.keys(filesUploaded).length, this.state.totalFilesToUpload);
 
-        if(Object.keys(filesUploaded).length == this.state.totalFilesToUpload){
-            this.props.setProjectUploadFinished();
-        }
-
         this.setState((prevState) => {
             console.log("Inside updateStateAfterSuccessfulLoading setState ",
             Object.keys(filesUploaded).length, prevState.totalFilesToUpload);
@@ -280,8 +266,7 @@ class FileUploadMain extends React.Component{
                 const loading = {...prevState.loading};
                 loading[fileType] = false;
 
-                return {loading,
-                        uploadFinished: true};
+                return {loading};
             }else{
                 const loading = {...prevState.loading};
                 loading[fileType] = false;
@@ -296,20 +281,20 @@ class FileUploadMain extends React.Component{
 
 
     loadFile = (selectedFile, 
-                columnName,
+                columnNames,
                 fileType,
                 uploadId, 
                 attemptNum, 
                 polling) => {
 
-        console.log("Inside loadFile", attemptNum, polling, selectedFile);
+        console.log("Inside loadFile", attemptNum, polling, selectedFile, columnNames);
         const data = new FormData();
         console.log('The name of the project is', this.state.projectName);
         data.append('file', selectedFile);
         data.append('project_name', this.state.projectName);
         data.append('project_type', this.props.projectType);
         data.append('file_type', fileType);
-        data.append('column_name', columnName);
+        data.append('column_names', JSON.stringify(columnNames));
         if(fileType==FILE_TYPE_KB){
             data.append('kb_upload_id', uploadId);
         }
@@ -317,7 +302,7 @@ class FileUploadMain extends React.Component{
             data.append('upload_id', uploadId);
         }
         data.append('polling', polling);
-        console.log('data', data);
+        console.log('data', ...data);
         
         $.ajax({
             url : '/api/upload',
@@ -381,20 +366,32 @@ class FileUploadMain extends React.Component{
 
 
     validateColumnsAndUpload = (selectedFile, fileType, defaultColumnNames, columns) => {
-        const allColumnsIncluded = defaultColumnNames.every((val) => _.includes(columns, val));
 
         console.log("Inside validateColumnsAndUpload", defaultColumnNames,
-        columns, allColumnsIncluded);
+        columns);
 
-        if(allColumnsIncluded){
+        const columnIndicesIncluded = defaultColumnNames.map((row, index) => _.includes(columns, row) && index).filter((val) => val !== false);
+
+        console.log("Inside validateColumnsAndUpload 2", columnIndicesIncluded);
+
+        if(columnIndicesIncluded.length == defaultColumnNames.length){
+            let defaultColumnNamesMapping={};
+            defaultColumnNames.forEach((key)=>{
+                defaultColumnNamesMapping[key]=key
+            }); 
+
             this.loadFile(selectedFile, 
-                          defaultColumnNames,
+                          defaultColumnNamesMapping,
                           fileType, 
                           uuid(), 
                           0, 
                           false);
         }else{
             this.updateCandidateInputColumnNames(fileType, columns);
+
+            for(const columnIndex in columnIndicesIncluded){
+                this.updateSelectedInputColumns(fileType, columnIndicesIncluded[columnIndex], defaultColumnNames[columnIndicesIncluded[columnIndex]]);
+            }
         }
     }
 
@@ -402,12 +399,14 @@ class FileUploadMain extends React.Component{
         this.setState({toNextPage: true});
     }
 
-    formatselectedColumns = (selectedColumnIndices) => {
+    formatselectedColumns = (selectedColumnIndices, candidateColumnNames) => {
         const selectedColumnNames = {};
+        
+        for (const [columnType, columnIndex] of Object.entries(selectedColumnIndices)) {
+            selectedColumnNames[columnType] = candidateColumnNames[columnIndex];
+        }
 
-        for (const columnType in selectedColumnIndices) {
-            selectedColumnNames[columnType] = this.state.candidateInputColumnNames[selectedColumnIndices[columnType]];
-          }
+        console.log("formatselectedColumns", selectedColumnNames);
 
         return selectedColumnNames
     }
@@ -422,12 +421,12 @@ class FileUploadMain extends React.Component{
     }
 
     createProject = (selectedFile, 
-                    fileType="documents", 
-                    defaultColumnNames=[DEFAULT_TEXT_COLUMN]) => {
+                    defaultColumnNames,
+                    fileType="documents") => {
 
-        console.log("Inside createProject", this.props, this.validateProjectSlug(getSlug(this.state.projectName)));
+        console.log("Inside createProject", defaultColumnNames, this.props, !this.props.filesUploaded, this.state.projectName, this.validateProjectSlug(getSlug(this.state.projectName)));
 
-        if(!this.props.filesUploaded){
+        if(Object.keys(this.props.filesUploaded).length === 0){
             const validation = this.validateProjectSlug(getSlug(this.state.projectName));
 
             if(!validation.isValid){
@@ -460,8 +459,9 @@ class FileUploadMain extends React.Component{
             return true;
         }else{
             const selectedColumns = this.state.selectedInputColumns[fileType];
+            const candidateColumnNames = this.state.candidateInputColumnNames[fileType];
             this.loadFile(selectedFile, 
-                            this.formatselectedColumns(selectedColumns),
+                            this.formatselectedColumns(selectedColumns, candidateColumnNames),
                             fileType, 
                             uuid(), 
                             0, 
@@ -495,7 +495,7 @@ class FileUploadMain extends React.Component{
                         selectedInputColumns={this.state.selectedInputColumns}
                         updateSelectedInputColumns={this.updateSelectedInputColumns}
                         setToNextPage={this.setToNextPage}
-                        uploadFinished={this.state.uploadFinished}
+                        setProjectUploadFinished={this.props.setProjectUploadFinished}
                     />
                 </div>
             )

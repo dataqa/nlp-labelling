@@ -145,7 +145,10 @@ export default class AppRouter extends React.Component {
             const projects = prevState.projects.concat({"projectId": projectId, 
                                                         "projectName": projectName,
                                                         "projectNameSlug": projectNameSlug,
-                                                        "projectType": prevState.projectType});
+                                                        "projectType": prevState.projectType,
+                                                        "projectUploadFinished": prevState.projectUploadFinished,
+                                                        "filenames": prevState.filenames
+                                                    });
             return {projects, projectName, projectNameSlug}});
     }
 
@@ -180,6 +183,8 @@ export default class AppRouter extends React.Component {
     }
 
     setFilename = (fileType, filename) => {
+        console.log("setting filename", fileType, filename);
+
         this.setState((prevState) => {
             const filenames = prevState.filenames;
             filenames[fileType] = filename;
@@ -249,9 +254,9 @@ export default class AppRouter extends React.Component {
                         <Route 
                             path="/select" 
                             render={() => <ProjectParamsPage
-                                                projectType={this.state.projectType}
                                                 projectName={this.state.projectName}
-                                                setProjectParams={this.setClassNames}/>}
+                                                setProjectParams={this.setClassNames}
+                                                setProjectUploadFinished={this.setProjectUploadFinished}/>}
                         />
                         
                         <Route 
@@ -309,6 +314,7 @@ export default class AppRouter extends React.Component {
                                             projectType={this.state.projectType}
                                             filenames={this.state.filenames}
                                             classNames={this.state.classNames}
+                                            setClassNames={this.setClassNames}
                                         />
                                     )
                                 }

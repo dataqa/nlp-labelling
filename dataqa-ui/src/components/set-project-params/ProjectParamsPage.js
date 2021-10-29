@@ -7,6 +7,7 @@ const ProjectParamsPage = (props) => {
         <ClassNames
             projectName={props.projectName}
             setProjectParams={props.setProjectParams}
+            setProjectUploadFinished={props.setProjectUploadFinished}
         />
     )
 }

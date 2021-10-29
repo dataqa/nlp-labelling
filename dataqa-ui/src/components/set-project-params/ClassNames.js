@@ -47,6 +47,7 @@ class ClassNames extends React.Component{
         data.append('project_name', this.props.projectName);
         data.append('column_name', columnName);
         data.append('file', selectedFile);
+        console.log('data', ...data);
 
         $.ajax({
             url : '/api/classnames',
@@ -134,7 +135,7 @@ class ClassNames extends React.Component{
                     helpText={<p>No column "{DEFAULT_CLASS_NAME_COLUMN}" found in file. Read more in the <a  href={DOCS_CLASSNAME_FILE_FORMAT} target="_blank"> documentation</a>. Please select columns:</p>}
                     rootClassName={classes.top_container}
                     instructionText={"Load a csv file with the class names."}
-                    defaultColumnName={DEFAULT_CLASS_NAME_COLUMN}
+                    defaultColumnNames={[DEFAULT_CLASS_NAME_COLUMN]}
                     createProject={this.uploadClassNamesFile}
                     projectName={this.props.projectName}
                     loading={this.state.loading}
@@ -143,6 +144,7 @@ class ClassNames extends React.Component{
                     selectedInputColumns={this.state.selectedInputColumns}
                     fileUploaded={this.state.fileUploaded}
                     setToNextPage={this.setToNextPage}
+                    setProjectUploadFinished={this.props.setProjectUploadFinished}
                 />
             </div>
         )
