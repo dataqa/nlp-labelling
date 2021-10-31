@@ -23,11 +23,14 @@ const styles = theme => ({
 
 const projectTypes = [
     {'type': 'classification', 
-    'explanation': 'I want to do text classification (e.g. sentiment analysis)'},
+    'explanation': 'I want to do text classification (e.g. sentiment analysis)',
+    'needParams': true},
     {'type': 'ner',
-    'explanation': 'I want to find mentions of an entity (e.g. drug names)'},
+    'explanation': 'I want to find mentions of an entity (e.g. drug names)',
+    'needParams': true},
     {'type': 'entity_disambiguation',
-    'explanation': 'I want to disambiguate entities.'}
+    'explanation': 'I want to disambiguate entities.',
+    'needParams': false}
 ];
 
 const Container = (props) => {
@@ -69,7 +72,7 @@ const ProjectTypeCards = (props) => {
                         <Link 
                             to={`/upload`}
                             style={{ textDecoration: 'none' }}
-                            onClick={() => {props.setProjectType(project.type)}}
+                            onClick={() => {props.setProjectType(project.type, !project.needParams)}}
                         >
                             <ProjectTypeCard 
                                 classes={classes}

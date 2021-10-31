@@ -41,6 +41,7 @@ export default class AppRouter extends React.Component {
         projectType: undefined,
         classNames : undefined,
         projectUploadFinished: false,
+        projectParamsFinished: false,
         projects: [],
         filenames: {}
     }
@@ -72,6 +73,7 @@ export default class AppRouter extends React.Component {
             const projectType = localStorage.getItem('projectType');
             const classNames = localStorage.getItem('classNames');
             const projectUploadFinished = localStorage.getItem('projectUploadFinished');
+            const projectParamsFinished = localStorage.getItem('projectParamsFinished');
 
             console.log("Just mounted AppRouter,", projectName, projectType, classNames);
 
@@ -92,6 +94,10 @@ export default class AppRouter extends React.Component {
 
             if(projectUploadFinished != "undefined"){
                 this.setState( { projectUploadFinished: (projectUploadFinished == "true") });
+            }
+
+            if(projectParamsFinished != "undefined"){
+                this.setState( { projectParamsFinished: (projectParamsFinished == "true") });
             }
 
             if(filenames != "undefined" && !!filenames){
@@ -120,6 +126,9 @@ export default class AppRouter extends React.Component {
         if (prevState.projectUploadFinished != this.state.projectUploadFinished) {
             localStorage.setItem('projectUploadFinished', this.state.projectUploadFinished);
         }
+        if (prevState.projectParamsFinished != this.state.projectParamsFinished) {
+            localStorage.setItem('projectParamsFinished', this.state.projectParamsFinished);
+        }
         if(!compareClassNames(prevState.classNames, this.state.classNames)) {
             console.log(`ClassNames have changed from `, 
                         prevState.classNames, 
@@ -147,6 +156,7 @@ export default class AppRouter extends React.Component {
                                                         "projectNameSlug": projectNameSlug,
                                                         "projectType": prevState.projectType,
                                                         "projectUploadFinished": prevState.projectUploadFinished,
+                                                        "projectParamsFinished": prevState.projectParamsFinished,
                                                         "filenames": prevState.filenames
                                                     });
             return {projects, projectName, projectNameSlug}});
@@ -158,13 +168,14 @@ export default class AppRouter extends React.Component {
                         projectType: undefined,
                         classNames: undefined,
                         projectUploadFinished: false,
+                        projectParamsFinished: false,
                         filenames: {}});
         localStorage.clear();
         console.log('resetCurrentProject', this.state);
     }
 
-    setProjectType = (projectType) => {
-        this.setState( {projectType} );
+    setProjectType = (projectType, projectParamsFinished) => {
+        this.setState( {projectType, projectParamsFinished} );
     }
 
     setProjectName = (projectName) => {
@@ -180,6 +191,11 @@ export default class AppRouter extends React.Component {
 
     setProjectUploadFinished = ( flag=true ) => {
         this.setState( {projectUploadFinished: flag} );
+    }
+
+    setProjectParamsFinished = ( flag=true ) => {
+        console.log("Calling setProjectParamsFinished ", flag)
+        this.setState( {projectParamsFinished: flag} );
     }
 
     setFilename = (fileType, filename) => {
@@ -210,6 +226,7 @@ export default class AppRouter extends React.Component {
                 this.setProjectType(currentProject.projectType);
                 this.setClassNames(currentProject.classNames);
                 this.setProjectUploadFinished(currentProject.projectUploadFinished);
+                this.setProjectParamsFinished(currentProject.projectParamsFinished);
                 this.setState( {filenames: currentProject.filenames });
                 // This did not work in ComponentDidUpdate
                 localStorage.setItem('filenames', JSON.stringify(currentProject.filenames));
@@ -256,7 +273,7 @@ export default class AppRouter extends React.Component {
                             render={() => <ProjectParamsPage
                                                 projectName={this.state.projectName}
                                                 setProjectParams={this.setClassNames}
-                                                setProjectUploadFinished={this.setProjectUploadFinished}/>}
+                                                setProjectParamsFinished={this.setProjectParamsFinished}/>}
                         />
                         
                         <Route 
@@ -302,6 +319,7 @@ export default class AppRouter extends React.Component {
                                     return (
                                         <ProjectStartPage 
                                             setProjectUploadFinished={this.setProjectUploadFinished}
+                                            setProjectParamsFinished={this.setProjectParamsFinished}
                                             deleteProject={this.deleteProject}
                                             setFilename={this.setFilename}
                                             addProjectToList={this.addProjectToList}
@@ -309,6 +327,7 @@ export default class AppRouter extends React.Component {
                                             uri={routeProps.match.params.name}
                                             //state vars
                                             projectUploadFinished={this.state.projectUploadFinished}
+                                            projectParamsFinished={this.state.projectParamsFinished}
                                             projectName={this.state.projectName}
                                             projectNameSlug={this.state.projectNameSlug}
                                             projectType={this.state.projectType}

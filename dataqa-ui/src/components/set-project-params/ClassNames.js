@@ -144,7 +144,7 @@ class ClassNames extends React.Component{
                     selectedInputColumns={this.state.selectedInputColumns}
                     fileUploaded={this.state.fileUploaded}
                     setToNextPage={this.setToNextPage}
-                    setProjectUploadFinished={this.props.setProjectUploadFinished}
+                    setProjectParamsFinished={this.props.setProjectParamsFinished}
                 />
             </div>
         )

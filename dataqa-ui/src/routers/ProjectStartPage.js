@@ -2,6 +2,7 @@ import React from 'react';
 import ProjectMain from '../components/project-summary/ProjectMain';
 import FileUploadMain from '../components/file-upload/FileUploadMain';
 import NotFoundPage from '../components/NotFoundPage';
+import ProjectParamsPage from '../components/set-project-params/ProjectParamsPage';
 
 
 class ProjectStartPage extends React.Component {
@@ -22,7 +23,7 @@ class ProjectStartPage extends React.Component {
             return <NotFoundPage/>
         }
 
-        if(this.props.projectUploadFinished){
+        if(this.props.projectUploadFinished && this.props.projectParamsFinished){
             return <ProjectMain
                         projectName={this.props.projectName}
                         projectNameSlug={this.props.projectNameSlug}
@@ -30,18 +31,25 @@ class ProjectStartPage extends React.Component {
                         classNames={this.props.classNames}
                         deleteProject={this.props.deleteProject}
                     />
-        }else{
-            // console.log("Doing file upload", props);
-            return <FileUploadMain
-                        projectName={this.props.projectName}
-                        projectType={this.props.projectType}
-                        addProjectToList={this.props.addProjectToList}
-                        setProjectUploadFinished={this.props.setProjectUploadFinished}
-                        setFilename={this.props.setFilename}
-                        filesUploaded={this.props.filenames}
-                        setClassNames={this.props.setClassNames}
-                    />
         }
+        
+        if(this.props.projectUploadFinished){
+            return <ProjectParamsPage
+                        projectName={this.props.projectName}
+                        setProjectParams={this.props.setClassNames}
+                        setProjectParamsFinished={this.props.setProjectParamsFinished}/>
+        }
+
+        // console.log("Doing file upload", props);
+        return <FileUploadMain
+                    projectName={this.props.projectName}
+                    projectType={this.props.projectType}
+                    addProjectToList={this.props.addProjectToList}
+                    setProjectUploadFinished={this.props.setProjectUploadFinished}
+                    setFilename={this.props.setFilename}
+                    filesUploaded={this.props.filenames}
+                    setClassNames={this.props.setClassNames}
+                />
     }
 }
 
