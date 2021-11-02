@@ -20,6 +20,7 @@ def check_mentions_upload(api, sql_db, mentions_filepath):
     data_dict["file_type"] = "documents"
     data_dict["polling"] = False
     data_dict["file"] = open(mentions_filepath, "rb")
+    data_dict["column_names"] = json.dumps({"text": "text", "mentions": "mentions"})
 
     response = api.post('/api/upload', data=data_dict)
     assert response.status_code == 200
@@ -68,6 +69,7 @@ def check_kb_upload(api, sql_db, kb_filepath):
     data_dict["file_type"] = "kb"
     data_dict["polling"] = False
     data_dict["file"] = open(kb_filepath, "rb")
+    data_dict["column_names"] = json.dumps({"name": "name", "description": "description"})
 
     response = api.post('/api/upload', data=data_dict)
     assert response.status_code == 200

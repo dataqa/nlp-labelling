@@ -49,10 +49,13 @@ def match_end_of_expression(tok_list, end_idx, n):
 
     for ind, tok in enumerate(tok_list):
         if tok.start_char == end_idx and tok.end_char == (end_idx + 1):
-            return ind
+            if (n == 0 and tok.is_punct) or tok.is_empty:
+                return last_valid_ind
+            else:
+                return ind
         if tok.start_char >= end_idx:
             return last_valid_ind
-        if n == 0 and tok.is_punct or tok.is_empty:
+        if (n == 0 and tok.is_punct) or tok.is_empty:
             continue
         # the first token in the expression can be punctuation
         if tok.is_sent_start and ind > 0 and n == 0:

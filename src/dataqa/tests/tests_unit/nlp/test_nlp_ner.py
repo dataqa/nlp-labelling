@@ -3,7 +3,8 @@ import re
 import pandas as pd
 import pytest
 
-from dataqa.nlp.nlp_ner import (get_spans_from_regex,
+from dataqa.nlp.nlp_ner import (get_spans_from_noun_phrase_regex,
+                                get_spans_from_regex,
                                 get_spans_from_start_end,
                                 merge_spans)
 from dataqa.nlp.spacy_nlp import nlp
@@ -53,6 +54,10 @@ def regex_0_entity():
     # match ending with punctuation
     params = {"regex": re.compile("millennia."),
               "expected": [get_span_from_extract("millennia")]}
+    all_params.append(params)
+    # match first token
+    params = {"regex": re.compile("Iron"),
+              "expected": [get_span_from_extract("Iron")]}
     all_params.append(params)
     return all_params
 
@@ -151,14 +156,50 @@ def test_get_spans_from_regex__3_entities(regex_3_entities):
             assert_same_span(result, expected_result)
 
 
+def test_get_spans_from_regex__single_char():
+    text = "Model A was launched yesterday."
+    spans = get_spans_from_regex(nlp(text),
+                                 re.compile("A"),
+                                 0,
+                                 "name")
+    assert (len(spans) == 1)
+    assert (spans[0]["text"] == "A")
+
+    spans = get_spans_from_regex(nlp(text),
+                                 re.compile("Model"),
+                                 1,
+                                 "name")
+    assert (len(spans) == 1)
+    assert (spans[0]["text"] == "A")
+
+    text = "A good day."
+    spans = get_spans_from_regex(nlp(text),
+                                 re.compile("A"),
+                                 0,
+                                 "name")
+    assert (len(spans) == 1)
+    assert (spans[0]["text"] == "A")
+
+
 def test_get_spans_from_regex__3_entities_overlapping():
     text = "I repeat here and here the text."
     spans = get_spans_from_regex(nlp(text),
                                  re.compile("here"),
                                  3,
                                  "name")
-    assert(len(spans) == 1)
-    assert(spans[0]["text"] == "and here the")
+    assert (len(spans) == 1)
+    assert (spans[0]["text"] == "and here the")
+
+
+def test_get_spans_from_noun_phrase_regex():
+    results = get_spans_from_noun_phrase_regex(example_doc,
+                                               True,
+                                               re.compile("element"),
+                                               re.compile("cien"),
+                                               1)
+    assert(len(results) == 1)
+    assert(results[0]['text'] == 'the ancient world')
+    return
 
 
 def test_get_spans_from_start_end():
@@ -167,3 +208,8 @@ def test_get_spans_from_start_end():
                                        [get_span_from_extract("lements undoubtedly known to t")])
     assert (len(results) == 1)
     assert_same_span(results[0], get_span_from_extract("elements undoubtedly known to"))
+
+    results = get_spans_from_start_end(df,
+                                       [get_span_from_extract("undoubtedly")])
+    assert (len(results) == 1)
+    assert_same_span(results[0], get_span_from_extract("undoubtedly"))
