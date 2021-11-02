@@ -48,6 +48,8 @@ def match_end_of_expression(tok_list, end_idx, n):
     last_valid_ind = 0
 
     for ind, tok in enumerate(tok_list):
+        if tok.start_char == end_idx and tok.end_char == (end_idx + 1):
+            return ind
         if tok.start_char >= end_idx:
             return last_valid_ind
         if n == 0 and tok.is_punct or tok.is_empty:

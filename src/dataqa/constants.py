@@ -157,7 +157,7 @@ SUPPORTED_RULES = {PROJECT_TYPE_CLASSIFICATION: ['ordered', 'non-ordered', 'sent
                    PROJECT_TYPE_NER: ['entity_regex', 'noun_phrase_regex']}
 
 SPAN_KEYS = ["id", "start", "end", "text", "entity_id"]
-NUM_MAX_SPAN_TOKENS = 5
+NUM_MAX_SPAN_TOKENS = 6
 
 # Request page sizes
 ENTITY_PAGE_SIZE = 10  # number of entities returned

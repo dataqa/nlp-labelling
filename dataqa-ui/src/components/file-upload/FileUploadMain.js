@@ -319,7 +319,7 @@ class FileUploadMain extends React.Component{
                 if(!projectId){
                     if(attemptNum < UPLOAD_PARAMS.totalAttempts){
                         setTimeout(() => this.loadFile(selectedFile, 
-                                                        columnName,
+                                                        columnNames,
                                                         fileType,
                                                         uploadId, 
                                                         attemptNum+1, 
@@ -347,7 +347,7 @@ class FileUploadMain extends React.Component{
                 console.log("Error", textstatus, message);
                 if(textstatus==="timeout" & attemptNum < UPLOAD_PARAMS.totalAttempts) {
                     setTimeout(() => this.loadFile(selectedFile, 
-                                                    columnName,
+                                                    columnNames,
                                                     fileType,
                                                     uploadId, 
                                                     attemptNum+1, 
