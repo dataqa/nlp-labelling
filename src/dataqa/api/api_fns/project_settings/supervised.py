@@ -7,14 +7,6 @@ from dataqa.db.ops.supervised import add_class_names
 from dataqa.elasticsearch.client.utils.classification import add_ground_truth_ids_to_es
 
 
-def check_num_columns(file):
-    reader = csv.reader(file)
-    first_line = next(reader)
-    if len(first_line) > 1:
-        raise Exception("The file with the class names cannot have more than one column.")
-    file.seek(0)
-
-
 def add_class_colours(class_names):
     for class_colour, class_item in zip(cycle(COLOURS), class_names):
         class_item['colour'] = class_colour
@@ -23,7 +15,6 @@ def add_class_colours(class_names):
 def get_class_names(file_bytes, column_name):
     file = get_decoded_stream(file_bytes)
     check_file_size(file)
-    check_num_columns(file)
 
     class_names = []
     reader = csv.DictReader(file)

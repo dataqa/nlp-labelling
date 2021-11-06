@@ -364,7 +364,7 @@ class SupervisedLabelPage extends React.Component{
                 let validatedLabels = prevState.validatedLabels;
                 validatedLabels[prevState.index] = spans;
                 const currentDisplayedLabels = spans;
-                console.log("Setting currentDisplayedLabels to", currentDisplayedLabels)
+                console.log("Setting currentDisplayedLabels to", currentDisplayedLabels, " and validatedLabels to ", validatedLabels)
                 return { validatedLabels, currentDisplayedLabels}
             })
         }
