@@ -218,7 +218,7 @@ class SupervisedLabelPage extends React.Component{
         }
 
         let currentDisplayedLabels;
-        if (validatedLabels[index]){
+        if (typeof validatedLabels[index] !== 'undefined'){
             if(this.props.projectType  == PROJECT_TYPES.classification){
                 currentDisplayedLabels = [this.props.classNames[validatedLabels[index]]];
             }

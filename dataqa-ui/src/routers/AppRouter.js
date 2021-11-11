@@ -140,6 +140,7 @@ export default class AppRouter extends React.Component {
     addProjectToList = (projectName, projectId) => {
         // we need to add project because the get-projects api only gets called
         // when AppRouter is first mounted
+        // this is only called once the upload is partially done
         this.setState((prevState) =>  {
             console.log("Inside addProjectToList", prevState.projects);
 
@@ -160,6 +161,25 @@ export default class AppRouter extends React.Component {
                                                         "filenames": prevState.filenames
                                                     });
             return {projects, projectName, projectNameSlug}});
+    }
+
+    getUpdatedProjectsCopy = (key, value, prevState) => {
+        let projectIndexToModify;
+        for(let projectIndex in prevState.projects){
+            if(prevState.projectNameSlug == prevState.projects[projectIndex].projectNameSlug){
+                projectIndexToModify = projectIndex;
+            }
+        }
+
+        if(typeof projectIndexToModify == 'undefined'){
+            return prevState.projects;
+        }
+
+        const projectsCopy = JSON.parse(JSON.stringify(prevState.projects));
+        projectsCopy[projectIndexToModify][key] = value;
+        console.log('getUpdatedProjectsCopy', projectsCopy, prevState.projects);
+
+        return projectsCopy;
     }
 
     resetCurrentProject = () => {
@@ -186,26 +206,32 @@ export default class AppRouter extends React.Component {
     }
 
     setClassNames = (classNames) => {
-        this.setState( {classNames} );
+        this.setState((prevState) =>  { return {classNames,
+                                                projects: this.getUpdatedProjectsCopy('classNames', classNames, prevState)}});
     };
 
     setProjectUploadFinished = ( flag=true ) => {
-        this.setState( {projectUploadFinished: flag} );
+        this.setState((prevState) =>  { return {projectUploadFinished: flag,
+                                                projects: this.getUpdatedProjectsCopy('projectUploadFinished', flag, prevState)}});
     }
 
     setProjectParamsFinished = ( flag=true ) => {
         console.log("Calling setProjectParamsFinished ", flag)
-        this.setState( {projectParamsFinished: flag} );
+        this.setState((prevState) =>  { return {projectParamsFinished: flag,
+                                                projects: this.getUpdatedProjectsCopy('projectParamsFinished', flag, prevState)}});
     }
 
     setFilename = (fileType, filename) => {
         console.log("setting filename", fileType, filename);
 
         this.setState((prevState) => {
-            const filenames = prevState.filenames;
-            filenames[fileType] = filename;
+            console.log(prevState.filenames);
+            const filenames = {...prevState.filenames,
+                              [fileType]: filename};
+            console.log("filenames becomes", filenames, prevState.filenames);
             localStorage.setItem('filenames', JSON.stringify(filenames));
-            return { filenames };
+            return { filenames,
+                     projects: this.getUpdatedProjectsCopy('filenames', filenames, prevState) };
         });
     }
 
@@ -217,7 +243,7 @@ export default class AppRouter extends React.Component {
             return;
         }
         for(let projectIndex in this.state.projects){
-            console.log("Comparing ", projectNameUrl, this.state.projects[projectIndex]);
+            console.log("Comparing ", uri, projectNameUrl, this.state.projects[projectIndex]);
             if(projectNameUrl === this.state.projects[projectIndex].projectName){
                 const currentProject = this.state.projects[projectIndex];
                 console.log("Doing currentProject", currentProject);
