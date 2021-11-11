@@ -98,8 +98,11 @@ dmypy.json
 data/
 api/templates
 bundle.js
+bundle.js.map
+bundle.js.LICENSE.txt
 *.tar.gz
 elasticsearch-7.9.2/
+node_modules/
 
 scrap.py
 original_images

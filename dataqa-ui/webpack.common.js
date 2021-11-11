@@ -11,7 +11,7 @@ module.exports = {
             loader: 'babel-loader',
             test: /\.js$/,
             exclude: /node_modules/,
-            query: {
+            options: {
                 plugins: ['recharts', 'lodash']
             }
         }, {
@@ -22,16 +22,5 @@ module.exports = {
                 'sass-loader'
             ]
         }]
-    },
-    devtool: 'cheap-module-eval-source-map',
-    devServer: {
-        contentBase: path.join(__dirname, 'public'),
-        proxy: {
-            '/api': {
-                target: 'http://localhost:5000',
-                secure: false
-            }
-        },
-        historyApiFallback: true
     }
 };
