@@ -1,22 +1,26 @@
 import React from 'react';
-import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
-import CircularProgress from '@material-ui/core/CircularProgress';
 import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
 import Grid from '@material-ui/core/Grid';
+import { UploadFileButton } from './UploadFileButton';
 
 import Radio from '@material-ui/core/Radio';
 import RadioGroup from '@material-ui/core/RadioGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import FormControl from '@material-ui/core/FormControl';
 import FormLabel from '@material-ui/core/FormLabel';
+import SingleFileUploadForm from './SingleFileUploadForm';
+import { NextButton } from './SingleFileUploadForm';
 
 import { DOCS_KB_FILE_FORMAT, 
         DOCS_MENTIONS_FILE_FORMAT, 
         FILE_TYPE_DOCUMENTS, 
-        FILE_TYPE_KB } from '../constants';
+        FILE_TYPE_KB,
+        DEFAULT_MENTIONS_COLUMNS,
+        DEFAULT_KB_COLUMNS } from '../constants';
+import { TrainRounded } from '@material-ui/icons';
 
 
 const styles = theme => ({
@@ -26,7 +30,8 @@ const styles = theme => ({
     button: {
         width: '200px',
         textAlign: 'center'
-    }
+    },
+    nextButton: { marginTop: 10}
   });
 
 
@@ -35,38 +40,13 @@ const Container = (props) => {
     return (<Grid container 
                     spacing={4} 
                     direction="row"
-                    justify='space-between'
+                    justifycontent='flex-start'
                     alignItems="center"
                     {...rest}/>)
 }
 
 const Item = props => {
-    return(<Grid item 
-                    {...props}/>)
-}
-
-
-const UploadFileButton = (props) => {
-    if(!props.loading){
-        return (
-            <Button 
-                variant="contained" 
-                color="primary" 
-                component="label"
-                htmlFor={props.htmlFor}
-                className={props.className}
-                disabled={props.disableLoading}
-            >
-                {props.text}
-            </Button> 
-        )
-    }else{
-        return (
-            <CircularProgress 
-                className={props.className}
-            />
-        )
-    }
+    return(<Grid item {...props}/>)
 }
 
 const ProjectNameTextField = (props) => {
@@ -83,79 +63,33 @@ const ProjectNameTextField = (props) => {
     )
 }
 
-const UploadForm = (props) => {
+const SingleFileUploadFormWithDescription = (props) => {
+    const widthUploadForm = (!props.selectedFile && !props.hasBeenUploaded)? undefined: {width: '100%'};
     return (
         <Container>
-            <Item xs={6}>
-                {props.description}
+            <Item style={widthUploadForm}>
+                <SingleFileUploadForm 
+                    rootClassName={props.classes.root}
+                    setSelectedFile = {props.setSelectedFile}
+                    id={props.id}
+                    uploadButtonText={props.uploadButtonText}
+                    helpText={props.helpText}
+                    createProject={props.createProject}
+                    defaultColumnNames={props.defaultColumnNames}
+                    projectName={props.projectName}
+                    loading={props.loading}
+                    candidateInputColumnNames={props.candidateInputColumnNames}
+                    updateSelectedInputColumns={props.updateSelectedInputColumns}
+                    selectedInputColumns={props.selectedInputColumns}
+                    fileUploaded={props.fileUploaded}
+                />
             </Item>
-            <Item xs={6}>
-                <form encType="multipart/form-data;" acceptCharset="utf-8">
-                    <input
-                        accept=".csv"
-                        style={{ display: 'none' }}
-                        id={props.id}
-                        type="file"
-                        onChange={props.onChange}
-                    />
-                    <UploadFileButton 
-                        htmlFor={props.id}
-                        loading={props.loading}
-                        disableLoading={props.disableLoading}
-                        className={props.classes.button}
-                        text={props.buttonText}
-                    />
-                </form>
-            </Item>
+            {!props.selectedFile && !props.hasBeenUploaded &&
+                <Item>
+                    {props.description}
+                </Item>
+            }
         </Container>
-    )
-}
-
-const TextWithMentionsUpload = (props) => {
-    let Description;
-    if(props.hasBeenUploaded){
-        Description = <Typography variant="body1">{`Successfully uploaded file with mentions ${props.filename}`}</Typography>
-    }
-    else{
-        Description = <Typography variant="body1">File with text and entity mentions. Read more in the <a  href={DOCS_MENTIONS_FILE_FORMAT} target="_blank"> documentation</a>.
-        </Typography>
-    }
-
-    return (
-        <UploadForm
-            loading={props.loading}
-            disableLoading={props.disableLoading}
-            description={Description}
-            id="upload-form-1"
-            classes={props.classes}
-            buttonText={"Upload mentions"}
-            target="_blank"
-            onChange={(e) => {props.createProject(e, "documents")}}
-        />
-    )
-}
-
-const KbUpload = (props) => {
-    let Description;
-    if(props.hasBeenUploaded){
-        Description = <Typography variant="body1">{`Successfully uploaded file with mentions ${props.filename}`}</Typography>
-    }
-    else{
-        Description = <Typography variant="body1">File with knowledge bases. Read more in the <a  href={DOCS_KB_FILE_FORMAT} target="_blank"> documentation</a>.
-                            </Typography>
-    }
-
-    return (
-        <UploadForm
-            loading={props.loading}
-            disableLoading={props.disableLoading}
-            description={Description}
-            id="upload-form-2"
-            classes={props.classes}
-            buttonText={"Upload knowledge base"}
-            target="_blank"
-            onChange={(e) => {props.createProject(e, "kb")}}
-        />
     )
 }
 
@@ -172,9 +106,55 @@ const RadioButtonGroup = () => {
     )
 }
 
-const MultipleFileUploadForm = (props) => {
+const initialiseSelectedFiles = () => {
+    var selectedFiles = {};
+    selectedFiles[FILE_TYPE_DOCUMENTS] = undefined;
+    selectedFiles[FILE_TYPE_KB] = undefined;
+    return selectedFiles;
+}
 
-        const { classes, filesUploaded } = props;
+const getTotalUploadedFiles = (filesUploaded) =>{
+    console.log("Counting ", filesUploaded, Object.entries(filesUploaded).filter(([key, val]) => val).length)
+    return Object.entries(filesUploaded).filter(([key, val]) => val).length;
+}
+
+const hasUploadFinished = (filesUploaded) => {
+    const actualFilesUploaded = getTotalUploadedFiles(filesUploaded);
+    if(actualFilesUploaded == 2){
+        return true;
+    }
+    return false;
+}
+
+
+class MultipleFileUploadForm extends React.Component{
+
+    constructor(props) {
+        super(props);
+        this.state = { selectedFiles: initialiseSelectedFiles(),
+                       uploadFinished: hasUploadFinished(this.props.filesUploaded) }
+    }
+
+    componentDidUpdate(prevProps, prevState) {
+
+        if(!this.state.uploadFinished && (getTotalUploadedFiles(this.props.filesUploaded) == 2))
+        {
+            this.setState( {uploadFinished: TrainRounded} )
+        }
+    }
+
+
+    setSelectedFile = (fileType, selectedFile) => {
+        this.setState((prevState) => {
+            const selectedFiles = {...prevState.selectedFiles};
+            selectedFiles[fileType] = selectedFile;
+            return { selectedFiles };
+        })
+    }
+
+    render() {
+
+        const { classes, filesUploaded } = this.props;
 
         return (
             <div style={{margin: 20, width:'100%'}}>
@@ -182,35 +162,76 @@ const MultipleFileUploadForm = (props) => {
                     <Typography variant="h6">Load the data and knowledge base.</Typography>
                 </Box>
                 <ProjectNameTextField
-                    projectName={props.projectName}
-                    setProjectName={props.setProjectName}
-                    loading={props.loading[FILE_TYPE_DOCUMENTS] || props.loading[FILE_TYPE_KB]}
-                    disableChangeProjectName={props.disableChangeProjectName}
+                    projectName={this.props.projectName}
+                    setProjectName={this.props.setProjectName}
+                    loading={this.props.loading[FILE_TYPE_DOCUMENTS] || this.props.loading[FILE_TYPE_KB]}
+                    disableChangeProjectName={this.props.disableChangeProjectName}
                 />
 
                 <div style={{marginTop: 30, marginBottom: 30}}>
-                    <TextWithMentionsUpload
-                        createProject={props.createProject}
+                    <SingleFileUploadFormWithDescription
                         classes={classes}
-                        loading={props.loading[FILE_TYPE_DOCUMENTS]}
-                        disableLoading={props.loading[FILE_TYPE_KB]}
+                        id={"contained-button-file-1"}
+                        uploadButtonText={"Upload mentions"}
+                        setSelectedFile={(selectedFile) => this.setSelectedFile(FILE_TYPE_DOCUMENTS, selectedFile)}
+                        selectedFile = {this.state.selectedFiles[FILE_TYPE_DOCUMENTS]}
+                        helpText={<p>No columns "{DEFAULT_MENTIONS_COLUMNS.join(', ')}" found in file. Read more in the <a  href={DOCS_MENTIONS_FILE_FORMAT} target="_blank"> documentation</a>. Please select columns:</p>}
+                        description={<Typography variant="body1">File with text and entity mentions. Read more in the <a  href={DOCS_MENTIONS_FILE_FORMAT} target="_blank"> documentation</a>.</Typography>}
+                        createProject={(e, defaultColumnNames) => {return this.props.createProject(e, 
+                                                            defaultColumnNames,
+                                                            FILE_TYPE_DOCUMENTS)}}
+                        defaultColumnNames={DEFAULT_MENTIONS_COLUMNS}
+                        projectName={this.props.projectName}
+                        classes={classes}
+                        loading={this.props.loading[FILE_TYPE_DOCUMENTS]}
+                        disableLoading={this.props.loading[FILE_TYPE_DOCUMENTS] || !this.props.projectName}
                         hasBeenUploaded={!!filesUploaded[FILE_TYPE_DOCUMENTS]}
                         filename={filesUploaded[FILE_TYPE_DOCUMENTS] || ""}
+                        candidateInputColumnNames={this.props.candidateInputColumnNames[FILE_TYPE_DOCUMENTS]}
+                        updateSelectedInputColumns={(columnIndex, columnType) => this.props.updateSelectedInputColumns(FILE_TYPE_DOCUMENTS, columnIndex, columnType)}
+                        selectedInputColumns={this.props.selectedInputColumns[FILE_TYPE_DOCUMENTS]}
+                        fileUploaded={this.props.filesUploaded[FILE_TYPE_DOCUMENTS]}
+                        setToNextPage={this.props.setToNextPage}
                     />
 
-                    <KbUpload 
-                        createProject={props.createProject}
+                    <SingleFileUploadFormWithDescription
                         classes={classes}
-                        loading={props.loading[FILE_TYPE_KB]}
-                        disableLoading={props.loading[FILE_TYPE_DOCUMENTS]}
+                        id={"contained-button-file-2"}
+                        uploadButtonText={"Upload KB"}
+                        setSelectedFile={(selectedFile) => this.setSelectedFile(FILE_TYPE_KB, selectedFile)}
+                        selectedFile = {this.state.selectedFiles[FILE_TYPE_KB]}
+                        helpText={<p>No columns "{DEFAULT_KB_COLUMNS.join(', ')}" found in file. Read more in the <a  href={DOCS_MENTIONS_FILE_FORMAT} target="_blank"> documentation</a>. Please select columns:</p>}
+                        description={<Typography variant="body1">File with knowledge bases. Read more in the <a  href={DOCS_KB_FILE_FORMAT} target="_blank"> documentation</a>.</Typography>}
+                        createProject={(e, defaultColumnNames) => {return this.props.createProject(e, 
+                                                                        defaultColumnNames,
+                                                                        FILE_TYPE_KB)}}
+                        defaultColumnNames={DEFAULT_KB_COLUMNS}
+                        projectName={this.props.projectName}
+                        classes={classes}
+                        loading={this.props.loading[FILE_TYPE_KB]}
+                        disableLoading={this.props.loading[FILE_TYPE_KB] || !this.props.projectName}
                         hasBeenUploaded={!!filesUploaded[FILE_TYPE_KB]}
                         filename={filesUploaded[FILE_TYPE_KB] || ""}
+                        candidateInputColumnNames={this.props.candidateInputColumnNames[FILE_TYPE_KB]}
+                        updateSelectedInputColumns={(columnIndex, columnType) => this.props.updateSelectedInputColumns(FILE_TYPE_KB, columnIndex, columnType)}
+                        selectedInputColumns={this.props.selectedInputColumns[FILE_TYPE_KB]}
+                        fileUploaded={this.props.filesUploaded[FILE_TYPE_KB]}
+                        setToNextPage={this.props.setToNextPage}
                     />
+
+                    {this.state.uploadFinished &&
+                        <NextButton
+                            setToNextPage={this.props.setToNextPage}
+                            setProjectUploadFinished={this.props.setProjectUploadFinished}
+                            className={classes.nextButton}
+                        />
+                    }
                 </div>
 
                 <RadioButtonGroup/>
             </div>
         )
+    }
 }
 
 

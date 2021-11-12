@@ -17,7 +17,6 @@ from dataqa.elasticsearch.client.utils.common import create_new_index, delete_in
 from dataqa.ml.sentiment import get_sentiment
 from dataqa.nlp.spacy_file_utils import serialise_save_spacy_docs
 
-
 ALLOWED_EXTENSIONS = {'csv'}
 
 
@@ -39,6 +38,7 @@ def create_supervised_project(session,
                               file_bytes,
                               project_name,
                               project_type,
+                              column_name_mapping,
                               upload_id,
                               file_type,
                               upload_folder):
@@ -50,14 +50,14 @@ def create_supervised_project(session,
     """
     column_specs = INPUT_FILE_SPECS[project_type][FILE_TYPE_DOCUMENTS]
     required_columns = column_specs["required"]
-    file = do_all_file_checks(file_type, file_bytes, required_columns)
+    file = do_all_file_checks(file_type, file_bytes, required_columns, column_name_mapping)
 
     # run spacy
     project_full_path, filepath, spacy_binary_filepath = get_paths(upload_folder,
                                                                    file_bytes.filename,
                                                                    project_name)
 
-    df = process_file(file, column_specs)
+    df = process_file(file, column_specs, column_name_mapping)
     has_ground_truth_labels = ES_GROUND_TRUTH_NAME_FIELD in df.columns
     total_documents = len(df)
 
@@ -95,10 +95,10 @@ def create_supervised_project(session,
     return project_id
 
 
-def do_all_file_checks(file_type, file_bytes, required_columns):
+def do_all_file_checks(file_type, file_bytes, required_columns, column_name_mapping):
     if file_type != FILE_TYPE_DOCUMENTS:
         raise Exception(f"Supervised projects (classification, NER) do not accept files of type {file_type}")
-    file = check_file(file_bytes, required_columns)
+    file = check_file(file_bytes, required_columns, column_name_mapping)
     return file
 
 

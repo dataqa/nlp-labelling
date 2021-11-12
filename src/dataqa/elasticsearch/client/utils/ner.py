@@ -21,6 +21,14 @@ def get_flattened_rule_spans(rules_field):
     return all_rule_spans
 
 
+def get_manual_label_if_exists_else_rule_labels(hit, rule_id=None):
+    if "manual_label" in hit:
+        return hit["manual_label"].get("label", [])
+    if rule_id:
+        return extract_label_from_rule(hit, rule_id)
+    return hit["predicted_label"]
+
+
 def process_es_docs_ner(query, es_uri, index_name, rule_id):
     """
     If rule_id is None, we return the spans from the merged predicted labels,
@@ -33,13 +41,17 @@ def process_es_docs_ner(query, es_uri, index_name, rule_id):
     total = response_json["hits"]["total"]["value"]
 
     if rule_id == -1:
-        get_label = lambda hit: hit["predicted_label"]
+        # all rules
+        get_label = lambda hit: get_manual_label_if_exists_else_rule_labels(hit)
     elif rule_id == -2:
-        get_label = lambda hit: []
+        # no rules
+        get_label = lambda hit: hit.get("manual_label", {}).get("label", [])
     elif rule_id == -3:
+        # read unlabelled docs
         get_label = lambda hit: hit.get("manual_label", {}).get("label", [])
     else:
-        get_label = lambda hit: extract_label_from_rule(hit, rule_id)
+        # get results from specific rule_id
+        get_label = lambda hit: get_manual_label_if_exists_else_rule_labels(hit, rule_id)
 
     documents = [{"text": hit["_source"][ES_TEXT_FIELD_NAME],
                   "label": get_label(hit["_source"]),
@@ -60,10 +72,10 @@ def extract_label_from_rule(hit, rule_id):
 
 
 def read_docs_with_empty_manual_labels(es_uri,
-                                    index_name,
-                                    from_,
-                                    size,
-                                    session_id):
+                                       index_name,
+                                       from_,
+                                       size,
+                                       session_id):
     query = queries.docs_with_empty_manual_entities_query(from_,
                                                           size,
                                                           session_id,

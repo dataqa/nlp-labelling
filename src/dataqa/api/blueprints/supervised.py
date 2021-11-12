@@ -36,6 +36,10 @@ def set_classnames():
     if not project_name:
         raise Exception("Project name undefined")
 
+    column_name = request.form['column_name']
+    if not column_name:
+        raise Exception("Column name undefined")
+
     file = request.files['file']
     if not file:
         raise Exception("File is undefined")
@@ -44,7 +48,7 @@ def set_classnames():
         project = get_project(session, project_name)
         es_uri = es.get_es_uri(current_app.config)
         check_supervised_project(project)
-        class_names = set_class_names(project, file, es_uri)
+        class_names = set_class_names(project, file, es_uri, column_name)
     return json.dumps(class_names)
 
 

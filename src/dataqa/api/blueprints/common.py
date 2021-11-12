@@ -58,6 +58,13 @@ def upload():
     if not project_name:
         raise Exception("Project name undefined")
 
+    try:
+        column_name_mapping = json.loads(request.form['column_names'])
+    except:
+        raise Exception(f"Column name mapping not passed correctly")
+    if not column_name_mapping:
+        raise Exception("Column names undefined")
+
     project_type = request.form['project_type']
     if not project_type:
         raise Exception("Project type undefined")
@@ -66,7 +73,7 @@ def upload():
         file_type = request.form['file_type']
         upload_key = get_upload_key(project_type, file_type)
     except:
-        raise Exception(f"File type undefined or incorrect..")
+        raise Exception(f"File type undefined or incorrect")
 
     upload_id = request.form[upload_key]
     if not upload_id:
@@ -95,6 +102,7 @@ def upload():
                             file,
                             project_name,
                             project_type,
+                            column_name_mapping,
                             upload_id,
                             file_type)
 

@@ -78,6 +78,7 @@ def get_project_list(db):
                                                       "colour": class_name.colour}
                                                      for class_name in project.classes],
                                      "project_upload_finished": project.index_name is not None,
+                                     "project_params_finished": len(project.classes)>0,
                                      "filenames": {FILE_TYPE_DOCUMENTS: project.filename}})
             else:
                 all_projects.append({"project_id": project.id,
@@ -90,7 +91,8 @@ def get_project_list(db):
                                      "class_names": [{"id": class_name.id,
                                                       "name": class_name.name,
                                                       "colour": class_name.colour}
-                                                     for class_name in project.kbs]})
+                                                     for class_name in project.kbs],
+                                     "project_params_finished": True})
     return all_projects
 
 

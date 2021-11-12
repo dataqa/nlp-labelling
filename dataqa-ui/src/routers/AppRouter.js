@@ -41,6 +41,7 @@ export default class AppRouter extends React.Component {
         projectType: undefined,
         classNames : undefined,
         projectUploadFinished: false,
+        projectParamsFinished: false,
         projects: [],
         filenames: {}
     }
@@ -72,6 +73,7 @@ export default class AppRouter extends React.Component {
             const projectType = localStorage.getItem('projectType');
             const classNames = localStorage.getItem('classNames');
             const projectUploadFinished = localStorage.getItem('projectUploadFinished');
+            const projectParamsFinished = localStorage.getItem('projectParamsFinished');
 
             console.log("Just mounted AppRouter,", projectName, projectType, classNames);
 
@@ -92,6 +94,10 @@ export default class AppRouter extends React.Component {
 
             if(projectUploadFinished != "undefined"){
                 this.setState( { projectUploadFinished: (projectUploadFinished == "true") });
+            }
+
+            if(projectParamsFinished != "undefined"){
+                this.setState( { projectParamsFinished: (projectParamsFinished == "true") });
             }
 
             if(filenames != "undefined" && !!filenames){
@@ -120,6 +126,9 @@ export default class AppRouter extends React.Component {
         if (prevState.projectUploadFinished != this.state.projectUploadFinished) {
             localStorage.setItem('projectUploadFinished', this.state.projectUploadFinished);
         }
+        if (prevState.projectParamsFinished != this.state.projectParamsFinished) {
+            localStorage.setItem('projectParamsFinished', this.state.projectParamsFinished);
+        }
         if(!compareClassNames(prevState.classNames, this.state.classNames)) {
             console.log(`ClassNames have changed from `, 
                         prevState.classNames, 
@@ -131,6 +140,7 @@ export default class AppRouter extends React.Component {
     addProjectToList = (projectName, projectId) => {
         // we need to add project because the get-projects api only gets called
         // when AppRouter is first mounted
+        // this is only called once the upload is partially done
         this.setState((prevState) =>  {
             console.log("Inside addProjectToList", prevState.projects);
 
@@ -145,8 +155,31 @@ export default class AppRouter extends React.Component {
             const projects = prevState.projects.concat({"projectId": projectId, 
                                                         "projectName": projectName,
                                                         "projectNameSlug": projectNameSlug,
-                                                        "projectType": prevState.projectType});
+                                                        "projectType": prevState.projectType,
+                                                        "projectUploadFinished": prevState.projectUploadFinished,
+                                                        "projectParamsFinished": prevState.projectParamsFinished,
+                                                        "filenames": prevState.filenames
+                                                    });
             return {projects, projectName, projectNameSlug}});
+    }
+
+    getUpdatedProjectsCopy = (key, value, prevState) => {
+        let projectIndexToModify;
+        for(let projectIndex in prevState.projects){
+            if(prevState.projectNameSlug == prevState.projects[projectIndex].projectNameSlug){
+                projectIndexToModify = projectIndex;
+            }
+        }
+
+        if(typeof projectIndexToModify == 'undefined'){
+            return prevState.projects;
+        }
+
+        const projectsCopy = JSON.parse(JSON.stringify(prevState.projects));
+        projectsCopy[projectIndexToModify][key] = value;
+        console.log('getUpdatedProjectsCopy', projectsCopy, prevState.projects);
+
+        return projectsCopy;
     }
 
     resetCurrentProject = () => {
@@ -155,13 +188,14 @@ export default class AppRouter extends React.Component {
                         projectType: undefined,
                         classNames: undefined,
                         projectUploadFinished: false,
+                        projectParamsFinished: false,
                         filenames: {}});
         localStorage.clear();
         console.log('resetCurrentProject', this.state);
     }
 
-    setProjectType = (projectType) => {
-        this.setState( {projectType} );
+    setProjectType = (projectType, projectParamsFinished) => {
+        this.setState( {projectType, projectParamsFinished} );
     }
 
     setProjectName = (projectName) => {
@@ -172,19 +206,32 @@ export default class AppRouter extends React.Component {
     }
 
     setClassNames = (classNames) => {
-        this.setState( {classNames} );
+        this.setState((prevState) =>  { return {classNames,
+                                                projects: this.getUpdatedProjectsCopy('classNames', classNames, prevState)}});
     };
 
     setProjectUploadFinished = ( flag=true ) => {
-        this.setState( {projectUploadFinished: flag} );
+        this.setState((prevState) =>  { return {projectUploadFinished: flag,
+                                                projects: this.getUpdatedProjectsCopy('projectUploadFinished', flag, prevState)}});
+    }
+
+    setProjectParamsFinished = ( flag=true ) => {
+        console.log("Calling setProjectParamsFinished ", flag)
+        this.setState((prevState) =>  { return {projectParamsFinished: flag,
+                                                projects: this.getUpdatedProjectsCopy('projectParamsFinished', flag, prevState)}});
     }
 
     setFilename = (fileType, filename) => {
+        console.log("setting filename", fileType, filename);
+
         this.setState((prevState) => {
-            const filenames = prevState.filenames;
-            filenames[fileType] = filename;
+            console.log(prevState.filenames);
+            const filenames = {...prevState.filenames,
+                              [fileType]: filename};
+            console.log("filenames becomes", filenames, prevState.filenames);
             localStorage.setItem('filenames', JSON.stringify(filenames));
-            return { filenames };
+            return { filenames,
+                     projects: this.getUpdatedProjectsCopy('filenames', filenames, prevState) };
         });
     }
 
@@ -196,7 +243,7 @@ export default class AppRouter extends React.Component {
             return;
         }
         for(let projectIndex in this.state.projects){
-            console.log("Comparing ", projectNameUrl, this.state.projects[projectIndex]);
+            console.log("Comparing ", uri, projectNameUrl, this.state.projects[projectIndex]);
             if(projectNameUrl === this.state.projects[projectIndex].projectName){
                 const currentProject = this.state.projects[projectIndex];
                 console.log("Doing currentProject", currentProject);
@@ -205,6 +252,7 @@ export default class AppRouter extends React.Component {
                 this.setProjectType(currentProject.projectType);
                 this.setClassNames(currentProject.classNames);
                 this.setProjectUploadFinished(currentProject.projectUploadFinished);
+                this.setProjectParamsFinished(currentProject.projectParamsFinished);
                 this.setState( {filenames: currentProject.filenames });
                 // This did not work in ComponentDidUpdate
                 localStorage.setItem('filenames', JSON.stringify(currentProject.filenames));
@@ -235,6 +283,7 @@ export default class AppRouter extends React.Component {
                         <Route 
                             path="/upload" 
                             render={() => <FileUploadMain
+                                            existingProjectSlugs={this.state.projects.map((x) => x.projectNameSlug)}
                                             projectName={this.state.projectName}
                                             projectType={this.state.projectType}
                                             addProjectToList={this.addProjectToList}
@@ -248,9 +297,9 @@ export default class AppRouter extends React.Component {
                         <Route 
                             path="/select" 
                             render={() => <ProjectParamsPage
-                                                projectType={this.state.projectType}
                                                 projectName={this.state.projectName}
-                                                setProjectParams={this.setClassNames}/>}
+                                                setProjectParams={this.setClassNames}
+                                                setProjectParamsFinished={this.setProjectParamsFinished}/>}
                         />
                         
                         <Route 
@@ -296,6 +345,7 @@ export default class AppRouter extends React.Component {
                                     return (
                                         <ProjectStartPage 
                                             setProjectUploadFinished={this.setProjectUploadFinished}
+                                            setProjectParamsFinished={this.setProjectParamsFinished}
                                             deleteProject={this.deleteProject}
                                             setFilename={this.setFilename}
                                             addProjectToList={this.addProjectToList}
@@ -303,11 +353,13 @@ export default class AppRouter extends React.Component {
                                             uri={routeProps.match.params.name}
                                             //state vars
                                             projectUploadFinished={this.state.projectUploadFinished}
+                                            projectParamsFinished={this.state.projectParamsFinished}
                                             projectName={this.state.projectName}
                                             projectNameSlug={this.state.projectNameSlug}
                                             projectType={this.state.projectType}
                                             filenames={this.state.filenames}
                                             classNames={this.state.classNames}
+                                            setClassNames={this.setClassNames}
                                         />
                                     )
                                 }

@@ -97,9 +97,10 @@ dmypy.json
 .dataqa_data/
 data/
 api/templates
-bundle.js
+bundle.js*
 *.tar.gz
 elasticsearch-7.9.2/
+node_modules/
 
 scrap.py
 original_images

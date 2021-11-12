@@ -30,10 +30,11 @@ def create_entity_disambiguation_project(session,
                                          file_bytes,
                                          project_name,
                                          project_type,
+                                         column_name_mapping,
                                          upload_id,
                                          file_type):
     column_specs = INPUT_FILE_SPECS[project_type][file_type]
-    file = check_file(file_bytes, column_specs["required"])
+    file = check_file(file_bytes, column_specs["required"], column_name_mapping)
 
     try:
         project = get_project(session, project_name)
@@ -67,7 +68,8 @@ def create_entity_disambiguation_project(session,
                                   file_bytes.filename,
                                   index_name,
                                   project_type,
-                                  column_specs)
+                                  column_specs,
+                                  column_name_mapping)
         else:
             class_names = upload_kb_file(project,
                                          es_uri,
@@ -75,7 +77,8 @@ def create_entity_disambiguation_project(session,
                                          file_bytes.filename,
                                          index_name,
                                          project_type,
-                                         column_specs)
+                                         column_specs,
+                                         column_name_mapping)
     except Exception:
         delete_index(es_uri, index_name)
         delete_ent_mapping(session, project_id)
@@ -122,7 +125,7 @@ def add_entity_ids(df):
     count_tokens = Counter()
     token_ids = Counter()
     total_mentions = 0
-    entity_id =  1
+    entity_id = 1
     for mentions in df["mentions"]:
         total_mentions += len(mentions)
         for mention in mentions:
@@ -149,14 +152,15 @@ def upload_documents_file(session,
                           filename,
                           index_name,
                           project_type,
-                          column_specs):
+                          column_specs,
+                          column_name_mapping):
     mapping_specs = MAPPINGS[project_type][FILE_TYPE_DOCUMENTS]
     get_row = lambda row: turn_doc_row_into_es_row(row, mapping_specs["mapping_columns"])
 
     if project.index_name:
         delete_index(es_uri, project.index_name)
 
-    df = process_file(file, column_specs)
+    df = process_file(file, column_specs, column_name_mapping)
 
     # get the normalised_text, normalised_id
     # max_id = get_top_entity_id(session, project.id)
@@ -195,14 +199,15 @@ def upload_kb_file(project,
                    filename,
                    index_name,
                    project_type,
-                   column_specs):
+                   column_specs,
+                   column_name_mapping):
     mapping_specs = MAPPINGS[project_type][FILE_TYPE_KB]
     get_row = lambda row: turn_kb_row_into_es_row(row, mapping_specs["mapping_columns"])
 
     if project.kb_index_name:
         delete_index(es_uri, project.kb_index_name)
 
-    df = process_file(file, column_specs)
+    df = process_file(file, column_specs, column_name_mapping)
     df["id"] = df.index
     class_names = get_class_names_from_kbs(df)
 

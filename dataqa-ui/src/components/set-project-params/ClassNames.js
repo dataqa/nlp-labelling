@@ -3,28 +3,37 @@ import $ from 'jquery';
 import { Redirect } from 'react-router-dom';
 import { withStyles } from '@material-ui/core/styles';
 import SideBar from '../SideBar';
-import Box from '@material-ui/core/Box';
-import Typography from '@material-ui/core/Typography';
-import Container from '@material-ui/core/Container';
-import { UploadFileButton } from '../file-upload/SingleFileUploadForm';
+import SingleFileUploadForm from '../file-upload/SingleFileUploadForm';
+import { DEFAULT_CLASS_NAME_COLUMN, DOCS_CLASSNAME_FILE_FORMAT } from  '../constants';
+import Papa from 'papaparse';
+import _ from 'lodash';
 
 
 const styles = theme => ({
-    container: {display: 'flex'}
+    container: {display: 'flex'},
+    top_container: {marginLeft: 10}
   });
+
+
+  const initialiseSelectedColumns = () => {
+    var columnNames = {};
+    columnNames[DEFAULT_CLASS_NAME_COLUMN] = undefined;
+    return columnNames;
+}
 
 class ClassNames extends React.Component{
 
     state = {
         toRules: false,
-        loading: false
+        loading: false,
+        selectedInputColumns: initialiseSelectedColumns(), 
+        candidateInputColumnNames: undefined,
+        fileUploaded: undefined
     };
 
-    submitClassNames = (event) => {
-        event.preventDefault();
-
+    submitClassNames = (selectedFile, columnName) => {
+        
         console.log('Inside submitClassNames');
-        const selectedFile = event.target.files[0];
 
         if(!selectedFile){
             alert("Need to select file!");
@@ -36,7 +45,9 @@ class ClassNames extends React.Component{
 
         const data = new FormData();
         data.append('project_name', this.props.projectName);
+        data.append('column_name', columnName);
         data.append('file', selectedFile);
+        console.log('data', ...data);
 
         $.ajax({
             url : '/api/classnames',
@@ -50,7 +61,8 @@ class ClassNames extends React.Component{
                 if(jsonData){
                     console.log("Classes set correctly to: ", jsonData);
 
-                    this.setState( {toRules: true} );
+                    this.setState( {loading: false,
+                                    fileUploaded: selectedFile.name} );
                     this.props.setProjectParams(jsonData);
                 }
             }.bind(this),
@@ -64,6 +76,49 @@ class ClassNames extends React.Component{
         
     }
 
+    updateCandidateInputColumnNames = (candidateInputColumnNames) => {
+        this.setState({ candidateInputColumnNames });
+    }
+
+    updateSelectedInputColumns = (columnIndex) => {
+        this.setState((prevState) => {
+            const selectedInputColumns = {...prevState.selectedInputColumns};
+            selectedInputColumns[DEFAULT_CLASS_NAME_COLUMN] = columnIndex;
+            return { selectedInputColumns };
+        })
+    }
+
+    validateColumnsAndUpload = (selectedFile, columns) => {
+        console.log("Inside validateColumnsAndUpload", DEFAULT_CLASS_NAME_COLUMN,
+        columns, _.includes(columns, DEFAULT_CLASS_NAME_COLUMN))
+        if(_.includes(columns, DEFAULT_CLASS_NAME_COLUMN)){
+            this.submitClassNames(selectedFile, DEFAULT_CLASS_NAME_COLUMN);
+        }else{
+            this.updateCandidateInputColumnNames(columns);
+        }
+    }
+
+    uploadClassNamesFile = (selectedFile) => {
+        console.log("Inside uploadClassNamesFile", this.props);
+
+        const selectedColumn = this.state.selectedInputColumns[DEFAULT_CLASS_NAME_COLUMN];
+        if(typeof selectedColumn === 'undefined'){
+            var results = Papa.parse(selectedFile, 
+                {header: true,
+                preview: 1,
+                complete: function(results) {
+                        this.validateColumnsAndUpload(selectedFile, results.meta.fields);
+                    }.bind(this)
+                });
+        }else{
+            this.submitClassNames(selectedFile, this.state.candidateInputColumnNames[selectedColumn]);
+        }
+    }
+
+    setToNextPage = () => {
+        this.setState({toRules: true});
+    }
+
     render() {
         const { classes } = this.props;
 
@@ -74,25 +129,23 @@ class ClassNames extends React.Component{
         return (
             <div className={classes.container}>
                 <SideBar/>
-                <Container>
-                    <Box my={2}>
-                        <Typography variant="h6">Upload a csv file with the class names.</Typography>
-                    </Box>
-                    <form encType="multipart/form-data;" acceptCharset="utf-8">
-                        <input
-                            accept=".csv"
-                            style={{ display: 'none' }}
-                            id="contained-button-file"
-                            type="file"
-                            onChange={this.submitClassNames}
-                        />
-                        <UploadFileButton 
-                            htmlFor="contained-button-file"
-                            loading={this.state.loading}
-                            className={classes.button}
-                        />
-                    </form>
-                </Container>
+
+                <SingleFileUploadForm 
+                    id={"contained-button-file"}
+                    helpText={<p>No column "{DEFAULT_CLASS_NAME_COLUMN}" found in file. Read more in the <a  href={DOCS_CLASSNAME_FILE_FORMAT} target="_blank"> documentation</a>. Please select columns:</p>}
+                    rootClassName={classes.top_container}
+                    instructionText={"Load a csv file with the class names."}
+                    defaultColumnNames={[DEFAULT_CLASS_NAME_COLUMN]}
+                    createProject={this.uploadClassNamesFile}
+                    projectName={this.props.projectName}
+                    loading={this.state.loading}
+                    candidateInputColumnNames={this.state.candidateInputColumnNames}
+                    updateSelectedInputColumns={this.updateSelectedInputColumns}
+                    selectedInputColumns={this.state.selectedInputColumns}
+                    fileUploaded={this.state.fileUploaded}
+                    setToNextPage={this.setToNextPage}
+                    setProjectUploadFinished={this.props.setProjectParamsFinished}
+                />
             </div>
         )
     }

@@ -14,7 +14,8 @@ patched = lambda query, es_uri, index_name, _: process_es_docs_classification(qu
 def check_file_upload(api, test_file_path):
     project_data = {"upload_id": 123,
                     "project_name": TEST_PROJECT_NAME,
-                    "project_type": "classification"}
+                    "project_type": "classification",
+                    "column_names": json.dumps({"text": "text"})}
 
     data_dict = project_data
     data_dict["file_type"] = "documents"
@@ -53,7 +54,8 @@ def check_file_upload(api, test_file_path):
 
 def check_classnames(api, test_class_name_file_path):
     data_dict = {"project_name": TEST_PROJECT_NAME,
-                 "file": open(test_class_name_file_path, "rb")}
+                 "file": open(test_class_name_file_path, "rb"),
+                 "column_name": "label"}
 
     response = api.post('/api/classnames', data=data_dict)
     assert response.status_code == 200

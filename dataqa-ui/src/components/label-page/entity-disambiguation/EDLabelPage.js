@@ -150,7 +150,7 @@ class EDLabelPage extends React.Component{
                         disablePrevDoc: true,
                         disableNextEnt: false,
                         disablePrevEnt: true,
-                        validatedLabels: undefined, // selected kbs that were sent from server
+                        validatedLabels: [], // selected kbs that were sent from server
                         totalEntityDocs: 0,
                         totalEntities: 0,
                         currentDocs: [], // current page of docs for specific entity we are checking
@@ -161,10 +161,10 @@ class EDLabelPage extends React.Component{
                         sessionId: uuid()};
      }
 
-    getEntities = (fromEntity, callback) => {
+    getEntities = (fromEntity, stateUpdateFn) => {
         const values = queryString.parse(this.props.location.search);
         const unmatched = Object.keys(values)[0] == "unmatched";
-        console.log(unmatched, values, this.props.location.search);
+        console.log("Inside getEntities ", unmatched, values, this.props.location.search);
         $.ajax({
                 url : '/api/get-entities',
                 type : 'GET',
@@ -174,16 +174,12 @@ class EDLabelPage extends React.Component{
                         "unmatched": unmatched},
                 success : function(data) {
                     const json = $.parseJSON(data);
-                    console.log("json is", json);
-                    this.setState(() => {                        
-                        return (
-                                    {   currentEntities: json.entities,
-                                        validatedLabels: json.entities.map((x) => x.label && this.formatSuggestion(x.label)),
-                                        totalEntities: json.total_entities,
-                                        firstLoading: false})});
-                    if(callback){
-                        callback();
-                    };
+                    console.log("json is", json, json.entities.map((x) => x.label && this.formatSuggestion(x.label), json.entities.map((x) => x.label && this.formatSuggestion(x.label).length)));
+                    stateUpdateFn(   
+                        json.entities,
+                        json.entities.map((x) => x.label && this.formatSuggestion(x.label)),
+                        json.total_entities,
+                        false);
                 }.bind(this),
                 error: function(error) {
                     this.setState({errorFetching: true});
@@ -192,13 +188,13 @@ class EDLabelPage extends React.Component{
         });
     }
 
-    getEntityDocs = (fromDoc) => {
+    getEntityDocs = (fromDoc, stateUpdateFn) => {
         const entityId = this.state.currentEntities[this.state.indexEntity].id;
         console.log(`We will get more documents for entity id ${entityId} from document ${fromDoc}.`);
         if(fromDoc == 0){
             // fromDoc == 0, which means we're subtracting
             const currentDocs = this.state.currentEntities[this.state.indexEntity].docs;
-            this.setState({currentDocs});
+            stateUpdateFn( currentDocs );
             console.log("Inside getEntityDocs", currentDocs, fromDoc);
         }else{
             // we pretend to get more docs
@@ -211,8 +207,8 @@ class EDLabelPage extends React.Component{
                 success : function(data) {
                     const currentDocs = $.parseJSON(data);
                     console.log("currentDocs is", currentDocs);
-                    this.setState(() => {                        
-                        return ({ currentDocs })});
+                    stateUpdateFn( currentDocs );
+                    
                 }.bind(this),
                 error: function(error) {
                     this.setState({errorFetching: true});
@@ -224,19 +220,31 @@ class EDLabelPage extends React.Component{
     }
 
     projectNameWasSet = () => {
-        const callback = () => {
+        const callback = (currentEntities,
+                            validatedLabels,
+                            totalEntities,
+                            firstLoading) => {
+            console.log("calling callback of projectNameWasSet ", currentEntities, validatedLabels);
             this.setState((prevState) => {
-                console.log("inside projectNameWasSet", prevState);
-                const currentEntity = prevState.currentEntities.length && prevState.currentEntities[0];
+                const currentEntitiesUpdated = currentEntities || prevState.currentEntities;
+                const validatedLabelsUpdated = validatedLabels || prevState.validatedLabels;
+                const totalEntitiesUpdated = totalEntities || prevState.totalEntities;
+
+                console.log("inside projectNameWasSet", prevState, validatedLabelsUpdated);
+                const currentEntity = currentEntitiesUpdated.length && currentEntitiesUpdated[0];
                 const currentDocs = currentEntity && currentEntity.docs;
                 const totalEntityDocs = currentEntity && currentEntity.total_docs;
                 console.log(currentEntity, totalEntityDocs);
 
                 const suggestions = currentEntity && currentEntity.kb_suggestions.map(this.formatSuggestion);
-                const validatedLabel = prevState.validatedLabels.length && prevState.validatedLabels[0];
+                console.log("Inside projectNameWasSet 2 ", suggestions, currentEntity);
+                const validatedLabel = validatedLabelsUpdated.length && validatedLabelsUpdated[0];
                 const currentSuggestions = this.getSuggestions(suggestions, validatedLabel);
                 
                 return ({   
+                            currentEntities: currentEntitiesUpdated,
+                            validatedLabels: validatedLabelsUpdated,
+                            totalEntities: totalEntitiesUpdated,
                             currentDocs: currentDocs,
                             currentSuggestions: currentSuggestions,
                             totalEntityDocs: totalEntityDocs,
@@ -245,7 +253,8 @@ class EDLabelPage extends React.Component{
                             offsetDoc: 0,
                             offsetEntity: 0,
                             disableNextDoc: totalEntityDocs == 1,
-                            disableNextEnt: prevState.totalEntities == 1})});
+                            disableNextEnt: totalEntitiesUpdated == 1,
+                            firstLoading})});
         }
 
         this.getEntities(0, callback);
@@ -270,10 +279,11 @@ class EDLabelPage extends React.Component{
 
     addToDocIndex = () => {
         // add to documents
-        const updateIndexAfterAdding = () => {
+        const updateIndexAfterAdding = (currentDocs) => {
             this.setState((prevState) => {
+                const currentDocsUpdated = currentDocs || prevState.currentDocs;
                 let newState = {};
-                if(prevState.indexDoc == prevState.currentDocs.length - 1){
+                if(prevState.indexDoc == currentDocsUpdated.length - 1){
                     // the last doc in the current batch, we need to ask for more docs
                     newState.indexDoc = 0;
                 }else{
@@ -283,6 +293,7 @@ class EDLabelPage extends React.Component{
                 newState.disableNextDoc =  prevState.offsetDoc + 1 >= prevState.totalEntityDocs - 1;
                 newState.disablePrevDoc = false;
                 newState.offsetDoc = prevState.offsetDoc + 1;
+                newState.currentDocs = currentDocsUpdated;
 
                 return newState;
             })
@@ -292,41 +303,53 @@ class EDLabelPage extends React.Component{
         // we don't check against pageSize because the first request only returns 1 doc per entity
         if(this.state.indexDoc == (this.state.currentDocs.length - 1) && this.state.indexDoc < this.state.totalEntityDocs - 1){
             console.log("Calling getEntityDocs")
-            this.getEntityDocs(this.state.offsetDoc + 1);
+            this.getEntityDocs(this.state.offsetDoc + 1, updateIndexAfterAdding);
         }else{
-            console.log("Not calling getEntityDocs", this.state)
+            console.log("Not calling getEntityDocs", this.state);
+            updateIndexAfterAdding();
         }
-
-        updateIndexAfterAdding();
     }
 
     addToEntityIndex = () => {
         // add to entities
-        const updateIndexAfterAdding = () => {
+        const updateIndexAfterAdding = (currentEntities,
+                                        validatedLabels,
+                                        totalEntities,
+                                        firstLoading) => {
+            
             this.setState((prevState) => {
+                const currentEntitiesUpdated = currentEntities || prevState.currentEntities;
+                const validatedLabelsUpdated = validatedLabels || prevState.validatedLabels;
+                const totalEntitiesUpdated = totalEntities || prevState.totalEntities;
+
                 let newState = {};
                 if(prevState.indexEntity < this.pageSize - 1){
                     newState.indexEntity = prevState.indexEntity + 1;
-                    newState.currentDocs = prevState.currentEntities[newState.indexEntity].docs;
-                    newState.totalEntityDocs = prevState.currentEntities[newState.indexEntity].total_docs;
+                    newState.currentDocs = currentEntitiesUpdated[newState.indexEntity].docs;
+                    newState.totalEntityDocs = currentEntitiesUpdated[newState.indexEntity].total_docs;
                 }else{
                     // the last entity in the current batch, we have added new entities
                     newState.indexEntity = 0;
-                    newState.currentDocs=prevState.currentEntities[0].docs;
-                    newState.totalEntityDocs=prevState.currentEntities[0].total_docs;
+                    newState.currentDocs=currentEntitiesUpdated[0].docs;
+                    newState.totalEntityDocs=currentEntitiesUpdated[0].total_docs;
                 }
 
-                const suggestions = prevState.currentEntities[newState.indexEntity].kb_suggestions.map(this.formatSuggestion);
-                const validatedLabel = prevState.validatedLabels[newState.indexEntity];
+                const suggestions = currentEntitiesUpdated[newState.indexEntity].kb_suggestions.map(this.formatSuggestion);
+                const validatedLabel = validatedLabelsUpdated[newState.indexEntity];
                 newState.currentSuggestions = this.getSuggestions(suggestions, validatedLabel);
 
                 newState.offsetDoc = 0;
                 newState.indexDoc = 0;
                 newState.disableNextDoc = newState.totalEntityDocs == 1;
                 newState.disablePrevDoc = true;
-                newState.disableNextEnt = (prevState.offsetEntity + 1) == (prevState.totalEntities - 1);
+                newState.disableNextEnt = (prevState.offsetEntity + 1) == (totalEntitiesUpdated - 1);
                 newState.disablePrevEnt = false;
                 newState.offsetEntity = prevState.offsetEntity + 1;
+                
+                newState.firstLoading = firstLoading;
+                newState.currentEntities = currentEntitiesUpdated;
+                newState.validatedLabels = validatedLabelsUpdated;
+                newState.totalEntities = totalEntitiesUpdated;
 
                 return newState
             })
@@ -334,15 +357,20 @@ class EDLabelPage extends React.Component{
 
         // if the index is 9, we need to get the new page
         if(this.state.indexEntity == (this.pageSize - 1)){
-            this.getEntities(this.state.offsetEntity + 1);
+            this.getEntities(this.state.offsetEntity + 1, updateIndexAfterAdding);
         }
-        updateIndexAfterAdding();
+        else{
+            updateIndexAfterAdding();
+        }
     }
 
     subtractToDocIndex = () => {
-        const updateIndexAfterSubtracting = () => {
+        console.log("Inside subtractToDocIndex ");
+
+        const updateIndexAfterSubtracting = (currentDocs) => {
             this.setState((prevState) => {
                 let indexDoc;
+                const currentDocsUpdated = currentDocs || prevState.currentDocs;
                 if(prevState.indexDoc == 0){
                     // the first doc in the current batch, we need to ask for more docs
                     if(prevState.offsetDoc == 1){
@@ -353,32 +381,48 @@ class EDLabelPage extends React.Component{
                 }else{
                     indexDoc = prevState.indexDoc - 1;
                 }
+                console.log("Inside subtractToDocIndex 2 ", prevState.offsetDoc==1);
                 return {
                     indexDoc,
                     disableNextDoc: false,
                     disablePrevDoc: prevState.offsetDoc==1,
                     offsetDoc: prevState.offsetDoc - 1,
+                    currentDocs: currentDocsUpdated
                 }
             })
         };
 
         if(this.state.indexDoc == 0){
-            this.getEntityDocs(Math.max(this.state.offsetDoc - this.pageSize, 0));
+            console.log("Inside subtractToDocIndex 4 ");
+            this.getEntityDocs(Math.max(this.state.offsetDoc - this.pageSize, 0),
+            updateIndexAfterSubtracting);
             // this.updateProjectState(this.state.offsetDoc - this.pageSize, updateIndexAfterSubtracting);
         }
-        updateIndexAfterSubtracting();
+        else{
+            console.log("Inside subtractToDocIndex 3 ");
+            updateIndexAfterSubtracting();
+        }
     }
 
     subtractToEntityIndex = () => {
         // add to entities
-        const updateIndexAfterSubtracting = () => {
+        const updateIndexAfterSubtracting = (currentEntities,
+                                            validatedLabels,
+                                            totalEntities,
+                                            firstLoading) => {
+            
             this.setState((prevState) => {
+                const currentEntitiesUpdated = currentEntities || prevState.currentEntities;
+                const validatedLabelsUpdated = validatedLabels || prevState.validatedLabels;
+                const totalEntitiesUpdated = totalEntities || prevState.totalEntities;
+
+                console.log("Inside updateIndexAfterSubtracting", prevState, this.state);
                 let newState = {};
 
                 if(prevState.indexEntity > 0){
                     newState.indexEntity = prevState.indexEntity - 1;
-                    newState.currentDocs = prevState.currentEntities[newState.indexEntity].docs;
-                    newState.totalEntityDocs = prevState.currentEntities[newState.indexEntity].total_docs;
+                    newState.currentDocs = currentEntitiesUpdated[newState.indexEntity].docs;
+                    newState.totalEntityDocs = currentEntitiesUpdated[newState.indexEntity].total_docs;
                 }else{
                     // the last doc in the current batch, we have new entities
                     if(prevState.offsetEntity == 1){
@@ -386,12 +430,13 @@ class EDLabelPage extends React.Component{
                     }else{
                         newState.indexEntity = this.pageSize - 1;
                     }
-                    newState.currentDocs = prevState.currentEntities[newState.indexEntity].docs;
-                    newState.totalEntityDocs = prevState.currentEntities[newState.indexEntity].total_docs;
+                    console.log("here ", newState.indexEntity, currentEntitiesUpdated, prevState.currentEntities, this.state.currentEntities);
+                    newState.currentDocs = currentEntitiesUpdated[newState.indexEntity].docs;
+                    newState.totalEntityDocs = currentEntitiesUpdated[newState.indexEntity].total_docs;
                 }
 
-                let suggestions = prevState.currentEntities[newState.indexEntity].kb_suggestions.map(this.formatSuggestion);
-                const validatedLabel = prevState.validatedLabels[newState.indexEntity];
+                let suggestions = currentEntitiesUpdated[newState.indexEntity].kb_suggestions.map(this.formatSuggestion);
+                const validatedLabel = validatedLabelsUpdated[newState.indexEntity];
                 newState.currentSuggestions = this.getSuggestions(suggestions, validatedLabel);
 
                 newState.indexDoc = 0;
@@ -402,15 +447,21 @@ class EDLabelPage extends React.Component{
                 newState.disablePrevEnt = prevState.offsetEntity == 1;
                 newState.offsetEntity = prevState.offsetEntity - 1;
 
+                newState.firstLoading = firstLoading;
+                newState.currentEntities = currentEntitiesUpdated;
+                newState.validatedLabels = validatedLabelsUpdated;
+                newState.totalEntities = totalEntitiesUpdated;
+
                 return newState;
             })
         };
 
         // if the index is 0, we need to get the previous page of results
         if(this.state.indexEntity == 0){
-            this.getEntities(Math.max(this.state.offsetEntity - this.pageSize, 0));
-        }
-        updateIndexAfterSubtracting();
+            this.getEntities(Math.max(this.state.offsetEntity - this.pageSize, 0), updateIndexAfterSubtracting);
+        }else{
+            updateIndexAfterSubtracting();
+        } 
     }
 
     updateIndexAfterLabelling = ({label, name}) => {

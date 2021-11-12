@@ -63,15 +63,18 @@ def get_random_index_name(prefix):
     return index_name
 
 
-def check_file(file_bytes, required_columns):
+def check_file(file_bytes, required_columns, column_name_mapping):
     file = get_decoded_stream(file_bytes)
     check_file_size(file)
-    check_column_names(file, column_names=required_columns)
+    mapped_columns = [column_name_mapping[col] for col in required_columns]
+    check_column_names(file, column_names=mapped_columns)
     return file
 
 
-def process_file(file, column_specs):
-    df = read_file(file, column_specs["required"], column_specs.get("optional", []))
+def process_file(file, column_specs, column_name_mapping):
+    mapped_columns = [column_name_mapping[col] for col in column_specs["required"]]
+    df = read_file(file, mapped_columns, column_specs.get("optional", []))
+    df = df.rename(columns=dict((val, key) for key, val in column_name_mapping.items()))
     df[column_specs["text"]] = df[column_specs["text"]].applymap(clean_html)
     return df
 

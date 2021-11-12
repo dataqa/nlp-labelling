@@ -8,7 +8,8 @@ TEST_PROJECT_NAME = "test_project_ner"
 def check_file_upload(api, test_file_path):
     project_data = {"upload_id": 123,
                     "project_name": TEST_PROJECT_NAME,
-                    "project_type": "ner"}
+                    "project_type": "ner",
+                    "column_names": json.dumps({"text": "text"})}
 
     data_dict = project_data
     data_dict["polling"] = False
@@ -47,7 +48,8 @@ def check_file_upload(api, test_file_path):
 
 def check_classnames(api, test_class_name_ner_file_path):
     data_dict = {"project_name": TEST_PROJECT_NAME,
-                 "file": open(test_class_name_ner_file_path, "rb")}
+                 "file": open(test_class_name_ner_file_path, "rb"),
+                 "column_name": "label"}
 
     response = api.post('/api/classnames', data=data_dict)
     assert response.status_code == 200
