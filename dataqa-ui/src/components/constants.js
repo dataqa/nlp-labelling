@@ -2,10 +2,10 @@ const PROJECT_TYPES = { classification: "classification",
                         ner: "ner",
                         entity_disambiguation: "entity_disambiguation"};
     
-const DOCS_TEXT_FILE_FORMAT = "https://dataqa.ai";
-const DOCS_CLASSNAME_FILE_FORMAT = "https://dataqa.ai";
-const DOCS_MENTIONS_FILE_FORMAT = "https://dataqa.ai";
-const DOCS_KB_FILE_FORMAT = "https://dataqa.ai";
+const DOCS_TEXT_FILE_FORMAT = "https://dataqa.ai/docs/v1.1.1/file_formats/classification";
+const DOCS_CLASSNAME_FILE_FORMAT = "https://dataqa.ai/docs/v1.1.1/file_formats/classification";
+const DOCS_MENTIONS_FILE_FORMAT = "https://dataqa.ai/docs/v1.1.1/file_formats/entity_disambiguation";
+const DOCS_KB_FILE_FORMAT = "https://dataqa.ai/docs/v1.1.1/file_formats/entity_disambiguation";
 
 const FILE_TYPE_DOCUMENTS = "documents";
 const FILE_TYPE_KB = "kb";

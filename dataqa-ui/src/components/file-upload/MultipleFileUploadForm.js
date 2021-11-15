@@ -20,8 +20,6 @@ import { DOCS_KB_FILE_FORMAT,
         FILE_TYPE_KB,
         DEFAULT_MENTIONS_COLUMNS,
         DEFAULT_KB_COLUMNS } from '../constants';
-import { TrainRounded } from '@material-ui/icons';
-
 
 const styles = theme => ({
     root: {
@@ -139,7 +137,7 @@ class MultipleFileUploadForm extends React.Component{
 
         if(!this.state.uploadFinished && (getTotalUploadedFiles(this.props.filesUploaded) == 2))
         {
-            this.setState( {uploadFinished: TrainRounded} )
+            this.setState( {uploadFinished: true} )
         }
     }
 
