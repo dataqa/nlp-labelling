@@ -221,11 +221,6 @@ export default class AppRouter extends React.Component {
                                                 projects: this.getUpdatedProjectsCopy('projectParamsFinished', flag, prevState)}});
     }
 
-    setProjectParamsFinished = ( flag=true ) => {
-        console.log("Calling setProjectParamsFinished ", flag)
-        this.setState( {projectParamsFinished: flag} );
-    }
-
     setFilename = (fileType, filename) => {
         console.log("setting filename", fileType, filename);
 
