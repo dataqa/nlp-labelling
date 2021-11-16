@@ -20,7 +20,6 @@ import { DOCS_KB_FILE_FORMAT,
         FILE_TYPE_KB,
         DEFAULT_MENTIONS_COLUMNS,
         DEFAULT_KB_COLUMNS } from '../constants';
-import { stubTrue } from 'lodash';
 
 const styles = theme => ({
     root: {

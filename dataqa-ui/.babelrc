@@ -1,20 +1,19 @@
 {
     "presets": [
         [
-            "env", 
+            "@babel/preset-env", 
             {
                 "targets": {
                     "node": "10"
                 }
             }
         ],
-        "react"
+        "@babel/react"
     ],
     "plugins": [
         "transform-class-properties",
         "emotion",
         "recharts",
-        "transform-object-rest-spread",
         "lodash"
     ]
 }
