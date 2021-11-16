@@ -8,12 +8,11 @@
     "dev-server": "webpack serve --config ./webpack.dev.js"
   },
   "dependencies": {
-    "@elastic/react-search-ui": "1.4.1",
-    "@elastic/react-search-ui-views": "1.4.1",
+    "@elastic/react-search-ui": "1.7.0",
+    "@elastic/react-search-ui-views": "1.7.0",
     "@material-ui/core": "4.11.2",
     "@material-ui/icons": "4.9.1",
     "@material-ui/lab": "4.0.0-alpha.57",
-    "@mui/x-data-grid": "4.0.2",
     "babel-cli": "6.24.1",
     "@babel/core": "7.16.0",
     "babel-loader": "8.2.3",
@@ -22,7 +21,7 @@
     "babel-plugin-transform-class-properties": "6.24.1",
     "@babel/preset-env": "7.16.0",
     "@babel/preset-react": "7.16.0",
-    "css-loader": "5.1.1",
+    "css-loader": "6.5.1",
     "emoji-regex": "^6.5.1",
     "jquery": "^3.4.1",
     "lodash": "4.17.20",
@@ -38,7 +37,7 @@
     "recharts": "1.8.5",
     "recompose": "0.30.0",
     "sass-loader": "12.3.0",
-    "style-loader": "0.18.2",
+    "style-loader": "3.3.1",
     "webpack": "5.62.1",
     "webpack-merge": "5.8.0",
     "webpack-dev-server": "4.4.0"
@@ -47,8 +46,8 @@
     "webpack-cli": "^4.9.1"
   },
   "engines": {
-    "node": "17.1.0",
-    "npm": "8.1.2"
+    "node": "16.13.0",
+    "npm": "8.1.0"
   }
 }
 
