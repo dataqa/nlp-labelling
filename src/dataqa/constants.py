@@ -17,7 +17,7 @@ GROUND_TRUTH_COLUMN_NAME = "__LABEL__"
 MENTIONS_COLUMN_NAME = "mentions"
 
 FILE_TYPE_DOCUMENTS = "documents"
-FILE_TYPE_DOCUMENTS_WIKI = "wiki"
+FILE_TYPE_DOCUMENTS_WIKI = "documents_wiki"
 FILE_TYPE_KB = "kb"
 
 INPUT_FILE_SPECS = {
@@ -25,16 +25,20 @@ INPUT_FILE_SPECS = {
                                       {"required": [TEXT_COLUMN_NAME],
                                        "optional": [GROUND_TRUTH_COLUMN_NAME],
                                        "text": [TEXT_COLUMN_NAME],
-                                       "upload_key": "upload_id"}},
+                                       "upload_key": "upload_id",
+                                       "max_rows": 3000}},
     PROJECT_TYPE_NER: {FILE_TYPE_DOCUMENTS: {"required": [TEXT_COLUMN_NAME],
                                              "text": [TEXT_COLUMN_NAME],
-                                             "upload_key": "upload_id"},
+                                             "upload_key": "upload_id",
+                                             "max_rows": 3000},
                        FILE_TYPE_DOCUMENTS_WIKI: {"required": ["url"],
                                                   "text": [TEXT_COLUMN_NAME],
-                                                  "upload_key": "upload_id"}},
+                                                  "upload_key": "upload_id",
+                                                  "max_rows": 100}},
     PROJECT_TYPE_ED: {FILE_TYPE_DOCUMENTS: {"required": [TEXT_COLUMN_NAME, MENTIONS_COLUMN_NAME],
                                             "text": [TEXT_COLUMN_NAME],
-                                            "upload_key": "upload_id"},
+                                            "upload_key": "upload_id",
+                                            "max_rows": 3000},
                       FILE_TYPE_KB: {"required": ["name", "description"],
                                      "text": ["description"],
                                      "upload_key": "kb_upload_id"}}

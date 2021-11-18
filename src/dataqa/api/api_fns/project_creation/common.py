@@ -30,12 +30,13 @@ class UploadedFile(ABC):
 
         self.column_name_mapping = column_name_mapping
         self.column_specs = INPUT_FILE_SPECS[project_type][file_type]
+        self.total_allowed_documents = self.column_specs.get('max_rows')
         self.mapping_specs = MAPPINGS[project_type][file_type]
         self.project_type = project_type
         self.input_data = input_data
         self.filename = input_data.filename
         self.total_documents = 0
-        self.file_type = file_type  # documents, kb or wiki
+        self.file_type = file_type  # documents, kb or documents_wiki
         self.actual_column_names = None
         self.processed_data = None
         self.has_ground_truth_labels = None
@@ -59,12 +60,18 @@ class UploadedFile(ABC):
         csvfile = csv.DictReader(self.input_data, fieldnames=mapped_columns)
         _ = next(csvfile)
 
+        num_lines = 0
         for line in csvfile:
-            if self.file_type == "wiki":
+            if self.file_type == FILE_TYPE_DOCUMENTS_WIKI:
                 for chunk in extract_wikipedia_paragraphs(line["url"]):
                     yield chunk
             else:
                 yield line
+            num_lines += 1
+
+            if self.total_allowed_documents and num_lines > self.total_allowed_documents:
+                raise Exception(f"The file contains more than the allowed number of rows: "
+                                f"{self.total_allowed_documents}")
 
     def __iter__(self):
         for line in self.read_line():

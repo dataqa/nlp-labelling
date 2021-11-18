@@ -103,6 +103,19 @@ def create_entity_disambiguation_project(session,
     # perform document checks
     column_specs = INPUT_FILE_SPECS[project_type][file_type]
 
+    if file_type == FILE_TYPE_DOCUMENTS:
+        uploaded_file = UploadedMentionsFile(project_type,
+                                             file_bytes,
+                                             file_type,
+                                             column_name_mapping)
+    else:
+        uploaded_file = UploadedKbFile(project_type,
+                                       file_bytes,
+                                       file_type,
+                                       column_name_mapping)
+
+    uploaded_file.do_all_file_checks()
+
     try:
         project = get_project(session, project_name)
         setattr(project, column_specs["upload_key"], upload_id)
@@ -128,13 +141,6 @@ def create_entity_disambiguation_project(session,
     class_names = None
     try:
         if file_type == FILE_TYPE_DOCUMENTS:
-            uploaded_file = UploadedMentionsFile(project_type,
-                                                 file_bytes,
-                                                 file_type,
-                                                 column_name_mapping)
-
-            uploaded_file.do_all_file_checks()
-
             upload_documents_file(session,
                                   project,
                                   es_uri,
@@ -142,13 +148,6 @@ def create_entity_disambiguation_project(session,
                                   index_name,
                                   project_type)
         else:
-            uploaded_file = UploadedKbFile(project_type,
-                                           file_bytes,
-                                           file_type,
-                                           column_name_mapping)
-
-            uploaded_file.do_all_file_checks()
-
             class_names = upload_kb_file(project,
                                          es_uri,
                                          uploaded_file,
