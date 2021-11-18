@@ -3,21 +3,36 @@ import sys
 
 from werkzeug.utils import secure_filename
 
-from dataqa.api.api_fns import utils
-from dataqa.api.api_fns.project_creation.common import (check_file,
+from dataqa.api.api_fns.project_creation.common import (ES_indexer,
                                                         get_random_index_name,
-                                                        index_df, process_file)
-from dataqa.constants import (INPUT_FILE_SPECS,
-                              TEXT_COLUMN_NAME,
-                              ES_GROUND_TRUTH_NAME_FIELD,
-                              FILE_TYPE_DOCUMENTS,
-                              MAPPINGS)
+                                                        UploadedFile)
+from dataqa.constants import MAPPINGS
 from dataqa.db.ops.supervised import add_supervised_project_to_db
-from dataqa.elasticsearch.client.utils.common import create_new_index, delete_index
-from dataqa.ml.sentiment import get_sentiment
-from dataqa.nlp.spacy_file_utils import serialise_save_spacy_docs
+from dataqa.elasticsearch.client.utils.common import delete_index
+from dataqa.nlp.spacy_file_utils import save_spacy_docs, SpacySerialiser
 
 ALLOWED_EXTENSIONS = {'csv'}
+
+
+class UploadedSupervisedFile(UploadedFile):
+
+    def __init__(self, project_type, input_data, file_type, column_name_mapping):
+        super().__init__(project_type, input_data, file_type, column_name_mapping)
+
+    def process_file(self, es_uri, index_name, get_row, project_full_path, spacy_binary_filepath):
+        if not os.path.exists(project_full_path):
+            os.makedirs(project_full_path)
+
+        spacy_serialiser = SpacySerialiser()
+
+        with ES_indexer(es_uri, index_name, get_row, self.mapping_specs) as es_indexer:
+            es_indexer.create_new_index()
+
+            for line in self:
+                spacy_serialiser.add_doc(line["text"])
+                es_indexer.index_line(line)
+
+        save_spacy_docs(spacy_serialiser.get_bytes(), spacy_binary_filepath)
 
 
 def allowed_file(filename):
@@ -25,11 +40,8 @@ def allowed_file(filename):
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
-def turn_doc_row_into_es_row(row, mapping_columns, columns_specs, optional_columns_present):
-    new_row = dict((mapping_columns[required_col], row[required_col])
-                   for required_col in columns_specs["required"])
-    for optional_col in optional_columns_present:
-        new_row[mapping_columns[optional_col]] = row[optional_col]
+def turn_doc_row_into_es_row(row, mapping_columns):
+    new_row = dict((mapping_columns[col], row[col]) for col in row if col in mapping_columns)
     return new_row
 
 
@@ -48,43 +60,41 @@ def create_supervised_project(session,
     #TODO: optimise so we don't need to iterate through file twice
     #TODO (once for saving, another time for counting lines)
     """
-    column_specs = INPUT_FILE_SPECS[project_type][FILE_TYPE_DOCUMENTS]
-    required_columns = column_specs["required"]
-    file = do_all_file_checks(file_type, file_bytes, required_columns, column_name_mapping)
+    uploaded_file = UploadedSupervisedFile(project_type,
+                                           file_bytes,
+                                           file_type,
+                                           column_name_mapping)
 
-    # run spacy
+    # perform document checks
+    uploaded_file.do_all_file_checks()
+
+    # Save project details in db
     project_full_path, filepath, spacy_binary_filepath = get_paths(upload_folder,
                                                                    file_bytes.filename,
                                                                    project_name)
-
-    df = process_file(file, column_specs, column_name_mapping)
-    has_ground_truth_labels = ES_GROUND_TRUTH_NAME_FIELD in df.columns
-    total_documents = len(df)
-
     index_name = get_random_index_name(project_name)
 
-    project_id = add_supervised_project_to_db(session,
-                                              project_name,
-                                              project_type,
-                                              file_bytes.filename,
-                                              upload_id,
-                                              index_name,
-                                              filepath,
-                                              spacy_binary_filepath,
-                                              total_documents,
-                                              has_ground_truth_labels)
-
     try:
-        save_files_to_disk(df, project_full_path, filepath, spacy_binary_filepath)
-        mapping_specs = MAPPINGS[project_type][FILE_TYPE_DOCUMENTS]
-        create_new_index(es_uri, index_name, mapping_specs["mapping_es"])
-        optional_columns = column_specs.get("optional", [])
-        optional_columns_present = [col for col in optional_columns if col in df.columns]
-        get_row = lambda row: turn_doc_row_into_es_row(row,
-                                                       mapping_specs["mapping_columns"],
-                                                       column_specs,
-                                                       optional_columns_present)
-        index_df(es_uri, index_name, df, get_row)
+        mapping_specs = MAPPINGS[project_type][file_type]
+
+        get_row = lambda row: turn_doc_row_into_es_row(row, mapping_specs["mapping_columns"])
+
+        uploaded_file.process_file(es_uri,
+                                   index_name,
+                                   get_row,
+                                   project_full_path,
+                                   spacy_binary_filepath)
+
+        project_id = add_supervised_project_to_db(session,
+                                                  project_name,
+                                                  project_type,
+                                                  file_bytes.filename,
+                                                  upload_id,
+                                                  index_name,
+                                                  filepath,
+                                                  spacy_binary_filepath,
+                                                  uploaded_file.total_documents,
+                                                  uploaded_file.has_ground_truth_labels)
     except:
         # clean up resources
         print("Error while creating ES index & saving files to disk", sys.exc_info())
@@ -93,21 +103,6 @@ def create_supervised_project(session,
         raise
 
     return project_id
-
-
-def do_all_file_checks(file_type, file_bytes, required_columns, column_name_mapping):
-    if file_type != FILE_TYPE_DOCUMENTS:
-        raise Exception(f"Supervised projects (classification, NER) do not accept files of type {file_type}")
-    file = check_file(file_bytes, required_columns, column_name_mapping)
-    return file
-
-
-def save_files_to_disk(df, project_full_path, filepath, spacy_binary_filepath):
-    if not os.path.exists(project_full_path):
-        os.makedirs(project_full_path)
-    serialise_save_spacy_docs(df, spacy_binary_filepath)
-    df = get_sentiment(df)
-    df.drop(columns=[TEXT_COLUMN_NAME]).to_csv(filepath)
 
 
 def delete_files_from_disk(filepath, spacy_binary_filepath):

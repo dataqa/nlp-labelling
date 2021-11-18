@@ -52,11 +52,13 @@ const FileUploadForm = (props) => {
             />
         )
     }else{
+        const title = props.wikiData? "Load a csv file with the wikipedia urls or paths.": "Load a csv file with the documents.";
+        
         return (
             <SingleFileUploadForm 
                 rootClassName={props.classes.root}
                 id={"contained-button-file"}
-                instructionText={"Load a csv file with the documents."}
+                instructionText={title}
                 helpText={<p>No column {DEFAULT_TEXT_COLUMN} found in file. Read more in the <a  href={DOCS_TEXT_FILE_FORMAT} target="_blank"> documentation</a>. Please select columns:</p>}
                 createProject={props.createProject}
                 defaultColumnNames={[DEFAULT_TEXT_COLUMN]}
@@ -484,6 +486,7 @@ class FileUploadMain extends React.Component{
                     <FileUploadForm 
                         classes={classes}
                         projectType={this.props.projectType}
+                        wikiData={this.props.wikiData}
                         selectFile={this.selectFile}
                         createProject={this.createProject}
                         setProjectName={this.setProjectName}

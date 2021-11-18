@@ -16,7 +16,7 @@ class Project(Base):
     name = Column(String)
     total_documents = Column(Integer)
     index_name = Column(String)
-    filename = Column(String)
+    filename = Column(String) # documents filename (shared by both supervised and NED projects)
 
     __mapper_args__ = {
         'polymorphic_identity': 'project',

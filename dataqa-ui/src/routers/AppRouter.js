@@ -39,6 +39,7 @@ export default class AppRouter extends React.Component {
         projectName: undefined,
         projectNameSlug: undefined,
         projectType: undefined,
+        wikiData: undefined,
         classNames : undefined,
         projectUploadFinished: false,
         projectParamsFinished: false,
@@ -71,11 +72,12 @@ export default class AppRouter extends React.Component {
         try{
             const projectName = localStorage.getItem('projectName');
             const projectType = localStorage.getItem('projectType');
+            const wikiData = localStorage.getItem('wikiData');
             const classNames = localStorage.getItem('classNames');
             const projectUploadFinished = localStorage.getItem('projectUploadFinished');
             const projectParamsFinished = localStorage.getItem('projectParamsFinished');
 
-            console.log("Just mounted AppRouter,", projectName, projectType, classNames);
+            console.log("Just mounted AppRouter,", projectName, projectType, wikiData, classNames);
 
             const filenames = localStorage.getItem('filenames');
 
@@ -86,6 +88,10 @@ export default class AppRouter extends React.Component {
 
             if (projectType && (projectType != "undefined")){
                 this.setState(() => ({ projectType }));
+            }
+
+            if (wikiData && (wikiData != "undefined")){
+                this.setState(() => ({ wikiData }));
             }
 
             if  (classNames && (classNames != "undefined")){
@@ -123,6 +129,9 @@ export default class AppRouter extends React.Component {
         if (prevState.projectType != this.state.projectType) {
             localStorage.setItem('projectType', this.state.projectType);
         }
+        if (prevState.wikiData != this.state.wikiData) {
+            localStorage.setItem('wikiData', this.state.wikiData);
+        }
         if (prevState.projectUploadFinished != this.state.projectUploadFinished) {
             localStorage.setItem('projectUploadFinished', this.state.projectUploadFinished);
         }
@@ -156,6 +165,7 @@ export default class AppRouter extends React.Component {
                                                         "projectName": projectName,
                                                         "projectNameSlug": projectNameSlug,
                                                         "projectType": prevState.projectType,
+                                                        "wikiData": prevState.wikiData,
                                                         "projectUploadFinished": prevState.projectUploadFinished,
                                                         "projectParamsFinished": prevState.projectParamsFinished,
                                                         "filenames": prevState.filenames
@@ -186,6 +196,7 @@ export default class AppRouter extends React.Component {
         this.setState({projectName: undefined,
                         projectNameSlug: undefined,
                         projectType: undefined,
+                        wikiData: undefined,
                         classNames: undefined,
                         projectUploadFinished: false,
                         projectParamsFinished: false,
@@ -194,8 +205,8 @@ export default class AppRouter extends React.Component {
         console.log('resetCurrentProject', this.state);
     }
 
-    setProjectType = (projectType, projectParamsFinished) => {
-        this.setState( {projectType, projectParamsFinished} );
+    setProjectType = (projectType, projectParamsFinished, wikiData=false) => {
+        this.setState( {projectType, projectParamsFinished, wikiData} );
     }
 
     setProjectName = (projectName) => {
@@ -249,7 +260,7 @@ export default class AppRouter extends React.Component {
                 console.log("Doing currentProject", currentProject);
 
                 this.setProjectName(currentProject.projectName);
-                this.setProjectType(currentProject.projectType);
+                this.setProjectType(currentProject.projectType, currentProject.wikiData);
                 this.setClassNames(currentProject.classNames);
                 this.setProjectUploadFinished(currentProject.projectUploadFinished);
                 this.setProjectParamsFinished(currentProject.projectParamsFinished);
@@ -286,6 +297,7 @@ export default class AppRouter extends React.Component {
                                             existingProjectSlugs={this.state.projects.map((x) => x.projectNameSlug)}
                                             projectName={this.state.projectName}
                                             projectType={this.state.projectType}
+                                            wikiData={this.state.wikiData}
                                             addProjectToList={this.addProjectToList}
                                             setProjectUploadFinished={this.setProjectUploadFinished}
                                             setFilename={this.setFilename}
@@ -357,6 +369,7 @@ export default class AppRouter extends React.Component {
                                             projectName={this.state.projectName}
                                             projectNameSlug={this.state.projectNameSlug}
                                             projectType={this.state.projectType}
+                                            wikiData={this.state.wikiData}
                                             filenames={this.state.filenames}
                                             classNames={this.state.classNames}
                                             setClassNames={this.setClassNames}
