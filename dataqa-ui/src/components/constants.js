@@ -2,7 +2,7 @@ const PROJECT_TYPES = { classification: "classification",
                         ner: "ner",
                         entity_disambiguation: "entity_disambiguation"};
     
-const WIKI_DOCS_FILE_FORMAT = "https://dataqa.ai/docs/v1.1.1/file_formats/classification";
+const WIKI_DOCS_FILE_FORMAT = "https://dataqa.ai/docs/v1.1.1/file_formats/NER";
 const DOCS_TEXT_FILE_FORMAT = "https://dataqa.ai/docs/v1.1.1/file_formats/classification";
 const DOCS_CLASSNAME_FILE_FORMAT = "https://dataqa.ai/docs/v1.1.1/file_formats/classification";
 const DOCS_MENTIONS_FILE_FORMAT = "https://dataqa.ai/docs/v1.1.1/file_formats/entity_disambiguation";
