@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 import csv
 import json
+from pathlib import Path
 import random
 
 from dataqa.api.api_fns.utils import check_file_size, get_column_names, get_decoded_stream
@@ -34,7 +35,7 @@ class UploadedFile(ABC):
         self.mapping_specs = MAPPINGS[project_type][file_type]
         self.project_type = project_type
         self.input_data = input_data
-        self.filename = input_data.filename
+        self.filename = Path(input_data.filename).name
         self.total_documents = 0
         self.file_type = file_type  # documents, kb or documents_wiki
         self.actual_column_names = None

@@ -86,7 +86,6 @@ class SupervisedProject(Project):
     import_id = Column(String)
     supervised_type = Column(String)
 
-    data_filepath = Column(String)  # for sentiment and other file attributes
     spacy_binary_filepath = Column(String)
 
     # accuracy of merged label across all document classes (classification) or span classes (NER)

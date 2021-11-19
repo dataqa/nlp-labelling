@@ -69,9 +69,7 @@ def create_supervised_project(session,
     uploaded_file.do_all_file_checks()
 
     # Save project details in db
-    project_full_path, filepath, spacy_binary_filepath = get_paths(upload_folder,
-                                                                   file_bytes.filename,
-                                                                   project_name)
+    project_full_path, spacy_binary_filepath = get_paths(upload_folder, project_name)
     index_name = get_random_index_name(project_name)
 
     try:
@@ -91,7 +89,6 @@ def create_supervised_project(session,
                                                   file_bytes.filename,
                                                   upload_id,
                                                   index_name,
-                                                  filepath,
                                                   spacy_binary_filepath,
                                                   uploaded_file.total_documents,
                                                   uploaded_file.has_ground_truth_labels)
@@ -112,13 +109,8 @@ def delete_files_from_disk(filepath, spacy_binary_filepath):
         os.remove(spacy_binary_filepath)
 
 
-def get_paths(upload_folder, filename, project_name):
+def get_paths(upload_folder, project_name):
     folder_name = secure_filename(project_name)
     project_full_path = os.path.join(upload_folder, folder_name)
-    if allowed_file(filename):
-        filename = secure_filename(filename)
-        filepath = os.path.join(project_full_path, filename)
-    else:
-        raise Exception("Name of file not allowed.")
     spacy_binary_filepath = os.path.join(project_full_path, 'spacy.bin')
-    return project_full_path, filepath, spacy_binary_filepath
+    return project_full_path, spacy_binary_filepath

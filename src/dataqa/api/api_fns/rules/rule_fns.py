@@ -486,8 +486,7 @@ def apply_rules(project, es_uri, new_rules):
     """
     Applies all the rules, recomputes merged label file and returns summary stats
     """
-    df = read_data_df(project.data_filepath,
-                      spacy_binary_filepath=project.spacy_binary_filepath)
+    df = read_data_df(project.spacy_binary_filepath)
 
     if project.type == PROJECT_TYPE_CLASSIFICATION:
         apply_update_rules_classification(project, es_uri, df, new_rules)
@@ -551,8 +550,8 @@ def compute_rule_accuracy(rule_ids,
     return stats
 
 
-def get_sentiment_distribution(filepath, spacy_binary_filepath):
-    df = read_data_df(filepath, spacy_binary_filepath, only_sentiment=True)
+def get_sentiment_distribution(spacy_binary_filepath):
+    df = read_data_df(spacy_binary_filepath)
     distribution = sentiment.get_sentiment_distribution(df)
     return distribution
 
@@ -595,14 +594,8 @@ def check_create_rule_id(session, create_rule_id):
     return None
 
 
-def read_data_df(data_filepath, spacy_binary_filepath, only_sentiment=False):
-    with open(data_filepath, 'r') as file:
-        column_names = utils.get_column_names(file)
-        usecols = list(sentiment.SENTIMENT_COL_MAPPING.values())
-        if ES_GROUND_TRUTH_NAME_FIELD in column_names:
-            usecols.append(ES_GROUND_TRUTH_NAME_FIELD)
-        df = pd.read_csv(file, encoding='utf8', usecols=usecols)
-        if not only_sentiment:
-            spacy_docs = deserialise_spacy_docs(spacy_binary_filepath)
-            df[SPACY_COLUMN_NAME] = spacy_docs
+def read_data_df(spacy_binary_filepath):
+    spacy_docs = deserialise_spacy_docs(spacy_binary_filepath)
+    df = pd.DataFrame()
+    df[SPACY_COLUMN_NAME] = spacy_docs
     return df
