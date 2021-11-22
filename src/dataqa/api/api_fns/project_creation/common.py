@@ -112,7 +112,7 @@ class ES_indexer(object):
                 bulk_load_documents(self.es_uri, self.index_name, self.current_rows, self.num_indexed_docs)
                 self.num_indexed_docs = self.num_read_lines
                 self.current_rows = []
-            except:
+            except Exception as e:
                 print(f"Error bulk loading lines "
                       f"{self.num_indexed_docs} to {self.num_indexed_docs + len(self.current_rows) - 1} to elasticsearch")
                 raise

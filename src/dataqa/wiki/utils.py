@@ -5,6 +5,8 @@ import pandas as pd
 import re
 import requests
 
+from dataqa.constants import TABLE_COLUMN_NAMES_FIELD_NAME, TABLE_ROWS_FIELD_NAME, TEXT_COLUMN_NAME
+
 Wikipage = namedtuple("Wikipage", ["name", "html", "url", "source"])
 
 
@@ -58,14 +60,19 @@ def extract_tables(soup):
     for tab in all_tables:
         list_tabs = pd.read_html(str(tab))
         for df_tab in list_tabs:
-            df_tab = df_tab.dropna(how='all')
+            df_tab = df_tab.dropna(how='all').fillna('')
 
             if type(df_tab.columns) == pd.core.indexes.numeric.Int64Index:
                 df_tab = df_tab.transpose()
                 df_tab.columns = df_tab.iloc[0]
                 df_tab = df_tab.iloc[1:]
 
-            output_tables.append(df_tab.to_markdown(index=False))
+            table_text = df_tab.to_string(index=False)
+            table_cols = df_tab.columns.tolist()
+            table_rows = df_tab.values.tolist()
+            output_tables.append({TABLE_ROWS_FIELD_NAME: table_rows,
+                                  TABLE_COLUMN_NAMES_FIELD_NAME: table_cols,
+                                  TEXT_COLUMN_NAME: table_text})
 
     for table in all_tables:
         table.decompose()
@@ -83,10 +90,18 @@ def extract_wikipedia_paragraphs(url):
 
     all_tables = extract_tables(soup)
     for table_ind, table in enumerate(all_tables):
-        yield {"paragraph_id": table_ind, "text": table, "url": url}
+        yield {"paragraph_id": table_ind,
+               TEXT_COLUMN_NAME: table[TEXT_COLUMN_NAME],
+               TABLE_COLUMN_NAMES_FIELD_NAME: table[TABLE_COLUMN_NAMES_FIELD_NAME],
+               TABLE_ROWS_FIELD_NAME: table[TABLE_ROWS_FIELD_NAME],
+               "url": url,
+               "is_table": "true"}
 
     for p_ind, paragraph in enumerate(get_paragraphs(soup)):
-        yield {"paragraph_id": p_ind + table_ind + 1, "text": paragraph, "url": url}
+        yield {"paragraph_id": p_ind + table_ind + 1,
+               TEXT_COLUMN_NAME: paragraph,
+               "url": url,
+               "is_table": "false"}
 
 
 def main(input_filepath, output_filepath):

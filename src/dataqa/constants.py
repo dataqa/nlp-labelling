@@ -13,6 +13,8 @@ ALL_PROJECT_TYPES = [PROJECT_TYPE_CLASSIFICATION, PROJECT_TYPE_NER, PROJECT_TYPE
 
 # input file columns
 TEXT_COLUMN_NAME = 'text'
+TABLE_COLUMN_NAMES_FIELD_NAME = 'column_names'
+TABLE_ROWS_FIELD_NAME = 'rows'
 GROUND_TRUTH_COLUMN_NAME = "__LABEL__"
 MENTIONS_COLUMN_NAME = "mentions"
 
@@ -70,7 +72,10 @@ MAPPING_CLASSIFICATION = {
 MAPPING_NER = {
     "properties": {
         ES_TEXT_FIELD_NAME: {"type": "text"},
-        "url": {"type": "keyword"},
+        "url": {"type": "keyword"},  # Does the data come from a url (wiki)?
+        "is_table": {"type": "boolean"},  # Is the data to be displayed as a table?
+        TABLE_ROWS_FIELD_NAME: {"type": "text"},  # array of arrays
+        TABLE_COLUMN_NAMES_FIELD_NAME: {"type": "text"},  # array of column names
         "paragraph_id": {"type": "integer"},
         "rules": {"type": "nested",
                   "properties": {
@@ -156,7 +161,11 @@ MAPPINGS = {PROJECT_TYPE_CLASSIFICATION:
                                        "mapping_columns": {TEXT_COLUMN_NAME: ES_TEXT_FIELD_NAME}},
                  FILE_TYPE_DOCUMENTS_WIKI: {"mapping_es": MAPPING_NER,
                                             "mapping_columns": {TEXT_COLUMN_NAME: ES_TEXT_FIELD_NAME,
+                                                                TABLE_ROWS_FIELD_NAME: TABLE_ROWS_FIELD_NAME,
+                                                                TABLE_COLUMN_NAMES_FIELD_NAME:
+                                                                    TABLE_COLUMN_NAMES_FIELD_NAME,
                                                                 "url": "url",
+                                                                "is_table": "is_table",
                                                                 "paragraph_id": "paragraph_id"}}},
             PROJECT_TYPE_ED:
                 {FILE_TYPE_DOCUMENTS: {"mapping_es": MAPPING_MENTIONS,

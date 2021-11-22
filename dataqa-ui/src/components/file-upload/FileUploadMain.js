@@ -343,7 +343,7 @@ class FileUploadMain extends React.Component{
                     }
                     else{
                         alert("Server timed out");
-                        this.updateLoadingState(fileType, true);
+                        this.updateLoadingState(fileType, false);
                     }
                 }else{
                     console.log("File loaded successfully", today.toLocaleString());

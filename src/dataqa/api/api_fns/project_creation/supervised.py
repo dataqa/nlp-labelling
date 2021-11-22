@@ -96,15 +96,12 @@ def create_supervised_project(session,
         # clean up resources
         print("Error while creating ES index & saving files to disk", sys.exc_info())
         delete_index(es_uri, index_name)
-        delete_files_from_disk(filepath, spacy_binary_filepath)
-        raise
+        delete_files_from_disk(spacy_binary_filepath)
 
     return project_id
 
 
-def delete_files_from_disk(filepath, spacy_binary_filepath):
-    if os.path.exists(filepath):
-        os.remove(filepath)
+def delete_files_from_disk(spacy_binary_filepath):
     if os.path.exists(spacy_binary_filepath):
         os.remove(spacy_binary_filepath)
 
