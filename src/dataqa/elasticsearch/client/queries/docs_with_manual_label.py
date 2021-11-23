@@ -1,12 +1,16 @@
 # Query to get documents with specific label
-from dataqa.constants import (ES_GROUND_TRUTH_LABEL_FIELD, PROJECT_TYPE_NER)
+from dataqa.constants import (ES_GROUND_TRUTH_LABEL_FIELD,
+                              ES_TEXT_FIELD_NAME,
+                              PROJECT_TYPE_NER,
+                              TABLE_COLUMN_NAMES_FIELD_NAME,
+                              TABLE_ROWS_FIELD_NAME,
+                              TABLE_ROWS_CHAR_STARTS_FIELD_NAME)
 
 
 def docs_with_manual_label_query(project_type,
                                  from_,
                                  size,
                                  session_id,
-                                 text_field,
                                  label):
     """
     Find all the documents with a specific manual label or the ones with the current session_id.
@@ -51,7 +55,11 @@ def docs_with_manual_label_query(project_type,
         "from": from_,
         "size": size,
         "_source": [
-            text_field,
+            ES_TEXT_FIELD_NAME,
+            TABLE_COLUMN_NAMES_FIELD_NAME,
+            TABLE_ROWS_FIELD_NAME,
+            TABLE_ROWS_CHAR_STARTS_FIELD_NAME,
+            "is_table",
             ES_GROUND_TRUTH_LABEL_FIELD,
             "manual_label",
             "id"

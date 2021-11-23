@@ -1,9 +1,12 @@
 # Query to get all documents that have not been labelled yet
+from dataqa.constants import (ES_TEXT_FIELD_NAME,
+                              TABLE_COLUMN_NAMES_FIELD_NAME,
+                              TABLE_ROWS_FIELD_NAME,
+                              TABLE_ROWS_CHAR_STARTS_FIELD_NAME)
 
 def all_docs_query(from_,
                    size,
                    session_id,
-                   text_field,
                    label_field):
     """
     The manual_label field must either not exist (has never been labelled before) or
@@ -34,7 +37,11 @@ def all_docs_query(from_,
         "from": from_,
         "size": size,
         "_source": [
-            text_field,
+            ES_TEXT_FIELD_NAME,
+            TABLE_COLUMN_NAMES_FIELD_NAME,
+            TABLE_ROWS_FIELD_NAME,
+            TABLE_ROWS_CHAR_STARTS_FIELD_NAME,
+            "is_table",
             label_field,
             "manual_label",
             "id"

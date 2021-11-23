@@ -1,7 +1,11 @@
+from dataqa.constants import (ES_TEXT_FIELD_NAME,
+                              TABLE_COLUMN_NAMES_FIELD_NAME,
+                              TABLE_ROWS_FIELD_NAME,
+                              TABLE_ROWS_CHAR_STARTS_FIELD_NAME)
+
 def docs_with_empty_manual_entities_query(from_,
                                           size,
-                                          session_id,
-                                          text_field):
+                                          session_id):
     """
     Returns documents where manual_label is an empty list or from the same session_id.
     """
@@ -41,7 +45,11 @@ def docs_with_empty_manual_entities_query(from_,
         "from": from_,
         "size": size,
         "_source": [
-            text_field,
+            ES_TEXT_FIELD_NAME,
+            TABLE_COLUMN_NAMES_FIELD_NAME,
+            TABLE_ROWS_FIELD_NAME,
+            TABLE_ROWS_CHAR_STARTS_FIELD_NAME,
+            "is_table",
             "manual_label",
             "id"
         ],

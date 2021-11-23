@@ -48,7 +48,6 @@ def read_docs_with_manual_label_classification(es_uri,
                                                  from_,
                                                  size,
                                                  session_id,
-                                                 ES_TEXT_FIELD_NAME,
                                                  label)
 
     query_results = process_es_docs_classification(query,
@@ -176,7 +175,6 @@ def read_docs_from_single_rule(es_uri,
     query = queries.docs_with_predicted_labels_query(from_,
                                                      size,
                                                      session_id,
-                                                     ES_TEXT_FIELD_NAME,
                                                      ES_GROUND_TRUTH_LABEL_FIELD,
                                                      rule_id)
     query_results = process_es_docs_classification(query,
@@ -196,7 +194,6 @@ def read_docs_from_all_rules(es_uri,
     query = queries.docs_with_predicted_labels_query(from_,
                                                      size,
                                                      session_id,
-                                                     ES_TEXT_FIELD_NAME,
                                                      ES_GROUND_TRUTH_LABEL_FIELD)
 
     results = process_es_docs_classification(query,
@@ -216,7 +213,6 @@ def read_docs_with_no_rule(es_uri,
     query = queries.docs_with_no_rule_query(from_,
                                             size,
                                             session_id,
-                                            ES_TEXT_FIELD_NAME,
                                             ES_GROUND_TRUTH_LABEL_FIELD)
 
     query_results = process_es_docs_classification(query,

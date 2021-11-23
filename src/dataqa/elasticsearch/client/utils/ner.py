@@ -2,7 +2,10 @@ import requests
 
 from dataqa.constants import (ES_GROUND_TRUTH_NAME_FIELD,
                               ES_TEXT_FIELD_NAME,
-                              PROJECT_TYPE_NER)
+                              PROJECT_TYPE_NER,
+                              TABLE_COLUMN_NAMES_FIELD_NAME,
+                              TABLE_ROWS_FIELD_NAME,
+                              TABLE_ROWS_CHAR_STARTS_FIELD_NAME)
 from dataqa.elasticsearch.client import queries
 from dataqa.elasticsearch.client.utils.common import (get_unlabelled_docs_query,
                                                       scroll_through,
@@ -54,6 +57,13 @@ def process_es_docs_ner(query, es_uri, index_name, rule_id):
         get_label = lambda hit: get_manual_label_if_exists_else_rule_labels(hit, rule_id)
 
     documents = [{"text": hit["_source"][ES_TEXT_FIELD_NAME],
+                  "is_table": hit["_source"]["is_table"] == 'true',
+                  TABLE_COLUMN_NAMES_FIELD_NAME: hit["_source"][TABLE_COLUMN_NAMES_FIELD_NAME]
+                  if hit["_source"]["is_table"] == 'true' else [],
+                  TABLE_ROWS_FIELD_NAME: hit["_source"][TABLE_ROWS_FIELD_NAME]
+                  if hit["_source"]["is_table"] == 'true' else [],
+                  TABLE_ROWS_CHAR_STARTS_FIELD_NAME: hit["_source"][TABLE_ROWS_CHAR_STARTS_FIELD_NAME]
+                  if hit["_source"]["is_table"] == 'true' else [],
                   "label": get_label(hit["_source"]),
                   "rules": get_flattened_rule_spans(hit["_source"].get("rules", []))}
                  for hit in response_json["hits"]["hits"]]
@@ -78,8 +88,7 @@ def read_docs_with_empty_manual_labels(es_uri,
                                        session_id):
     query = queries.docs_with_empty_manual_entities_query(from_,
                                                           size,
-                                                          session_id,
-                                                          ES_TEXT_FIELD_NAME)
+                                                          session_id)
     field_id = -2
     query_results = process_es_docs_ner(query, es_uri, index_name, field_id)
     return query_results
@@ -95,7 +104,6 @@ def read_docs_with_manual_label_ner(es_uri,
                                                  from_,
                                                  size,
                                                  session_id,
-                                                 ES_TEXT_FIELD_NAME,
                                                  label)
     field_id = -3
 
@@ -223,7 +231,6 @@ def read_docs_from_single_rule(es_uri,
     query = queries.docs_with_predicted_labels_query(from_,
                                                      size,
                                                      session_id,
-                                                     ES_TEXT_FIELD_NAME,
                                                      ground_truth_field=None,
                                                      rule_id=rule_id)
     query_results = process_es_docs_ner(query, es_uri, index_name, rule_id)
@@ -239,8 +246,7 @@ def read_docs_from_all_rules(es_uri,
                              has_ground_truth_labels=False):
     query = queries.docs_with_predicted_labels_query(from_,
                                                      size,
-                                                     session_id,
-                                                     ES_TEXT_FIELD_NAME)
+                                                     session_id)
     results = process_es_docs_ner(query, es_uri, index_name, -1)
 
     return results
@@ -255,7 +261,6 @@ def read_docs_with_no_rule(es_uri,
     query = queries.docs_with_no_rule_query(from_,
                                             size,
                                             session_id,
-                                            ES_TEXT_FIELD_NAME,
                                             ES_GROUND_TRUTH_NAME_FIELD)
 
     query_results = process_es_docs_ner(query, es_uri, index_name, -2)

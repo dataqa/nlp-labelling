@@ -5,7 +5,10 @@ import pandas as pd
 import re
 import requests
 
-from dataqa.constants import TABLE_COLUMN_NAMES_FIELD_NAME, TABLE_ROWS_FIELD_NAME, TEXT_COLUMN_NAME
+from dataqa.constants import (TABLE_COLUMN_NAMES_FIELD_NAME,
+                              TABLE_ROWS_FIELD_NAME,
+                              TABLE_ROWS_CHAR_STARTS_FIELD_NAME,
+                              TEXT_COLUMN_NAME)
 
 Wikipage = namedtuple("Wikipage", ["name", "html", "url", "source"])
 
@@ -33,11 +36,13 @@ def get_paragraphs(soup):
     prev_header = all_headers[0]
     for i in all_headers:
         if not (prev_header.text.startswith('References') or prev_header.text.startswith('External links')
-               or prev_header.text.startswith('Further reading')):
+                or prev_header.text.startswith('Further reading')):
             paragraphs = []
             for x in between(prev_header, i):
                 paragraph = f"(section {prev_header.text.replace('[edit]', '')}) " + x
-                paragraphs.append(re.sub('\n+', ' ', paragraph))
+                paragraph = re.sub('\n+', ' ', paragraph)
+                paragraph = re.sub('(\[edit\]|\[\d\])', ' ', paragraph)
+                paragraphs.append(paragraph)
             text.extend(paragraphs)
         prev_header = i
 
@@ -67,12 +72,33 @@ def extract_tables(soup):
                 df_tab.columns = df_tab.iloc[0]
                 df_tab = df_tab.iloc[1:]
 
-            table_text = df_tab.to_string(index=False)
+            # we add a white space to prevent the spacy tokeniser to create a token across columns
+            # (a comma is not enough)
+            table_cols = df_tab.columns.tolist()
+            df_tab_csv = df_tab.applymap(lambda x: re.sub('\[\d\]', ' ', x) + ' ')
+            table_text = ','.join(table_cols) + '\n'
+            column_csv_length = len(table_text)
+
+            # This is not exactly csv, but otherwise it was too difficult to align
+            # the spans selected in the values and the ones in the text turned to csv
+            table_text += '\n'.join(df_tab_csv.apply(lambda x: ','.join(x), axis=1).values.tolist()) + '\n'
             table_cols = df_tab.columns.tolist()
             table_rows = df_tab.values.tolist()
+
+            char_starts = []
+            current_char = column_csv_length
+
+            for _, row in df_tab_csv.iterrows():
+                char_starts_row = [current_char]
+                for val in row:
+                    current_char += len(val) + 1  # + comma or newline
+                    char_starts_row.append(current_char)
+                char_starts.append(char_starts_row[:-1])
+
             output_tables.append({TABLE_ROWS_FIELD_NAME: table_rows,
                                   TABLE_COLUMN_NAMES_FIELD_NAME: table_cols,
-                                  TEXT_COLUMN_NAME: table_text})
+                                  TEXT_COLUMN_NAME: table_text,
+                                  TABLE_ROWS_CHAR_STARTS_FIELD_NAME: char_starts})
 
     for table in all_tables:
         table.decompose()
@@ -85,8 +111,15 @@ def extract_wikipedia_paragraphs(url):
 
     soup = BeautifulSoup(html, 'html.parser')
 
+    # remove style tags
     for style_tag in soup.find_all('style'):
         style_tag.decompose()
+
+    # add whitespace to list items to make sure they are extracted as separate strings
+    all_list_items = soup.find_all(['li'])
+    for li in all_list_items:
+        if li.string:
+            li.string = li.string + ', '
 
     all_tables = extract_tables(soup)
     for table_ind, table in enumerate(all_tables):
@@ -94,6 +127,7 @@ def extract_wikipedia_paragraphs(url):
                TEXT_COLUMN_NAME: table[TEXT_COLUMN_NAME],
                TABLE_COLUMN_NAMES_FIELD_NAME: table[TABLE_COLUMN_NAMES_FIELD_NAME],
                TABLE_ROWS_FIELD_NAME: table[TABLE_ROWS_FIELD_NAME],
+               TABLE_ROWS_CHAR_STARTS_FIELD_NAME: table[TABLE_ROWS_CHAR_STARTS_FIELD_NAME],
                "url": url,
                "is_table": "true"}
 

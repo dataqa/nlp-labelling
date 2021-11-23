@@ -71,8 +71,8 @@ export default class Highlightable extends Component {
     const startHL = startContainerPosition < endContainerPosition ? startContainerPosition : endContainerPosition;
     const endHL = startContainerPosition < endContainerPosition ? endContainerPosition : startContainerPosition;
 
-    const rangeObj = Range(startHL, 
-                           endHL, 
+    const rangeObj = Range(startHL + (this.props.startChar || 0), 
+                           endHL + (this.props.startChar || 0), 
                            text, 
                            `${startHL}-${endHL}-${uuid()}`,
                            this.props.entityId);
@@ -146,7 +146,7 @@ export default class Highlightable extends Component {
 
     // For all the characters on the text
     for(let textCharIndex = 0;textCharIndex < this.props.text.length;textCharIndex++) {
-      const range = this.getRange(textCharIndex);
+      const range = this.getRange((this.props.startChar || 0) + textCharIndex);
       const url = getUrl(textCharIndex, this.props.text);
       const isEmoji = emojiRegex().test(this.props.text[textCharIndex] + this.props.text[textCharIndex + 1]);
       // Get the current character node
@@ -173,7 +173,7 @@ export default class Highlightable extends Component {
       // For all the characters in the highlighted range
       let rangeCharIndex = textCharIndex + 1;
 
-      for(;rangeCharIndex < parseInt(range.end) + 1;rangeCharIndex++) {
+      for(;rangeCharIndex < parseInt(range.end - (this.props.startChar || 0)) + 1;rangeCharIndex++) {
         const isEmoji = emojiRegex().test(`${this.props.text[rangeCharIndex]}${this.props.text[rangeCharIndex + 1]}`);
 
         if(isEmoji) {
@@ -224,6 +224,7 @@ export default class Highlightable extends Component {
 }
 
 Highlightable.propTypes = {
+  startChar: PropTypes.number,
   ranges: PropTypes.array,
   id: PropTypes.oneOfType([
     PropTypes.string,

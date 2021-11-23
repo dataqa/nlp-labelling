@@ -350,6 +350,7 @@ class SupervisedLabelPage extends React.Component{
     }
 
     updateIndexAfterLabelling = ({label, spans, goToNext = true}) => {
+        console.log("Inside updateIndexAfterLabelling ", goToNext);
         if(typeof(label)!="undefined"){
             this.setState((prevState) => {
                 let validatedLabels = prevState.validatedLabels;

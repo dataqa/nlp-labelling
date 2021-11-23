@@ -15,6 +15,7 @@ ALL_PROJECT_TYPES = [PROJECT_TYPE_CLASSIFICATION, PROJECT_TYPE_NER, PROJECT_TYPE
 TEXT_COLUMN_NAME = 'text'
 TABLE_COLUMN_NAMES_FIELD_NAME = 'column_names'
 TABLE_ROWS_FIELD_NAME = 'rows'
+TABLE_ROWS_CHAR_STARTS_FIELD_NAME = "char_starts"
 GROUND_TRUTH_COLUMN_NAME = "__LABEL__"
 MENTIONS_COLUMN_NAME = "mentions"
 
@@ -76,6 +77,7 @@ MAPPING_NER = {
         "is_table": {"type": "boolean"},  # Is the data to be displayed as a table?
         TABLE_ROWS_FIELD_NAME: {"type": "text"},  # array of arrays
         TABLE_COLUMN_NAMES_FIELD_NAME: {"type": "text"},  # array of column names
+        TABLE_ROWS_CHAR_STARTS_FIELD_NAME: {"type": "integer"}, # array of integers with char starts of each row
         "paragraph_id": {"type": "integer"},
         "rules": {"type": "nested",
                   "properties": {
@@ -164,6 +166,8 @@ MAPPINGS = {PROJECT_TYPE_CLASSIFICATION:
                                                                 TABLE_ROWS_FIELD_NAME: TABLE_ROWS_FIELD_NAME,
                                                                 TABLE_COLUMN_NAMES_FIELD_NAME:
                                                                     TABLE_COLUMN_NAMES_FIELD_NAME,
+                                                                TABLE_ROWS_CHAR_STARTS_FIELD_NAME:
+                                                                    TABLE_ROWS_CHAR_STARTS_FIELD_NAME,
                                                                 "url": "url",
                                                                 "is_table": "is_table",
                                                                 "paragraph_id": "paragraph_id"}}},
