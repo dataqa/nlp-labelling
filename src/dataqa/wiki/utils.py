@@ -41,7 +41,7 @@ def get_paragraphs(soup):
             for x in between(prev_header, i):
                 paragraph = f"(section {prev_header.text.replace('[edit]', '')}) " + x
                 paragraph = re.sub('\n+', ' ', paragraph)
-                paragraph = re.sub('(\[edit\]|\[\d\])', ' ', paragraph)
+                paragraph = re.sub('(\[edit\]|\[\d+\])', ' ', paragraph)
                 paragraphs.append(paragraph)
             text.extend(paragraphs)
         prev_header = i
@@ -57,13 +57,24 @@ def get_html(url):
     html = r.text
     return html
 
+def sanitise_string(x, url):
+    try:
+        return re.sub('\[\d+\]', ' ', str(x))
+    except:
+        raise Exception("Could not sanitise string ", x, " at url ", url)
 
-def extract_tables(soup):
+
+def extract_tables(soup, url):
     output_tables = []
     all_tables = soup.find_all(['table'])
 
     for tab in all_tables:
-        list_tabs = pd.read_html(str(tab))
+        try:
+            list_tabs = pd.read_html(str(tab))
+        except:
+            print("Could not parse table for url ", url)
+            continue
+
         for df_tab in list_tabs:
             df_tab = df_tab.dropna(how='all').fillna('')
 
@@ -74,16 +85,25 @@ def extract_tables(soup):
 
             # we add a white space to prevent the spacy tokeniser to create a token across columns
             # (a comma is not enough)
+            if df_tab.columns.nlevels > 2:
+                continue
+            elif df_tab.columns.nlevels == 2:
+                df_tab.columns = [' '.join((col[0], str(col[1]))) for col in df_tab.columns]
+
             table_cols = df_tab.columns.tolist()
-            df_tab_csv = df_tab.applymap(lambda x: re.sub('\[\d\]', ' ', x) + ' ')
-            table_text = ','.join(table_cols) + '\n'
+            df_tab_csv = df_tab.applymap(lambda x: sanitise_string(x, url))
+            try:
+                table_text = ','.join(table_cols) + '\n'
+            except:
+                raise Exception("Could not create csv out of columns ", table_cols, " at url ", url)
             column_csv_length = len(table_text)
 
             # This is not exactly csv, but otherwise it was too difficult to align
             # the spans selected in the values and the ones in the text turned to csv
+            table_cols = df_tab_csv.columns.tolist()
+            table_rows = df_tab_csv.values.tolist()
+            df_tab_csv = df_tab_csv.applymap(lambda x: x + ' ')
             table_text += '\n'.join(df_tab_csv.apply(lambda x: ','.join(x), axis=1).values.tolist()) + '\n'
-            table_cols = df_tab.columns.tolist()
-            table_rows = df_tab.values.tolist()
 
             char_starts = []
             current_char = column_csv_length
@@ -120,8 +140,15 @@ def extract_wikipedia_paragraphs(url):
     for li in all_list_items:
         if li.string:
             li.string = li.string + ', '
+        else:
+            children = list(li.children)
+            if children:
+                last_child = children[-1]
+                if last_child.string:
+                    last_child.string.replace_with(last_child.string + ', ')
 
-    all_tables = extract_tables(soup)
+    all_tables = extract_tables(soup, url)
+    table_ind = -1
     for table_ind, table in enumerate(all_tables):
         yield {"paragraph_id": table_ind,
                TEXT_COLUMN_NAME: table[TEXT_COLUMN_NAME],

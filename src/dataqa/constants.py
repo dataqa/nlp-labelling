@@ -37,7 +37,7 @@ INPUT_FILE_SPECS = {
                        FILE_TYPE_DOCUMENTS_WIKI: {"required": ["url"],
                                                   "text": [TEXT_COLUMN_NAME],
                                                   "upload_key": "upload_id",
-                                                  "max_rows": 100}},
+                                                  "max_rows": 400}},
     PROJECT_TYPE_ED: {FILE_TYPE_DOCUMENTS: {"required": [TEXT_COLUMN_NAME, MENTIONS_COLUMN_NAME],
                                             "text": [TEXT_COLUMN_NAME],
                                             "upload_key": "upload_id",

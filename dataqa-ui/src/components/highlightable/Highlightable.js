@@ -147,6 +147,9 @@ export default class Highlightable extends Component {
     // For all the characters on the text
     for(let textCharIndex = 0;textCharIndex < this.props.text.length;textCharIndex++) {
       const range = this.getRange((this.props.startChar || 0) + textCharIndex);
+      if(range){
+        console.log("char index ", textCharIndex, "startChar ", this.props.startChar , range);
+      }
       const url = getUrl(textCharIndex, this.props.text);
       const isEmoji = emojiRegex().test(this.props.text[textCharIndex] + this.props.text[textCharIndex + 1]);
       // Get the current character node

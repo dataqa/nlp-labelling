@@ -1,5 +1,6 @@
 import os
 import sys
+import traceback
 
 from werkzeug.utils import secure_filename
 
@@ -71,6 +72,7 @@ def create_supervised_project(session,
     # Save project details in db
     project_full_path, spacy_binary_filepath = get_paths(upload_folder, project_name)
     index_name = get_random_index_name(project_name)
+    project_id = None
 
     try:
         mapping_specs = MAPPINGS[project_type][file_type]
@@ -95,6 +97,7 @@ def create_supervised_project(session,
     except:
         # clean up resources
         print("Error while creating ES index & saving files to disk", sys.exc_info())
+        traceback.print_exc()
         delete_index(es_uri, index_name)
         delete_files_from_disk(spacy_binary_filepath)
 

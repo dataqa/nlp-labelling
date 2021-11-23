@@ -22,7 +22,7 @@ import Papa from 'papaparse';
 import _ from 'lodash';
 
 const UPLOAD_PARAMS = {
-    totalAttempts: 16,
+    totalAttempts: 100,
     timeAttemptms: 15000
 }
 
