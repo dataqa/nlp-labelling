@@ -38,6 +38,7 @@ class UploadedFile(ABC):
         self.filename = Path(input_data.filename).name
         self.total_documents = 0
         self.file_type = file_type  # documents, kb or documents_wiki
+        self.is_wiki = (file_type == FILE_TYPE_DOCUMENTS_WIKI)
         self.actual_column_names = None
         self.processed_data = None
         self.has_ground_truth_labels = None
@@ -63,7 +64,7 @@ class UploadedFile(ABC):
 
         num_lines = 0
         for line in csvfile:
-            if self.file_type == FILE_TYPE_DOCUMENTS_WIKI:
+            if self.is_wiki:
                 for chunk in extract_wikipedia_paragraphs(line["url"]):
                     yield chunk
             else:

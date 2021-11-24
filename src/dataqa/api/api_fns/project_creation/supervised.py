@@ -93,7 +93,8 @@ def create_supervised_project(session,
                                                   index_name,
                                                   spacy_binary_filepath,
                                                   uploaded_file.total_documents,
-                                                  uploaded_file.has_ground_truth_labels)
+                                                  uploaded_file.has_ground_truth_labels,
+                                                  uploaded_file.is_wiki)
     except:
         # clean up resources
         print("Error while creating ES index & saving files to disk", sys.exc_info())

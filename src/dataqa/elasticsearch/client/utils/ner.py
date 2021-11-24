@@ -1,3 +1,5 @@
+import csv
+import io
 import requests
 
 from dataqa.constants import (ES_GROUND_TRUTH_NAME_FIELD,
@@ -267,15 +269,39 @@ def read_docs_with_no_rule(es_uri,
     return query_results
 
 
-def export_spans(es_uri, index_name):
+def export_text_or_table(hit):
+    if hit["is_table"] == 'true':
+        column_names = hit[TABLE_COLUMN_NAMES_FIELD_NAME]
+        rows = hit[TABLE_ROWS_FIELD_NAME]
+
+        output = io.StringIO()
+        writer = csv.writer(output)
+        writer.writerow(column_names)
+        for row in rows:
+            writer.writerow(row)
+        return output.getvalue()
+    else:
+        return hit["text"]
+
+
+def export_spans(es_uri, index_name, is_wiki):
     query = queries.docs_with_any_rule_or_manual_label_query()
 
     hits = scroll_through(es_uri, index_name, query)
 
-    docs = [(hit["id"],
-             hit.get("manual_label", {}).get("label"),
-             dict((rule["rule_id"], rule["label"]) for rule in hit.get("rules", {})))
-            for hit in hits]
+    if is_wiki:
+        docs = [(hit["id"],
+                 hit["url"],
+                 export_text_or_table(hit),
+                 hit["is_table"],
+                 hit.get("manual_label", {}).get("label"),
+                 dict((rule["rule_id"], rule["label"]) for rule in hit.get("rules", {})))
+                for hit in hits]
+    else:
+        docs = [(hit["id"],
+                 hit.get("manual_label", {}).get("label"),
+                 dict((rule["rule_id"], rule["label"]) for rule in hit.get("rules", {})))
+                for hit in hits]
 
     results = sorted(docs, key=lambda x: x[0])
 

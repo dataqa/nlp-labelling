@@ -85,6 +85,7 @@ class SupervisedProject(Project):
     id = Column(Integer, ForeignKey('project.id'), primary_key=True)
     import_id = Column(String)
     supervised_type = Column(String)
+    is_wiki = Column(Boolean, default=False)
 
     spacy_binary_filepath = Column(String)
 

@@ -463,7 +463,10 @@ class FileUploadMain extends React.Component{
             return false;
         }
 
+        console.log("Inside createProject 2");
+
         if(!this.hasAnyColumnBeenSelected(fileType)){
+            console.log("Inside createProject 3");
             var results = Papa.parse(selectedFile, 
                 {header: true,
                 preview: 1,
@@ -473,10 +476,15 @@ class FileUploadMain extends React.Component{
                                                         isWiki,
                                                         defaultColumnNames,
                                                         results.meta.fields);
+                    }.bind(this),
+                error: function(err, file, inputElem, reason)
+                    {
+                        alert(err);
                     }.bind(this)
                 });
             return true;
         }else{
+            console.log("Inside createProject 4");
             const selectedColumns = this.state.selectedInputColumns[fileType];
             const candidateColumnNames = this.state.candidateInputColumnNames[fileType];
             this.loadFile(selectedFile, 

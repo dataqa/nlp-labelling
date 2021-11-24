@@ -242,6 +242,7 @@ class SingleFileUploadForm extends React.Component{
                                 id={this.props.id}
                                 type="file"
                                 onChange={(e) => {
+                                                console.log("Inside onChange of form");
                                                 e.preventDefault();
                                                 this.uploadFile(e.target.files[0]); 
                                                 e.target.value = null;

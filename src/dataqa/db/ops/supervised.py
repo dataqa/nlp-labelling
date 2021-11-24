@@ -21,7 +21,8 @@ def add_supervised_project_to_db(session,
                                  index_name,
                                  spacy_binary_filepath,
                                  total_documents,
-                                 has_ground_truth_labels):
+                                 has_ground_truth_labels,
+                                 is_wiki):
     """
     Create a new project with empty attributes (class names)
     """
@@ -31,7 +32,8 @@ def add_supervised_project_to_db(session,
                          "total_documents": total_documents,
                          "spacy_binary_filepath": spacy_binary_filepath,
                          "index_name": index_name,
-                         "filename": filename}
+                         "filename": filename,
+                         "is_wiki": is_wiki}
 
     if project_type == PROJECT_TYPE_NER:
         project = models.NERProject(**supervised_params)
