@@ -49,7 +49,6 @@ def get_unlabelled_docs_query(from_,
     query = queries.all_docs_query(from_,
                                    size,
                                    session_id,
-                                   ES_TEXT_FIELD_NAME,
                                    ES_GROUND_TRUTH_LABEL_FIELD)
     return query
 

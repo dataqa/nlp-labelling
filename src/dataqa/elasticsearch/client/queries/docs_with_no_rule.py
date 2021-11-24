@@ -1,13 +1,29 @@
+from dataqa.constants import (ES_TEXT_FIELD_NAME,
+                              TABLE_COLUMN_NAMES_FIELD_NAME,
+                              TABLE_ROWS_FIELD_NAME,
+                              TABLE_ROWS_CHAR_STARTS_FIELD_NAME)
+
+
 def docs_with_no_rule_query(from_,
                             size,
                             session_id,
-                            text_field,
                             label_field):
     """
     Get documents that have no rule labels and either no manual labels or a manual label from current session.
 
     We return manual_label because we want to display the latest manual_labels set by the user.
     """
+    source = [
+        ES_TEXT_FIELD_NAME,
+        TABLE_COLUMN_NAMES_FIELD_NAME,
+        TABLE_ROWS_FIELD_NAME,
+        TABLE_ROWS_CHAR_STARTS_FIELD_NAME,
+        "is_table",
+        label_field,
+        "manual_label",
+        "id"
+    ]
+
     query = {
         "query": {
             "bool": {
@@ -42,12 +58,7 @@ def docs_with_no_rule_query(from_,
         },
         "from": from_,
         "size": size,
-        "_source": [
-            text_field,
-            label_field,
-            "manual_label",
-            "id"
-        ],
+        "_source": source,
         "sort": "id"
     }
     return query

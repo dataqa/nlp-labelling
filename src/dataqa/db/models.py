@@ -16,7 +16,7 @@ class Project(Base):
     name = Column(String)
     total_documents = Column(Integer)
     index_name = Column(String)
-    filename = Column(String)
+    filename = Column(String) # documents filename (shared by both supervised and NED projects)
 
     __mapper_args__ = {
         'polymorphic_identity': 'project',
@@ -85,8 +85,8 @@ class SupervisedProject(Project):
     id = Column(Integer, ForeignKey('project.id'), primary_key=True)
     import_id = Column(String)
     supervised_type = Column(String)
+    is_wiki = Column(Boolean, default=False)
 
-    data_filepath = Column(String)  # for sentiment and other file attributes
     spacy_binary_filepath = Column(String)
 
     # accuracy of merged label across all document classes (classification) or span classes (NER)

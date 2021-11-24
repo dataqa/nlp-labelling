@@ -44,6 +44,7 @@ class ProjectStartPage extends React.Component {
         return <FileUploadMain
                     projectName={this.props.projectName}
                     projectType={this.props.projectType}
+                    wikiData={this.props.wikiData}
                     addProjectToList={this.props.addProjectToList}
                     setProjectUploadFinished={this.props.setProjectUploadFinished}
                     setFilename={this.props.setFilename}

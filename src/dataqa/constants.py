@@ -13,10 +13,14 @@ ALL_PROJECT_TYPES = [PROJECT_TYPE_CLASSIFICATION, PROJECT_TYPE_NER, PROJECT_TYPE
 
 # input file columns
 TEXT_COLUMN_NAME = 'text'
+TABLE_COLUMN_NAMES_FIELD_NAME = 'column_names'
+TABLE_ROWS_FIELD_NAME = 'rows'
+TABLE_ROWS_CHAR_STARTS_FIELD_NAME = "char_starts"
 GROUND_TRUTH_COLUMN_NAME = "__LABEL__"
 MENTIONS_COLUMN_NAME = "mentions"
 
 FILE_TYPE_DOCUMENTS = "documents"
+FILE_TYPE_DOCUMENTS_WIKI = "documents_wiki"
 FILE_TYPE_KB = "kb"
 
 INPUT_FILE_SPECS = {
@@ -24,13 +28,20 @@ INPUT_FILE_SPECS = {
                                       {"required": [TEXT_COLUMN_NAME],
                                        "optional": [GROUND_TRUTH_COLUMN_NAME],
                                        "text": [TEXT_COLUMN_NAME],
-                                       "upload_key": "upload_id"}},
+                                       "upload_key": "upload_id",
+                                       "max_rows": 3000}},
     PROJECT_TYPE_NER: {FILE_TYPE_DOCUMENTS: {"required": [TEXT_COLUMN_NAME],
                                              "text": [TEXT_COLUMN_NAME],
-                                             "upload_key": "upload_id"}},
+                                             "upload_key": "upload_id",
+                                             "max_rows": 3000},
+                       FILE_TYPE_DOCUMENTS_WIKI: {"required": ["url"],
+                                                  "text": [TEXT_COLUMN_NAME],
+                                                  "upload_key": "upload_id",
+                                                  "max_rows": 400}},
     PROJECT_TYPE_ED: {FILE_TYPE_DOCUMENTS: {"required": [TEXT_COLUMN_NAME, MENTIONS_COLUMN_NAME],
                                             "text": [TEXT_COLUMN_NAME],
-                                            "upload_key": "upload_id"},
+                                            "upload_key": "upload_id",
+                                            "max_rows": 3000},
                       FILE_TYPE_KB: {"required": ["name", "description"],
                                      "text": ["description"],
                                      "upload_key": "kb_upload_id"}}
@@ -62,6 +73,12 @@ MAPPING_CLASSIFICATION = {
 MAPPING_NER = {
     "properties": {
         ES_TEXT_FIELD_NAME: {"type": "text"},
+        "url": {"type": "keyword"},  # Does the data come from a url (wiki)?
+        "is_table": {"type": "boolean"},  # Is the data to be displayed as a table?
+        TABLE_ROWS_FIELD_NAME: {"type": "text"},  # array of arrays
+        TABLE_COLUMN_NAMES_FIELD_NAME: {"type": "text"},  # array of column names
+        TABLE_ROWS_CHAR_STARTS_FIELD_NAME: {"type": "integer"}, # array of integers with char starts of each row
+        "paragraph_id": {"type": "integer"},
         "rules": {"type": "nested",
                   "properties": {
                       "rule_id": {"type": "integer"},
@@ -123,7 +140,7 @@ SETTINGS_KB = {
     "analysis": {
         "analyzer": {
             "stem_analyzer": {
-                "tokenizer": "standard", # tried whitespace and gave weird results
+                "tokenizer": "standard",  # tried whitespace and gave weird results
                 "filter": [
                     "lowercase",
                     "porter_stem"
@@ -143,7 +160,17 @@ MAPPINGS = {PROJECT_TYPE_CLASSIFICATION:
                  },
             PROJECT_TYPE_NER:
                 {FILE_TYPE_DOCUMENTS: {"mapping_es": MAPPING_NER,
-                                       "mapping_columns": {TEXT_COLUMN_NAME: ES_TEXT_FIELD_NAME}}},
+                                       "mapping_columns": {TEXT_COLUMN_NAME: ES_TEXT_FIELD_NAME}},
+                 FILE_TYPE_DOCUMENTS_WIKI: {"mapping_es": MAPPING_NER,
+                                            "mapping_columns": {TEXT_COLUMN_NAME: ES_TEXT_FIELD_NAME,
+                                                                TABLE_ROWS_FIELD_NAME: TABLE_ROWS_FIELD_NAME,
+                                                                TABLE_COLUMN_NAMES_FIELD_NAME:
+                                                                    TABLE_COLUMN_NAMES_FIELD_NAME,
+                                                                TABLE_ROWS_CHAR_STARTS_FIELD_NAME:
+                                                                    TABLE_ROWS_CHAR_STARTS_FIELD_NAME,
+                                                                "url": "url",
+                                                                "is_table": "is_table",
+                                                                "paragraph_id": "paragraph_id"}}},
             PROJECT_TYPE_ED:
                 {FILE_TYPE_DOCUMENTS: {"mapping_es": MAPPING_MENTIONS,
                                        "mapping_columns": {TEXT_COLUMN_NAME: ES_TEXT_FIELD_NAME,
@@ -187,5 +214,5 @@ COLOURS = ['deepOrange',
 
 # Modelling constants
 NUM_ITERATIONS_BOOTSTRAP = 100
-MIN_LABELLED_PRECISION = 5 # minimum number of predicted labels of a class that have been manually labelled
-MIN_LABELLED_RECALL = 5 # minimum number of manual labels assigned to a specific class
+MIN_LABELLED_PRECISION = 5  # minimum number of predicted labels of a class that have been manually labelled
+MIN_LABELLED_RECALL = 5  # minimum number of manual labels assigned to a specific class

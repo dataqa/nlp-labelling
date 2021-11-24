@@ -8,18 +8,21 @@ import { withStyles } from '@material-ui/core/styles';
 import uuid from 'react-uuid';
 import { PROJECT_TYPES, 
         FILE_TYPE_DOCUMENTS, 
+        FILE_TYPE_DOCUMENTS_WIKI,
         FILE_TYPE_KB, 
         DEFAULT_TEXT_COLUMN,
         DEFAULT_MENTIONS_COLUMNS,
         DEFAULT_KB_COLUMNS,
-        DOCS_TEXT_FILE_FORMAT} from '../constants';
+        DEFAULT_WIKI_COLUMN,
+        DOCS_TEXT_FILE_FORMAT,
+        WIKI_DOCS_FILE_FORMAT} from '../constants';
 import { getSlug } from '../../utils';
 import { renameKeysToCamelCase } from '../utils';
 import Papa from 'papaparse';
 import _ from 'lodash';
 
 const UPLOAD_PARAMS = {
-    totalAttempts: 16,
+    totalAttempts: 100,
     timeAttemptms: 15000
 }
 
@@ -52,19 +55,23 @@ const FileUploadForm = (props) => {
             />
         )
     }else{
+        const title = props.wikiData? "Load a csv file with the wikipedia urls or paths.": "Load a csv file with the documents.";
+        const defaultColumns = props.wikiData? [DEFAULT_WIKI_COLUMN]: [DEFAULT_TEXT_COLUMN];
+        const helpTextLink =  props.wikiData? WIKI_DOCS_FILE_FORMAT: DOCS_TEXT_FILE_FORMAT;
+
         return (
             <SingleFileUploadForm 
                 rootClassName={props.classes.root}
                 id={"contained-button-file"}
-                instructionText={"Load a csv file with the documents."}
-                helpText={<p>No column {DEFAULT_TEXT_COLUMN} found in file. Read more in the <a  href={DOCS_TEXT_FILE_FORMAT} target="_blank"> documentation</a>. Please select columns:</p>}
-                createProject={props.createProject}
-                defaultColumnNames={[DEFAULT_TEXT_COLUMN]}
+                instructionText={title}
+                helpText={<p>No column {defaultColumns[0]} found in file. Read more in the <a  href={helpTextLink} target="_blank"> documentation</a>. Please select columns:</p>}
+                createProject={(selectedFile, defaultColumnNames) => props.createProject(selectedFile, defaultColumnNames, FILE_TYPE_DOCUMENTS, props.wikiData)}
+                defaultColumnNames={defaultColumns}
                 setProjectName={props.setProjectName}
                 projectName={props.projectName}
                 loading={props.loading[FILE_TYPE_DOCUMENTS]}
                 candidateInputColumnNames={props.candidateInputColumnNames[FILE_TYPE_DOCUMENTS]}
-                updateSelectedInputColumns={(columnIndex, columnType) => props.updateSelectedInputColumns(FILE_TYPE_DOCUMENTS, columnIndex, columnType)}
+                updateSelectedInputColumns={(columnIndex, defaultColumns) => props.updateSelectedInputColumns(FILE_TYPE_DOCUMENTS, columnIndex, defaultColumns)}
                 selectedInputColumns={props.selectedInputColumns[FILE_TYPE_DOCUMENTS]}
                 fileUploaded={props.filesUploaded[FILE_TYPE_DOCUMENTS]}
                 setToNextPage={props.setToNextPage}
@@ -103,7 +110,7 @@ const initialiseLoading = (projectType) => {
 
 }
 
-const initialiseSelectedColumns = (projectType) => {
+const initialiseSelectedColumns = (projectType, isWiki) => {
     var columnNames = {};
     switch(projectType){
         case PROJECT_TYPES.classification: 
@@ -112,7 +119,12 @@ const initialiseSelectedColumns = (projectType) => {
             return columnNames;
         case PROJECT_TYPES.ner:
             columnNames[FILE_TYPE_DOCUMENTS] = {};
-            columnNames[FILE_TYPE_DOCUMENTS][DEFAULT_TEXT_COLUMN] = undefined;
+            if(isWiki){
+                columnNames[FILE_TYPE_DOCUMENTS][DEFAULT_WIKI_COLUMN] = undefined;
+            }
+            else{
+                columnNames[FILE_TYPE_DOCUMENTS][DEFAULT_TEXT_COLUMN] = undefined;
+            }
             return columnNames;
         default:
             columnNames[FILE_TYPE_DOCUMENTS] = {};
@@ -174,7 +186,7 @@ class FileUploadMain extends React.Component{
             nextPage: initialiseNextPage(props.projectType, props.projectName),
             totalFilesToUpload: totalFilesToUpload,
             disableChangeProjectName: !!props.projectName,
-            selectedInputColumns: initialiseSelectedColumns(props.projectType),
+            selectedInputColumns: initialiseSelectedColumns(props.projectType, props.wikiData),
             candidateInputColumnNames: initialiseCandidateColumnNames(props.projectType)
         }
     }
@@ -192,7 +204,8 @@ class FileUploadMain extends React.Component{
 
             this.setState( {
                 loading: initialiseLoading(this.props.projectType),
-                selectedInputColumns: initialiseSelectedColumns(this.props.projectType),
+                selectedInputColumns: initialiseSelectedColumns(this.props.projectType,
+                                                                this.props.wikiData),
                 candidateInputColumnNames: initialiseCandidateColumnNames(this.props.projectType),
                 totalFilesToUpload: totalFilesToUpload,
                 nextPage: initialiseNextPage(this.props.projectType, this.props.projectName)} );
@@ -283,6 +296,7 @@ class FileUploadMain extends React.Component{
     loadFile = (selectedFile, 
                 columnNames,
                 fileType,
+                isWiki,
                 uploadId, 
                 attemptNum, 
                 polling) => {
@@ -293,7 +307,7 @@ class FileUploadMain extends React.Component{
         data.append('file', selectedFile);
         data.append('project_name', this.state.projectName);
         data.append('project_type', this.props.projectType);
-        data.append('file_type', fileType);
+        data.append('file_type', isWiki? FILE_TYPE_DOCUMENTS_WIKI: fileType);
         data.append('column_names', JSON.stringify(columnNames));
         if(fileType==FILE_TYPE_KB){
             data.append('kb_upload_id', uploadId);
@@ -321,6 +335,7 @@ class FileUploadMain extends React.Component{
                         setTimeout(() => this.loadFile(selectedFile, 
                                                         columnNames,
                                                         fileType,
+                                                        isWiki,
                                                         uploadId, 
                                                         attemptNum+1, 
                                                         true), 
@@ -328,7 +343,7 @@ class FileUploadMain extends React.Component{
                     }
                     else{
                         alert("Server timed out");
-                        this.updateLoadingState(fileType, true);
+                        this.updateLoadingState(fileType, false);
                     }
                 }else{
                     console.log("File loaded successfully", today.toLocaleString());
@@ -349,6 +364,7 @@ class FileUploadMain extends React.Component{
                     setTimeout(() => this.loadFile(selectedFile, 
                                                     columnNames,
                                                     fileType,
+                                                    isWiki,
                                                     uploadId, 
                                                     attemptNum+1, 
                                                     true), 
@@ -365,7 +381,7 @@ class FileUploadMain extends React.Component{
     }
 
 
-    validateColumnsAndUpload = (selectedFile, fileType, defaultColumnNames, columns) => {
+    validateColumnsAndUpload = (selectedFile, fileType, isWiki, defaultColumnNames, columns) => {
 
         console.log("Inside validateColumnsAndUpload", defaultColumnNames,
         columns);
@@ -383,6 +399,7 @@ class FileUploadMain extends React.Component{
             this.loadFile(selectedFile, 
                           defaultColumnNamesMapping,
                           fileType, 
+                          isWiki,
                           uuid(), 
                           0, 
                           false);
@@ -422,7 +439,8 @@ class FileUploadMain extends React.Component{
 
     createProject = (selectedFile, 
                     defaultColumnNames,
-                    fileType="documents") => {
+                    fileType="documents",
+                    isWiki=false) => {
 
         console.log("Inside createProject", defaultColumnNames, this.props, !this.props.filesUploaded, this.state.projectName, this.validateProjectSlug(getSlug(this.state.projectName)));
 
@@ -445,24 +463,34 @@ class FileUploadMain extends React.Component{
             return false;
         }
 
+        console.log("Inside createProject 2");
+
         if(!this.hasAnyColumnBeenSelected(fileType)){
+            console.log("Inside createProject 3");
             var results = Papa.parse(selectedFile, 
                 {header: true,
                 preview: 1,
                 complete: function(results) {
                         this.validateColumnsAndUpload(selectedFile, 
                                                         fileType,
+                                                        isWiki,
                                                         defaultColumnNames,
                                                         results.meta.fields);
+                    }.bind(this),
+                error: function(err, file, inputElem, reason)
+                    {
+                        alert(err);
                     }.bind(this)
                 });
             return true;
         }else{
+            console.log("Inside createProject 4");
             const selectedColumns = this.state.selectedInputColumns[fileType];
             const candidateColumnNames = this.state.candidateInputColumnNames[fileType];
             this.loadFile(selectedFile, 
                             this.formatselectedColumns(selectedColumns, candidateColumnNames),
                             fileType, 
+                            isWiki,
                             uuid(), 
                             0, 
                             false);
@@ -484,6 +512,7 @@ class FileUploadMain extends React.Component{
                     <FileUploadForm 
                         classes={classes}
                         projectType={this.props.projectType}
+                        wikiData={this.props.wikiData}
                         selectFile={this.selectFile}
                         createProject={this.createProject}
                         setProjectName={this.setProjectName}

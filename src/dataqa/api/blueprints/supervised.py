@@ -149,18 +149,18 @@ def update_rules():
     return json.dumps(project_info)
 
 
-@supervised_bp.route('/api/get-sentiment-distribution', methods=['GET'])
-def get_sentiment_distribution():
-    project_name = request.args['project_name']
-    if not project_name:
-        raise Exception("Project name undefined")
-
-    with session_scope(db) as session:
-        project = get_project(session, project_name)
-        check_supervised_project(project)
-        distribution = rule_fns.get_sentiment_distribution(project.data_filepath,
-                                                           project.spacy_binary_filepath)
-    return json.dumps(distribution)
+# @supervised_bp.route('/api/get-sentiment-distribution', methods=['GET'])
+# def get_sentiment_distribution():
+#     project_name = request.args['project_name']
+#     if not project_name:
+#         raise Exception("Project name undefined")
+#
+#     with session_scope(db) as session:
+#         project = get_project(session, project_name)
+#         check_supervised_project(project)
+#         distribution = rule_fns.get_sentiment_distribution(project.data_filepath,
+#                                                            project.spacy_binary_filepath)
+#     return json.dumps(distribution)
 
 
 @supervised_bp.route('/api/get-docs', methods=['GET'])

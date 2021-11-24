@@ -7,6 +7,7 @@ import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import Grid from '@material-ui/core/Grid';
 import { Link } from 'react-router-dom';
+import { PROJECT_TYPES } from '../constants';
 
 
 const styles = theme => ({
@@ -16,21 +17,32 @@ const styles = theme => ({
         width: '250px',
         textAlign: 'center',
         alignItems: 'center',
-        display: 'flex'
+        display: 'flex',
+        position: 'relative'
     },
-    main_content: {marginLeft: "20px"}
+    main_content: {marginLeft: "20px"},
+    new_banner: { position: 'absolute', 
+                    top: '10px', 
+                    right: '10px' ,
+                    color: theme.palette.secondary.main,
+                    fontWeight: 'bold'}
 });
 
 const projectTypes = [
-    {'type': 'classification', 
-    'explanation': 'I want to do text classification (e.g. sentiment analysis)',
+    {'type': PROJECT_TYPES.classification, 
+    'explanation': 'I want to do text classification.',
     'needParams': true},
-    {'type': 'ner',
-    'explanation': 'I want to find mentions of an entity (e.g. drug names)',
+    {'type': PROJECT_TYPES.ner,
+    'explanation': 'I want to extract entities.',
     'needParams': true},
-    {'type': 'entity_disambiguation',
-    'explanation': 'I want to disambiguate entities.',
-    'needParams': false}
+    {'type': PROJECT_TYPES.entity_disambiguation,
+    'explanation': 'I want to disambiguate/link entities.',
+    'needParams': false},
+    {'type': PROJECT_TYPES.ner,
+    'explanation': 'I want to extract entities from Wikipedia pages.',
+    'needParams': true,
+    'isNew': true,
+    'wikiData': true}
 ];
 
 const Container = (props) => {
@@ -50,13 +62,18 @@ const ProjectTypeCard = (props) => {
     const { classes } = props;
     return (
         <Card className={classes.card}>
+            {props.isNew && 
+                <div className={classes.new_banner}>
+                    NEW
+                </div>
+            }
             <CardContent className={classes.card}>
                 <Typography 
                     className={classes.card} 
                     variant="body1"
                 >
-                    {props.explanation
-                }</Typography>
+                    {props.explanation}
+                </Typography>
             </CardContent>
         </Card>
     )
@@ -72,11 +89,12 @@ const ProjectTypeCards = (props) => {
                         <Link 
                             to={`/upload`}
                             style={{ textDecoration: 'none' }}
-                            onClick={() => {props.setProjectType(project.type, !project.needParams)}}
+                            onClick={() => {props.setProjectType(project.type, !project.needParams, project.wikiData)}}
                         >
                             <ProjectTypeCard 
                                 classes={classes}
                                 explanation={project.explanation}
+                                isNew={project.isNew}
                             />
                         </Link>
                     </Item>)

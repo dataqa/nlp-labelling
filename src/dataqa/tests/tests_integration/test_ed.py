@@ -2,6 +2,7 @@
 End-to-end tests for entity disambiguation
 """
 import json
+from pathlib import Path
 import time
 
 from dataqa.db.ops.common import get_project, session_scope
@@ -53,7 +54,7 @@ def check_mentions_upload(api, sql_db, mentions_filepath):
         assert project.id == project_id
         assert project.index_name is not None
         assert project.kb_index_name is None
-        assert project.filename == mentions_filepath
+        assert project.filename == Path(mentions_filepath).name
         assert project.total_mentions == 17
         assert project.total_entities == 14
         assert project.total_documents == 6
@@ -92,7 +93,7 @@ def check_kb_upload(api, sql_db, kb_filepath):
     with session_scope(sql_db) as session:
         project = get_project(session, TEST_PROJECT_NAME)
         assert project.kb_index_name is not None
-        assert project.kb_filename == kb_filepath
+        assert project.kb_filename == Path(kb_filepath).name
         assert project.total_bases == 10
 
 

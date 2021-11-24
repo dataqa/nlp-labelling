@@ -1,8 +1,12 @@
 # Query to get documents with rule predicted labels but no old manual label
+from dataqa.constants import (ES_TEXT_FIELD_NAME,
+                              TABLE_COLUMN_NAMES_FIELD_NAME,
+                              TABLE_ROWS_FIELD_NAME,
+                              TABLE_ROWS_CHAR_STARTS_FIELD_NAME)
+
 def docs_with_predicted_labels_query(from_,
                                      size,
                                      session_id,
-                                     text_field,
                                      ground_truth_field=None,
                                      rule_id=None):
     """
@@ -15,7 +19,11 @@ def docs_with_predicted_labels_query(from_,
     We return manual_label because we want to display the latest manual_labels set by the user.
     """
     source = [
-        text_field,
+        ES_TEXT_FIELD_NAME,
+        TABLE_COLUMN_NAMES_FIELD_NAME,
+        TABLE_ROWS_FIELD_NAME,
+        TABLE_ROWS_CHAR_STARTS_FIELD_NAME,
+        "is_table",
         "predicted_label",
         "manual_label",
         "rules",

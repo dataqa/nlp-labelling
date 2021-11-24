@@ -22,14 +22,14 @@ def add_ent_dis_project_to_db(session,
     return project
 
 
-def get_top_entity_id(session, project_id):
-    query = session.query(func.max(models.EntityDisambiguationMapping.id)).filter(
-        models.EntityDisambiguationMapping.project_id == project_id
-    )
-
-    res = query.one()[0]
-    max_id = res or 0
-    return max_id
+# def get_top_entity_id(session, project_id):
+#     query = session.query(func.max(models.EntityDisambiguationMapping.id)).filter(
+#         models.EntityDisambiguationMapping.project_id == project_id
+#     )
+#
+#     res = query.one()[0]
+#     max_id = res or 0
+#     return max_id
 
 
 def delete_ent_mapping(session, project_id):

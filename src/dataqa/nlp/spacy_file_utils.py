@@ -2,6 +2,19 @@ from spacy.tokens import DocBin
 import dataqa.nlp.spacy_nlp as spacy_nlp
 
 
+class SpacySerialiser:
+
+    def __init__(self):
+        self.doc_bin = DocBin(attrs=["POS", "LEMMA", "HEAD", "ENT_TYPE", "ENT_IOB", "DEP"])
+
+    def add_doc(self, text):
+        doc = spacy_nlp.nlp(text)
+        self.doc_bin.add(doc)
+
+    def get_bytes(self):
+        return self.doc_bin.to_bytes()
+
+
 def serialise_spacy_docs(df):
     # for some reason, I need to add POS to be able to access the lemmas (https://github.com/explosion/spaCy/issues/4824)
     # I also need to add SENT_START to access the sentences (https://github.com/explosion/spaCy/issues/5578)

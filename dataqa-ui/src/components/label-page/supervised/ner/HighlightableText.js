@@ -3,7 +3,7 @@ import Highlightable from '../../../highlightable/Highlightable';
 import _ from 'lodash'
 
 
-class Text extends React.Component{
+class HighlightableText extends React.Component{
     state = {
       currentTextSpans: this.props.currentTextSpans
     };
@@ -62,5 +62,5 @@ class Text extends React.Component{
     }
 }
 
-export default Text;
+export default HighlightableText;
 

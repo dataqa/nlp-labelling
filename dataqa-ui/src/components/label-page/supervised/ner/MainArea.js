@@ -1,7 +1,8 @@
 import React from 'react';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
-import Text from './Text';
+import HighlightableText from './HighlightableText';
+import HighlightableTable from './HighlightableTable';
 import Typography from '@material-ui/core/Typography';
 import Navigation from './Navigation';
 import { withStyles } from '@material-ui/core/styles';
@@ -21,6 +22,9 @@ const styles = theme => ({
         padding: theme.spacing(1),
         margin: theme.spacing(5)
       },
+      container: {
+        width: '100%',
+      },
   });
 
 
@@ -36,8 +40,9 @@ const Container = (props) => {
                     {...rest}/>)
 }
 
-const Item = props => {
-    return(<Grid item {...props}/>)
+const Item = (props) => {
+    const { classes, ...rest } = props;
+    return(<Grid item className={classes.container} {...rest}/>)
 }
 
 const PaperContainer = (props) => {
@@ -72,11 +77,20 @@ const MainArea = (props) => {
     
     return (
         <Container classes={props.classes}>
-            <Item>
-                <PaperContainer classes={props.classes}>
-                    <Grid item>
+            <Item classes={props.classes}>
+                {props.content.isTable? 
+                    <HighlightableTable
+                        content={props.content}
+                        currentSelectedEntityId={props.currentSelectedEntityId}
+                        currentTextSpans={props.currentDisplayedLabels}
+                        addTextSpan={props.addTextSpan}
+                        deleteTextSpan={props.deleteTextSpan}
+                        entityColourMap={entityColourMap}
+                    />
+                :
+                    <PaperContainer classes={props.classes}>
                         <Typography align='center' component={'span'}>
-                            <Text 
+                            <HighlightableText 
                                 content={props.content.text}
                                 currentSelectedEntityId={props.currentSelectedEntityId}
                                 currentTextSpans={props.currentDisplayedLabels}
@@ -85,10 +99,10 @@ const MainArea = (props) => {
                                 entityColourMap={entityColourMap}
                             />
                         </Typography>
-                    </Grid>
-                </PaperContainer>
+                    </PaperContainer>
+                }
             </Item>
-            <Item>
+            <Item classes={props.classes}>
                 <Navigation
                     projectType={props.projectType}
                     subtractToIndex={props.subtractToIndex}

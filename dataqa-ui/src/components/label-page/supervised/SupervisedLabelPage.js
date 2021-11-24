@@ -213,12 +213,13 @@ class SupervisedLabelPage extends React.Component{
     }
 
     getcurrentDisplayedLabels = (validatedLabels, docs, index) => {
+        console.log("Inside getcurrentDisplayedLabels ", validatedLabels, docs, index);
         if(docs.length == 0){
             return [];
         }
 
         let currentDisplayedLabels;
-        if (typeof validatedLabels[index] !== 'undefined'){
+        if (typeof validatedLabels[index] !== 'undefined' && validatedLabels[index] !== null ){
             if(this.props.projectType  == PROJECT_TYPES.classification){
                 currentDisplayedLabels = [this.props.classNames[validatedLabels[index]]];
             }
@@ -228,6 +229,7 @@ class SupervisedLabelPage extends React.Component{
         }else{
             const rules = docs[index].rules;
             if(rules.length > 0){
+                console.log("Mapping over rules ", rules);
                 if(this.props.projectType  == PROJECT_TYPES.classification){
                     currentDisplayedLabels = rules.map((x, ind) => this.props.classNames[x]);
                 }
@@ -259,7 +261,7 @@ class SupervisedLabelPage extends React.Component{
 
             const currentSelectedEntityId = this.getCurrentSelectEntityId(newState.validatedLabels[0]);
 
-            console.log("Setting currentDisplayedLabels to ", currentDisplayedLabels,
+            console.log("(projectNameWasSet) Setting currentDisplayedLabels to ", currentDisplayedLabels,
             "and currentSelectedEntityId to ", currentSelectedEntityId);
             return ({   index: 0, 
                         fromDoc: 0,
@@ -288,7 +290,7 @@ class SupervisedLabelPage extends React.Component{
 
         if(typeof(prevState.validatedLabels) == "undefined" && typeof(this.state.validatedLabels) != "undefined"){
             const currentDisplayedLabels = this.getcurrentDisplayedLabels(this.state.validatedLabels, this.state.docs, this.state.index);
-            console.log("Setting currentDisplayedLabels to ", currentDisplayedLabels);
+            console.log("(componentDidUpdate) Setting currentDisplayedLabels to ", currentDisplayedLabels);
             this.setState( {currentDisplayedLabels} );
         }
     }
@@ -350,6 +352,7 @@ class SupervisedLabelPage extends React.Component{
     }
 
     updateIndexAfterLabelling = ({label, spans, goToNext = true}) => {
+        console.log("Inside updateIndexAfterLabelling ", goToNext);
         if(typeof(label)!="undefined"){
             this.setState((prevState) => {
                 let validatedLabels = prevState.validatedLabels;

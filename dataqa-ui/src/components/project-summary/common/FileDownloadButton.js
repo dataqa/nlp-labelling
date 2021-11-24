@@ -55,6 +55,7 @@ class FileDownloadButton extends React.Component{
                 this.setState({ loading: false });
             }.bind(this),
             error: function (error) {
+                this.setState({ loading: false });
                 alert(error);
             }
         });
