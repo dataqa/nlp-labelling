@@ -111,11 +111,7 @@ In the terminal:
 
 #### Does this tool need an internet connection?
 
-Only the first time you run it, it will need to download a language model from the internet. This is the only time it will need an internet connection. There is ongoing work to remove this constraint, so it can be run locally without any internet.
-
-**No data will ever leave your local machine.**
-
-
+Nope. **No data will ever leave your local machine.**
 
 # Troubleshooting
 
