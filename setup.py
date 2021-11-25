@@ -4,10 +4,8 @@ from sys import platform
 import os
 
 PKG_DIR = os.path.dirname(os.path.abspath(__file__))
-RELATIVE_SPACY_MODEL_PATH = "nlp/en_core_web_sm-2.3.1.tar.gz"
 
 required = Path("requirements.txt").read_text().splitlines()
-required.append(f"en-core-web-sm @ file://localhost/{PKG_DIR}/src/dataqa/{RELATIVE_SPACY_MODEL_PATH}")
 
 def package_files(directory):
     paths = []
@@ -26,8 +24,7 @@ extra_files.extend(package_files(Path('', 'src/dataqa', 'config')))
 
 extra_files.extend(["api/static/bundle.js",
                     "api/static/protractor.png",
-                    "api/templates/index.html",
-                    RELATIVE_SPACY_MODEL_PATH])
+                    "api/templates/index.html"])
 
 setuptools.setup(
     name="dataqa",

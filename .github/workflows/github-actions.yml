@@ -1,8 +1,6 @@
 name: GitHub CI
 on: [pull_request]
 env:
-  SPACY_LANGUAGE_MODEL_NAME: en_core_web_sm-2.3.1
-  SPACY_LANGUAGE_MODEL_URL: https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-2.3.1/en_core_web_sm-2.3.1.tar.gz
   PACKAGE_VERSION: $(python setup.py --version)
 jobs:
   Run-tests:
@@ -45,9 +43,6 @@ jobs:
       - run: python --version
       - run: pip --version
       - run: pip install wheel
-      - run: |
-            ls src/dataqa/nlp/
-            wget ${{ env.SPACY_LANGUAGE_MODEL_URL }} -O src/dataqa/nlp/${{ env.SPACY_LANGUAGE_MODEL_NAME }}.tar.gz
       - run: python setup.py bdist_wheel
       - run: |
           if [ ${{ matrix.python-version }} == '3.9' ];
