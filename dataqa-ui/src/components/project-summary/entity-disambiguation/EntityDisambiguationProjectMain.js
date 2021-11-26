@@ -18,6 +18,7 @@ import FileDownloadButton from '../common/FileDownloadButton';
 import { Redirect } from 'react-router-dom';
 import DeleteProjectButton from '../common/DeleteProjectButton';
 import { withRouter } from "react-router-dom";
+import ProjectTitle from '../ProjectTitle';
 
 
 const styles = theme => ({
@@ -26,7 +27,8 @@ const styles = theme => ({
                     width: "100%"},
     table: {fontSize: "1.2em"},
     button: {marginTop: "20px",
-            marginLeft: "10px"}
+            marginLeft: "10px"},
+    project_title: {"marginBottom": 20}
   });
 
 
@@ -145,9 +147,12 @@ class EntityDisambiguationProjectMain extends React.Component{
 
         return(
             <div className={classes.container}>
-                <SideBar/>
+                <SideBar noRules/>
                 <div className={classes.main_content}>
-                    <Typography variant="h1">{this.props.projectName}</Typography>
+                    <ProjectTitle 
+                        projectName={this.props.projectName}
+                        className={classes.project_title}
+                    />
                     <KbTable 
                         classes={classes}
                         setGoToMatchedEntities={this.setGoToMatchedEntities}

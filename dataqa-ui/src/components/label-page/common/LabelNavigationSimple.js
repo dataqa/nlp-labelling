@@ -22,6 +22,7 @@ const SingleLabel = (props) => {
             <Button 
                 onClick={props.addLabel}
                 variant="outlined"
+                color='primary'
             >
                 {props.className}
             </Button>
@@ -30,6 +31,8 @@ const SingleLabel = (props) => {
         return (
             <Button 
                 onClick={props.addLabel}
+                variant="contained"
+                color='primary'
             >
                 {props.className}
             </Button>

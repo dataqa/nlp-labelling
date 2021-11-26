@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import AppRouter from './routers/AppRouter';
 import 'normalize.css/normalize.css';
 // import './styles/styles.scss';
-import theme from './styles/theme';
+// import theme from './styles/theme';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import { ThemeProvider } from '@material-ui/core/styles';
 
@@ -20,11 +20,10 @@ import ProjectParamsPage from './components/set-project-params/ProjectParamsPage
 
 
 ReactDOM.render(
-    <ThemeProvider theme={theme}>
-      {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
-      <CssBaseline />
-      <AppRouter />
-    </ThemeProvider>,
+      <React.Fragment>
+        <CssBaseline />
+        <AppRouter />
+      </React.Fragment>,
     document.getElementById('app'),
   );
 

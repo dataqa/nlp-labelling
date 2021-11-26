@@ -54,7 +54,7 @@ const EntityButton = (props) => {
         return (
             <Button 
                 onClick={props.selectEntity}
-                style={{backgroundColor: colors[props.colour][500]}}
+                style={{backgroundColor: colors[props.colour][500], color: 'white'}}
             >
                 {props.entityName}
             </Button>

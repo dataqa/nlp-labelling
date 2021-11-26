@@ -9,7 +9,7 @@ import { PROJECT_TYPES } from '../../constants';
 import Text from './Text';
 import Navigation from './Navigation';
 import queryString from 'query-string';
-
+import { trimString } from '../../../utils';
 
 const PAGESIZE = 10;
 const TRUNCATED_BUTTON_TEXT = 100;
@@ -231,15 +231,23 @@ class EDLabelPage extends React.Component{
                 const totalEntitiesUpdated = totalEntities || prevState.totalEntities;
 
                 console.log("inside projectNameWasSet", prevState, validatedLabelsUpdated);
-                const currentEntity = currentEntitiesUpdated.length && currentEntitiesUpdated[0];
-                const currentDocs = currentEntity && currentEntity.docs;
-                const totalEntityDocs = currentEntity && currentEntity.total_docs;
-                console.log(currentEntity, totalEntityDocs);
-
-                const suggestions = currentEntity && currentEntity.kb_suggestions.map(this.formatSuggestion);
-                console.log("Inside projectNameWasSet 2 ", suggestions, currentEntity);
-                const validatedLabel = validatedLabelsUpdated.length && validatedLabelsUpdated[0];
-                const currentSuggestions = this.getSuggestions(suggestions, validatedLabel);
+                let currentDocs, currentSuggestions, totalEntityDocs;
+                if(currentEntitiesUpdated.length){
+                    const currentEntity = currentEntitiesUpdated[0];
+                    currentDocs = currentEntity.docs;
+                    totalEntityDocs = currentEntity.total_docs;
+                    console.log(currentEntity, totalEntityDocs);
+    
+                    const suggestions = currentEntity.kb_suggestions.map(this.formatSuggestion);
+                    console.log("Inside projectNameWasSet 2 ", suggestions, currentEntity);
+                    const validatedLabel = validatedLabelsUpdated.length && validatedLabelsUpdated[0];
+                    currentSuggestions = this.getSuggestions(suggestions, validatedLabel);
+                }else{
+                    currentDocs = [];
+                    currentSuggestions = [];
+                    totalEntityDocs = 0;
+                }
+                
                 
                 return ({   
                             currentEntities: currentEntitiesUpdated,
@@ -477,14 +485,7 @@ class EDLabelPage extends React.Component{
     }
 
     formatSuggestion = ( {name, id, colour} ) => {
-        let displayedName = name.trim();
-        if(name.length > TRUNCATED_BUTTON_TEXT){
-            const spaceIndex = displayedName.indexOf(' ');
-            if((spaceIndex > 3) & (spaceIndex < TRUNCATED_BUTTON_TEXT)){
-                displayedName = displayedName.substring(0, spaceIndex) + '...';
-            }
-            displayedName = displayedName.substring(0, TRUNCATED_BUTTON_TEXT).trim() + '...';
-        }
+        const displayedName = trimString(name, TRUNCATED_BUTTON_TEXT);
         return ( {name: displayedName, "label": id, "colour": colour}
         )
     }

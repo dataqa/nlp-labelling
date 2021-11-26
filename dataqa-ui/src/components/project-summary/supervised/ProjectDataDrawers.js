@@ -29,7 +29,7 @@ class ProjectDataDrawers extends React.Component{
                             <Tab label="Estimated performance" />
                         </Tabs>
                     </AppBar>
-                    <div className={this.props.classes.offset} />
+                    <div className={this.props.classes.offset} style={{minHeight: '30px'}} />
                     {this.state.tab == 0 && 
                         <RuleTable 
                             rules={this.props.rules}

@@ -1,16 +1,16 @@
 import React from 'react';
-;
 import { Redirect } from 'react-router-dom';
 import $ from 'jquery';
+import { drawerWidth } from '../../SideBar';
 import SideBar from '../../SideBar';
 import { withStyles } from '@material-ui/core/styles';
-import Typography from '@material-ui/core/Typography';
 import ProjectDataDrawers from './ProjectDataDrawers';
 import FileDownloadButton from '../common/FileDownloadButton';
 import ExportRulesButton from './ExportRulesButton';
 import uuid from 'react-uuid';
 import { renameKeysToCamelCase } from '../../utils';
 import DeleteProjectButton from '../common/DeleteProjectButton';
+import ProjectTitle from '../ProjectTitle';
 
 
 const RULE_UPDATE_PARAMS = {
@@ -22,9 +22,9 @@ const RULE_UPDATE_PARAMS = {
 const styles = theme => ({
     container: {display: 'flex'},
     main_content: {margin: '20px',
-                    width: "100%"},
+                    width: `calc(100% - ${drawerWidth}px)`},  
     project_content: {marginTop: '20px'},
-    offset: theme.mixins.toolbar,
+    offset: {...theme.mixins.toolbar},
     button: {marginTop: "20px",
             marginLeft: "10px"},
     table: {fontSize: "1.2em"},
@@ -198,7 +198,7 @@ class SupervisedProjectMain extends React.Component{
                     projectName={this.props.projectName}
                 />
                 <div className={classes.main_content}>
-                    <Typography variant="h1">{this.props.projectName}</Typography>
+                    <ProjectTitle projectName={this.props.projectName}/>
                     <ProjectDataDrawers
                         classes={classes}
                         loading={this.state.loading}
