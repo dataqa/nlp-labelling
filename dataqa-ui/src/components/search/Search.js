@@ -87,6 +87,7 @@ const Search = (props) => {
       <SideBar
           projectNameSlug={props.projectNameSlug}
           projectName={props.projectName}
+          projectType={props.projectType}
       />
       <SearchProvider config={searchConfig}>
         <WithSearch mapContextToProps={({ wasSearched, results }) => ({ wasSearched, results })}>
