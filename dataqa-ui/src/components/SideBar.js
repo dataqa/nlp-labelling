@@ -17,7 +17,7 @@ const styles = theme => ({
     drawerPaper: {width: drawerWidth},
   });
 
-const CurrentProjectSideBar = ({projectName, projectNameSlug, noRules}) => {
+const CurrentProjectSideBar = ({projectName, projectNameSlug, noRules=false}) => {
     return (
         <React.Fragment>
             <ListItem
@@ -38,7 +38,7 @@ const CurrentProjectSideBar = ({projectName, projectNameSlug, noRules}) => {
                     Search
                 </ListItemText>
             </ListItem>
-            {noRules &&
+            {!noRules &&
                 <ListItem
                     button
                     component={Link}
