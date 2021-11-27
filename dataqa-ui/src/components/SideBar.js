@@ -6,6 +6,7 @@ import ListItem from '@material-ui/core/ListItem';
 import Divider from '@material-ui/core/Divider';
 import { withStyles } from '@material-ui/core/styles';
 import ListItemText from '@material-ui/core/ListItemText';
+import { PROJECT_TYPES } from './constants';
 
 const drawerWidth = 150;
 
@@ -17,7 +18,8 @@ const styles = theme => ({
     drawerPaper: {width: drawerWidth},
   });
 
-const CurrentProjectSideBar = ({projectName, projectNameSlug, noRules=false}) => {
+const CurrentProjectSideBar = ({projectName, projectNameSlug, projectType}) => {
+    const showRules = projectType != PROJECT_TYPES.entity_disambiguation;
     return (
         <React.Fragment>
             <ListItem
@@ -33,16 +35,18 @@ const CurrentProjectSideBar = ({projectName, projectNameSlug, noRules=false}) =>
             <ListItem
                 button
                 component={Link}
-                to="/search">
+                to="/search"
+            >
                 <ListItemText>
                     Search
                 </ListItemText>
             </ListItem>
-            {!noRules &&
+            {showRules &&
                 <ListItem
                     button
                     component={Link}
-                    to="/rules">
+                    to="/rules"
+                >
                     <ListItemText>
                         Add rules
                     </ListItemText>
@@ -60,7 +64,7 @@ const SideBarContent = (props) => {
                 <CurrentProjectSideBar 
                     projectName={props.projectName} 
                     projectNameSlug={props.projectNameSlug}
-                    noRules={props.noRules}
+                    projectType={props.projectType}
                 />
             }
             <ListItem
@@ -76,13 +80,9 @@ const SideBarContent = (props) => {
 }
 
 class SideBar extends React.Component{
-    constructor(props) {
-        super(props);
-        this.state = {}
-    }
 
     render(){
-        const { classes } = this.props;
+        const { classes, ...rest } = this.props;
 
         return (
             <nav className={classes.drawer}>
@@ -93,7 +93,7 @@ class SideBar extends React.Component{
                     <SideBarContent
                         projectName={this.props.projectName}
                         projectNameSlug={this.props.projectNameSlug}
-                        noRules={this.props.noRules}
+                        projectType={this.props.projectType}
                     />
                 </Drawer>
             </nav>

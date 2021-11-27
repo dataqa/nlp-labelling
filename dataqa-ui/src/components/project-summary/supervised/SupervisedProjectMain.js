@@ -196,6 +196,7 @@ class SupervisedProjectMain extends React.Component{
                 <SideBar 
                     projectNameSlug={this.props.projectNameSlug}
                     projectName={this.props.projectName}
+                    projectType={this.props.projectType}
                 />
                 <div className={classes.main_content}>
                     <ProjectTitle projectName={this.props.projectName}/>

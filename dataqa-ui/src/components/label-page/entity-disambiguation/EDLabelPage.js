@@ -518,6 +518,7 @@ class EDLabelPage extends React.Component{
                 <SideBar
                     projectNameSlug={this.props.projectNameSlug}
                     projectName={this.props.projectName}
+                    projectType={this.props.projectType}
                 />
                 <MainArea
                     {...this.state}

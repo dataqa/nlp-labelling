@@ -147,7 +147,7 @@ class EntityDisambiguationProjectMain extends React.Component{
 
         return(
             <div className={classes.container}>
-                <SideBar noRules={true}/>
+                <SideBar projectType={this.props.projectType}/>
                 <div className={classes.main_content}>
                     <ProjectTitle 
                         projectName={this.props.projectName}
