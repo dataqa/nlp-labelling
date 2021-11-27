@@ -7,7 +7,10 @@ import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import Typography from '@material-ui/core/Typography';
 import Grid from '@material-ui/core/Grid';
+import { trimString } from '../../utils';
+import { PROJECT_TYPES_ABBREV } from '../constants';
 
+const MAX_PROJECT_NAME_LENGTH = 20;
 
 const styles = theme => ({
     button_root: {
@@ -21,13 +24,22 @@ const styles = theme => ({
     card: {
         height: '150px',
         width: '150px',
+        justifyContent: 'center',
+        display: 'flex',
+        alignItems: 'center',
+        position: 'relative'
     },
     container: {
         marginTop: '20px'
     },
     main_div: {
         margin: '20px'
-    }
+    },
+    new_banner: { position: 'absolute', 
+                    top: '10px', 
+                    right: '10px' ,
+                    color: theme.palette.secondary.main,
+                    fontWeight: 'bold'}
 });
 
 const Container = (props) => {
@@ -45,10 +57,14 @@ const Item = props => {
 
 const ProjectCard = (props) => {
     const { classes } = props;
+    const trimmedProjectName = trimString(props.title, MAX_PROJECT_NAME_LENGTH);
     return (
         <Card className={classes.card}>
+            <div className={classes.new_banner}>
+                {PROJECT_TYPES_ABBREV[props.projectType]}
+            </div>
             <CardContent>
-                <Typography variant="h4">{props.title}</Typography>
+                <Typography variant="h5">{trimmedProjectName}</Typography>
             </CardContent>
         </Card>
     )
@@ -91,6 +107,7 @@ const ProjectCards = (props) => {
                             <ProjectCard 
                                 classes={classes}
                                 title={project.projectName}
+                                projectType={project.projectType}
                             />
                         </Link>
                     </Item>)
@@ -114,7 +131,7 @@ class Projects extends React.Component {
         const classes = this.props.classes;
         return (
             <div className={classes.main_div}>
-                <Typography variant="h1">My projects</Typography>
+                <Typography variant="h3">My projects</Typography>
                 <ProjectCards classes={classes} {...this.props}/>
             </div>
         )

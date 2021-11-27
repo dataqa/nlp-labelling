@@ -1,7 +1,11 @@
 const PROJECT_TYPES = { classification: "classification", 
                         ner: "ner",
                         entity_disambiguation: "entity_disambiguation"};
-    
+
+const PROJECT_TYPES_ABBREV = { classification: "classification", 
+                                ner: "NER",
+                                entity_disambiguation: "entity linking"};
+
 const WIKI_DOCS_FILE_FORMAT = "https://dataqa.ai/docs/v1.1.1/file_formats/NER";
 const DOCS_TEXT_FILE_FORMAT = "https://dataqa.ai/docs/v1.1.1/file_formats/classification";
 const DOCS_CLASSNAME_FILE_FORMAT = "https://dataqa.ai/docs/v1.1.1/file_formats/classification";
@@ -19,6 +23,7 @@ const DEFAULT_MENTIONS_COLUMNS = ["text", "mentions"];
 const DEFAULT_KB_COLUMNS = ["name", "description"];
 
 export { PROJECT_TYPES,
+         PROJECT_TYPES_ABBREV,
          DOCS_MENTIONS_FILE_FORMAT,
          DOCS_KB_FILE_FORMAT,
          DOCS_TEXT_FILE_FORMAT,

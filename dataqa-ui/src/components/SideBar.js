@@ -7,70 +7,99 @@ import Divider from '@material-ui/core/Divider';
 import { withStyles } from '@material-ui/core/styles';
 import ListItemText from '@material-ui/core/ListItemText';
 
-const drawerWidth = 120;
+const drawerWidth = 150;
 
 const styles = theme => ({
-    drawer: {flexBasis: drawerWidth,
-             flexShrink: 0},
-    drawerPaper: {width: drawerWidth}
+    drawer: {
+        width: drawerWidth,
+        flexShrink: 0
+      },
+    drawerPaper: {width: drawerWidth},
   });
 
-const CurrentProjectSideBar = ({projectName, projectNameSlug}) => {
+const CurrentProjectSideBar = ({projectName, projectNameSlug, noRules=false}) => {
     return (
         <React.Fragment>
             <ListItem
+                button
+                color="primary"
                 component={Link}
                 to={`/projects/${projectNameSlug}`}
             >
                 <ListItemText>
-                    Current project: {projectName}
+                    Summary table
                 </ListItemText>
             </ListItem>
             <ListItem
+                button
                 component={Link}
                 to="/search">
                 <ListItemText>
                     Search
                 </ListItemText>
             </ListItem>
-            <ListItem
-                component={Link}
-                to="/rules">
-                <ListItemText>
-                    Add rules
-                </ListItemText>
-            </ListItem>
+            {!noRules &&
+                <ListItem
+                    button
+                    component={Link}
+                    to="/rules">
+                    <ListItemText>
+                        Add rules
+                    </ListItemText>
+                </ListItem>
+            }
             <Divider/>
         </React.Fragment>
     )
 }
 
-const SideBar = ({projectName, projectNameSlug, classes}) => {
-
+const SideBarContent = (props) => {
     return (
-        <nav className={classes.drawer}>
-        <Drawer
-            variant="permanent"
-            classes={{paper: classes.drawerPaper}}
-        >
         <List>
-            {projectName && 
+            {props.projectName && 
                 <CurrentProjectSideBar 
-                    projectName={projectName} 
-                    projectNameSlug={projectNameSlug}
+                    projectName={props.projectName} 
+                    projectNameSlug={props.projectNameSlug}
+                    noRules={props.noRules}
                 />
             }
             <ListItem
+                button
                 component={Link}
                 to="/projects">
                 <ListItemText>
                     Projects
                 </ListItemText>
             </ListItem>
-            </List>
-        </Drawer>
-    </nav>
+        </List>
     )
 }
 
+class SideBar extends React.Component{
+    constructor(props) {
+        super(props);
+        this.state = {}
+    }
+
+    render(){
+        const { classes } = this.props;
+
+        return (
+            <nav className={classes.drawer}>
+                <Drawer
+                    variant="permanent"
+                    classes={{paper: classes.drawerPaper}}
+                >
+                    <SideBarContent
+                        projectName={this.props.projectName}
+                        projectNameSlug={this.props.projectNameSlug}
+                        noRules={this.props.noRules}
+                    />
+                </Drawer>
+            </nav>
+        )
+    }
+}
+
 export default withStyles(styles)(SideBar);
+export { drawerWidth };
