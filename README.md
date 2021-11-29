@@ -107,6 +107,12 @@ Documentation at: [https://dataqa.ai/docs/](https://dataqa.ai/docs/).
 
 Weak supervision is a set of techniques to produce noisy labels for large quantities of data. It has gained popularity in recent years due to the large amounts of data typically needed for ML systems. The annotator is able to encode any prior domain knowledge it has in the form of rules. Even though these rules can be noisy, the algorithm learns how to weigh them accordingly and use them as signals to extract patterns from the data.
 
+<div align="center">
+    <img src="github_images/rule_creation.gif" width="800" align="center"/>
+    <p>&nbsp;</p>
+    <img src="github_images/ner_rule.gif" width="800" align="center"/>
+</div>
+
 # Contact
 
 For any feedback, please contact us at contact@dataqa.ai. Also follow me on [![alt text][1.1]][1] for more updates and content around ML and labelling.
