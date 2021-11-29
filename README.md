@@ -102,10 +102,10 @@ Documentation at: [https://dataqa.ai/docs/](https://dataqa.ai/docs/).
 * To get started with a multi-class classification problem, go [here](https://dataqa.ai/docs/latest/tutorials/ecomm_product_categories/classification_product_categories/).
 * To get started with a named entity recognition problem, go [here](https://dataqa.ai/docs/latest/tutorials/medical_side_effects/ner_medical/).
 * To get started with a named entity linking problem, go [here](https://dataqa.ai/docs/latest/tutorials/medical_entity_disambiguation/ned_side_effects/).
-* 
+
 # What is weak supervision and why does it work?
 
-Weak supervision is a set of techniques to produce noisy labels for large quantities of data. It has gained popularity in recent years due to the large amounts of data typically needed for ML systems. It includes a set of powerful techniques to encode any prior domain knowledge that the annotator has in the form of rules. Even though these rules can be noisy, the algorithm learns how to weigh them accordingly and use them as signals when labelling the data.
+Weak supervision is a set of techniques to produce noisy labels for large quantities of data. It has gained popularity in recent years due to the large amounts of data typically needed for ML systems. The annotator is able to encode any prior domain knowledge it has in the form of rules. Even though these rules can be noisy, the algorithm learns how to weigh them accordingly and use them as signals to extract patterns from the data.
 
 # Contact
 
