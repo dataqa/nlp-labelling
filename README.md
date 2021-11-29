@@ -30,7 +30,7 @@ DataQA is a tool to label and explore unstructured documents. It is the only too
 
 * [Installation](#installation)
 * [Usage](#usage)
-* [What is weak supervision and why does it work?](#what-is-weak-supervision-and-why-does-it-work?)
+* [What is weak supervision and why does it work?](#what-is-weak-supervision-and-why-does-it-work)
 * [Tutorials](#documentation)
 * [Contact](#contact)
 
