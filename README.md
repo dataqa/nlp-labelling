@@ -12,48 +12,25 @@
 
 &nbsp;
 
-With DataQA, you can label unstructured text documents using rule-based distant supervision. Why rule-based labelling?
-* you can label much faster by turning a multi-label problem into a binary labelling problem,
-* you can get a high-performance NLP baseline with 50% less labelling,
-* you can label documents that have an imbalanced class distribution by upsampling your minority classes,
-* and much more!
+DataQA is a tool to label and explore unstructured documents. It is the only tool that uses rules-based weak supervision to significantly reduce the number of labels needed compared to other tools. Here are a few things you can do with it:
+- Search your documents using Elasticsearch powerful text search engine,
+- Classify your documents,
+- Extract entities from your own data or from Wikipedia,
+- Link mentions of entities to your own ontology.
 
-Currently these are the main projects supported:
-* multiclass classification,
-* named entity recognition,
-* named entity disambiguation.
-
-In addition to this, DataQA ships with a search engine that you can use the explore and label your data at the same time.
-
-#### Classify or extract named entities from your text
+... and it's all available with a simple pip command!
 
 <div align="center">
-    <img src="github_images/classification.gif" width="800" align="center"/>
-    <p>&nbsp;</p>
-    <img src="github_images/ner_labelling.gif" width="800" align="center"/>
+    <img src="github_images/merged.gif" width="800" align="center"/>
 </div>
 
-#### Link entities to knowledge bases in large ontologies
+* [Installation](#installation)
+* [Usage](#usage)
+* [What is weak supervision and why does it work?](#what-is-weak-supervision-and-why-does-it-work-?)
+* [Tutorials](#documentation)
+* [Contact](#contact)
 
-<div align="center">
-    <img src="github_images/ned.gif" width="800" align="center"/>
-</div>
-
-#### Search and label your data
-
-<div align="center">
-    <img src="github_images/search.gif" width="800" align="center"/>
-</div>
-
-#### Use rules & heuristics to automatically label your documents
-
-<div align="center">
-    <img src="github_images/rule_creation.gif" width="800" align="center"/>
-    <p>&nbsp;</p>
-    <img src="github_images/ner_rule.gif" width="800" align="center"/>
-</div>
-
-# Get started
+# Installation
 
 ## Pre-requisites:
 
@@ -62,7 +39,7 @@ In addition to this, DataQA ships with a search engine that you can use the expl
 * Update your pip `pip install -U pip`
 * Tested on backend: MacOSX, Ubuntu. Tested on browser: Chrome.
 
-## Installation
+## Installing from pypi
 
 To install the package from pypi:
 
@@ -76,12 +53,12 @@ To install the package from pypi:
 
 * This is due to an error in snorkel's dependencies, which uses a low version of the `networkx` package incompatible with python 3.9 ([issue in github](https://github.com/snorkel-team/snorkel/issues/1667)). The latest dependency resolver shipped with pip throws an error when a package has incompatible requirements (read more [here](https://pip.pypa.io/en/latest/user_guide/#changes-to-the-pip-dependency-resolver-in-20-3-2020)).
 
-### To run with Docker:
+## To run with Docker
 
 * `docker build . -t dataqa`
 * `docker run -p 5000:5000 dataqa`
 
-## Usage
+# Usage
 
 In the terminal, type `dataqa run`. Wait a few minutes initially, as it takes some minutes to start everything up.
 
@@ -89,11 +66,30 @@ Doing this will run a server locally and open a browser window at port `5000`. I
 
 To quit the application, simply do `Ctr-C` in the terminal. To resume the application, type `dataqa run`. Doing so will create a folder at `$HOME/.dataqa_data`.
 
-### Uploading data
+## Uploading data
 
 The text file needs to be a csv file in utf-8 encoding of up to 30MB with a column named "text" which contains the main text. The other columns will be ignored.
 
 This step is running some analysis on your text and might take up to 5 minutes.
+
+## Uninstall
+
+In the terminal:
+
+* `dataqa uninstall`: this deletes your local application data in the home directory in the folder `.dataqa_data`. It will prompt the user before deleting.
+* `pip uninstall dataqa` 
+
+### Does this tool need an internet connection?
+
+Nope. **No data will ever leave your local machine.**
+
+## Troubleshooting
+
+If the project data does not load, try to go to the homepage and `http://localhost:5000` and navigate to the project from there.
+
+Try running `dataqa test` to get more information about the error, and bug reports are very welcome!
+
+To test the application, it is possible to upload a text that contains a column "\_\_LABEL\_\_". The ground-truth labels will then be displayed during labelling and the real performance will be shown in the performance table between brackets.
 
 # Documentation
 
@@ -102,25 +98,9 @@ Documentation at: [https://dataqa.ai/docs/](https://dataqa.ai/docs/).
 * To get started with a multi-class classification problem, go [here](https://dataqa.ai/docs/tutorials/ecomm_product_categories/classification_product_categories/).
 * To get started with a named entity recognition problem, go [here](https://dataqa.ai/docs/tutorials/medical_side_effects/ner_medical/).
 
-# Uninstall
+# What is weak supervision and why does it work?
 
-In the terminal:
-
-* `dataqa uninstall`: this deletes your local application data in the home directory in the folder `.dataqa_data`. It will prompt the user before deleting.
-* `pip uninstall dataqa` 
-
-#### Does this tool need an internet connection?
-
-Nope. **No data will ever leave your local machine.**
-
-# Troubleshooting
-
-If the project data does not load, try to go to the homepage and `http://localhost:5000` and navigate to the project from there.
-
-Try running `dataqa test` to get more information about the error, and bug reports are very welcome!
-
-To test the application, it is possible to upload a text that contains a column "\_\_LABEL\_\_". The ground-truth labels will then be displayed during labelling and the real performance will be shown in the performance table between brackets.
-
+Weak supervision is a set of techniques to produce noisy labels for large quantities of data. It has gained popularity in recent years due to the large amounts of data typically needed for ML systems. It includes a set of powerful techniques to encode any prior domain knowledge that the annotator has in the form of rules. Even though these rules can be noisy, the algorithm learns how to weigh them accordingly and use them as signals when labelling the data.
 
 # Contact
 
