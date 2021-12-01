@@ -49,6 +49,7 @@ def check_file_upload(api, test_file_path):
                 for project in project_list])
 
     docs = wait_until_docs_labelled(api, {"rule_id": "-2"}, 456)
+    time.sleep(10)
     assert len(docs) == 10
 
 
