@@ -142,10 +142,10 @@ class EDLabelPage extends React.Component{
 
         this.pageSize = PAGESIZE;
         
-        this.state = {  indexDoc: 0,
-                        indexEntity: 0,
-                        offsetDoc: 0,
-                        offsetEntity: 0,
+        this.state = {  indexDoc: 0, // the index of the document for a specific entity in the currentDocs array
+                        indexEntity: 0, // the index of the entity in the currentEntities array
+                        offsetDoc: 0, // the true index of the document for a specific entity
+                        offsetEntity: 0, // the true index of the entity
                         disableNextDoc: false,
                         disablePrevDoc: true,
                         disableNextEnt: false,
@@ -290,18 +290,19 @@ class EDLabelPage extends React.Component{
         const updateIndexAfterAdding = (currentDocs) => {
             this.setState((prevState) => {
                 const currentDocsUpdated = currentDocs || prevState.currentDocs;
+                console.log("Calling updateIndexAfterAdding with ", prevState, currentDocsUpdated);
                 let newState = {};
-                if(prevState.indexDoc == currentDocsUpdated.length - 1){
+                if(prevState.indexDoc == prevState.currentDocs.length - 1){
                     // the last doc in the current batch, we need to ask for more docs
-                    newState.indexDoc = 0;
+                    newState.indexDoc = 0;   
                 }else{
                     newState.indexDoc = prevState.indexDoc + 1;
                 }
 
                 newState.disableNextDoc =  prevState.offsetDoc + 1 >= prevState.totalEntityDocs - 1;
                 newState.disablePrevDoc = false;
-                newState.offsetDoc = prevState.offsetDoc + 1;
                 newState.currentDocs = currentDocsUpdated;
+                newState.offsetDoc = prevState.offsetDoc + 1;
 
                 return newState;
             })
@@ -309,8 +310,8 @@ class EDLabelPage extends React.Component{
 
         // if we arrive at end of currentDocs, we need to get the new page
         // we don't check against pageSize because the first request only returns 1 doc per entity
-        if(this.state.indexDoc == (this.state.currentDocs.length - 1) && this.state.indexDoc < this.state.totalEntityDocs - 1){
-            console.log("Calling getEntityDocs")
+        if((this.state.indexDoc == (this.state.currentDocs.length - 1)) && (this.state.offsetDoc < (this.state.totalEntityDocs - 1))){
+            console.log("Calling getEntityDocs ", this.state);
             this.getEntityDocs(this.state.offsetDoc + 1, updateIndexAfterAdding);
         }else{
             console.log("Not calling getEntityDocs", this.state);
