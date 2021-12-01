@@ -12,7 +12,7 @@
 
 &nbsp;
 
-DataQA is a tool to label and explore unstructured documents. It is the only tool that uses rules-based weak supervision to significantly reduce the number of labels needed compared to other tools. Here are a few things you can do with it:
+DataQA is a tool to label and explore unstructured documents. It uses rules-based weak supervision to significantly reduce the number of labels needed compared to other tools. Here are a few things you can do with it:
 - Search your documents using Elasticsearch powerful text search engine,
 - Classify your documents,
 - Extract entities from your own data or from Wikipedia,

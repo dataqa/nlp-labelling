@@ -71,13 +71,14 @@ export default class Highlightable extends Component {
     const startHL = startContainerPosition < endContainerPosition ? startContainerPosition : endContainerPosition;
     const endHL = startContainerPosition < endContainerPosition ? endContainerPosition : startContainerPosition;
 
-    const rangeObj = Range(startHL + (this.props.startChar || 0), 
-                           endHL + (this.props.startChar || 0), 
-                           text, 
-                           `${startHL}-${endHL}-${uuid()}`,
-                           this.props.entityId);
-
-    this.props.onTextHighlighted(rangeObj);
+    if((startHL !== undefined) && (endHL !== undefined) && !isNaN(startHL) && !isNaN(endHL)){
+      const rangeObj = Range(startHL + (this.props.startChar || 0), 
+                            endHL + (this.props.startChar || 0), 
+                            text, 
+                            `${startHL}-${endHL}-${uuid()}`,
+                            this.props.entityId);
+      this.props.onTextHighlighted(rangeObj);
+    }
   }
 
   onMouseUp(event) {

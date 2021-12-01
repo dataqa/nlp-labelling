@@ -28,7 +28,8 @@ class UploadedMentionsFile(UploadedFile):
         super().__init__(project_type, input_data, file_type, column_name_mapping)
         self.total_mentions = 0
         self.token_ids = Counter()  # mapping of normalised entity text to entity_id
-        self.count_tokens = Counter()  # mapping of normalised entity text to number of documents
+        self.count_mention_docs = Counter()  # mapping of normalised entity text to number of documents
+        self.count_mentions = Counter() # mapping of normalised entity text to total
         self.current_entity_id = 1
 
     def __iter__(self):
@@ -39,9 +40,16 @@ class UploadedMentionsFile(UploadedFile):
 
             mentions = json.loads(line["mentions"])
             self.total_mentions += len(mentions)
+            mentions_already_done = set([]) # to prevent double-counting mentions that appear more than once in same doc
             for mention in mentions:
                 normalised_text = normalise_text(mention["text"])
-                self.count_tokens[normalised_text] += 1
+
+                if normalised_text not in mentions_already_done:
+                    mentions_already_done.add(normalised_text)
+                    self.count_mention_docs[normalised_text] += 1
+
+                self.count_mentions[normalised_text] += 1
+
                 if self.token_ids[normalised_text]:
                     mention["id"] = self.token_ids[normalised_text]
                 else:
@@ -195,12 +203,12 @@ def upload_documents_file(session,
     project.index_name = index_name
     project.filename = uploaded_file.filename
 
-    project.total_mentions = sum([x for x in uploaded_file.count_tokens.values()])
+    project.total_mentions = sum([x for x in uploaded_file.count_mentions.values()])
     project.total_entities = len(uploaded_file.token_ids)
     project.total_matched_entities = 0
 
     token_dict = {}
-    for token, num_docs in uploaded_file.count_tokens.items():
+    for token, num_docs in uploaded_file.count_mention_docs.items():
         token_dict[token] = {"num_docs": num_docs, "id": uploaded_file.token_ids[token]}
     add_ent_mapping_to_db(session, project.id, token_dict)
 

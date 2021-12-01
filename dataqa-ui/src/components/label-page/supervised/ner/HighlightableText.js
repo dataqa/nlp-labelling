@@ -24,7 +24,7 @@ class HighlightableText extends React.Component{
 
     componentDidUpdate(prevProps){
       if(!this.compareSpans(prevProps.currentTextSpans, this.props.currentTextSpans)) {
-        console.log("props at TextNER have changed");
+        console.log("props at TextNER have changed from ", prevProps.currentTextSpans, " to ", this.props.currentTextSpans);
         this.setState({currentTextSpans: this.props.currentTextSpans});
       }
     }
@@ -34,6 +34,7 @@ class HighlightableText extends React.Component{
     }
 
     addTextSpan(range){
+      console.log("Inside addTextSpan", range);
       if(this.props.currentSelectedEntityId === undefined){
         alert("Need to select entity.");
         return;
