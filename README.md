@@ -59,8 +59,8 @@ To install the package from pypi:
 
 ## To run with Docker
 
-* `docker build . -t dataqa`
-* `docker run -p 5000:5000 dataqa`
+* The first time it is run: `docker run -d -p 5000:5000 dataqa/dataqa`
+* In order to keep the data between runs, use `docker start [container-id]` and `docker stop [container-id]`
 
 # Usage
 
