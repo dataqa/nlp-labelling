@@ -91,7 +91,7 @@ export default class AppRouter extends React.Component {
             }
 
             if (wikiData && (wikiData != "undefined")){
-                this.setState(() => ({ wikiData }));
+                this.setState(() => ({ wikiData: (wikiData == "true")}));
             }
 
             if  (classNames && (classNames != "undefined")){

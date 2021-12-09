@@ -1,11 +1,12 @@
 FROM ubuntu:hirsute-20210917
 
+ARG tag
 ENV DEBIAN_FRONTEND=noninteractive
 EXPOSE 5000
 RUN apt --yes update
 RUN apt --yes install python3-pip
 RUN pip3 install -U pip
-RUN pip install dataqa --use-deprecated=legacy-resolver
+RUN pip install dataqa==$tag --use-deprecated=legacy-resolver
 RUN mkdir /usr/local/lib/python3.9/dist-packages/dataqa_es/server/elasticsearch-7.9.2/plugins
 
 RUN useradd -p $(openssl passwd -crypt appuser) appuser

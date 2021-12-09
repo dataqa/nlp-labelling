@@ -175,9 +175,9 @@ class MultipleFileUploadForm extends React.Component{
                         selectedFile = {this.state.selectedFiles[FILE_TYPE_DOCUMENTS]}
                         helpText={<p>No columns "{DEFAULT_MENTIONS_COLUMNS.join(', ')}" found in file. Read more in the <a  href={DOCS_MENTIONS_FILE_FORMAT} target="_blank"> documentation</a>. Please select columns:</p>}
                         description={<Typography variant="body1">File with text and entity mentions. Read more in the <a  href={DOCS_MENTIONS_FILE_FORMAT} target="_blank"> documentation</a>.</Typography>}
-                        createProject={(e, defaultColumnNames) => {return this.props.createProject(e, 
-                                                            defaultColumnNames,
-                                                            FILE_TYPE_DOCUMENTS)}}
+                        createProject={({selectedFile, defaultColumnNames}) => {return this.props.createProject({selectedFile: selectedFile, 
+                        defaultColumnNames: defaultColumnNames,
+                        fileType: FILE_TYPE_DOCUMENTS})}}
                         defaultColumnNames={DEFAULT_MENTIONS_COLUMNS}
                         projectName={this.props.projectName}
                         classes={classes}
@@ -200,9 +200,9 @@ class MultipleFileUploadForm extends React.Component{
                         selectedFile = {this.state.selectedFiles[FILE_TYPE_KB]}
                         helpText={<p>No columns "{DEFAULT_KB_COLUMNS.join(', ')}" found in file. Read more in the <a  href={DOCS_MENTIONS_FILE_FORMAT} target="_blank"> documentation</a>. Please select columns:</p>}
                         description={<Typography variant="body1">File with knowledge bases. Read more in the <a  href={DOCS_KB_FILE_FORMAT} target="_blank"> documentation</a>.</Typography>}
-                        createProject={(e, defaultColumnNames) => {return this.props.createProject(e, 
-                                                                        defaultColumnNames,
-                                                                        FILE_TYPE_KB)}}
+                        createProject={({selectedFile, defaultColumnNames}) => {return this.props.createProject({selectedFile: selectedFile, 
+                                                                        defaultColumnNames: defaultColumnNames,
+                                                                        fileType: FILE_TYPE_KB})}}
                         defaultColumnNames={DEFAULT_KB_COLUMNS}
                         projectName={this.props.projectName}
                         classes={classes}

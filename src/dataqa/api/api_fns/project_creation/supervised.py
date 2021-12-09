@@ -1,5 +1,6 @@
 import os
 import sys
+import shutil
 import traceback
 
 from werkzeug.utils import secure_filename
@@ -61,6 +62,8 @@ def create_supervised_project(session,
     #TODO: optimise so we don't need to iterate through file twice
     #TODO (once for saving, another time for counting lines)
     """
+    project_full_path, spacy_binary_filepath = get_paths(upload_folder, project_name)
+
     uploaded_file = UploadedSupervisedFile(project_type,
                                            file_bytes,
                                            file_type,
@@ -70,7 +73,6 @@ def create_supervised_project(session,
     uploaded_file.do_all_file_checks()
 
     # Save project details in db
-    project_full_path, spacy_binary_filepath = get_paths(upload_folder, project_name)
     index_name = get_random_index_name(project_name)
     project_id = None
 
@@ -87,8 +89,9 @@ def create_supervised_project(session,
 
         project_id = add_supervised_project_to_db(session,
                                                   project_name,
+                                                  project_full_path,
                                                   project_type,
-                                                  file_bytes.filename,
+                                                  uploaded_file.filename,
                                                   upload_id,
                                                   index_name,
                                                   spacy_binary_filepath,
@@ -100,14 +103,14 @@ def create_supervised_project(session,
         print("Error while creating ES index & saving files to disk", sys.exc_info())
         traceback.print_exc()
         delete_index(es_uri, index_name)
-        delete_files_from_disk(spacy_binary_filepath)
+        delete_files_from_disk(project_full_path)
 
     return project_id
 
 
-def delete_files_from_disk(spacy_binary_filepath):
-    if os.path.exists(spacy_binary_filepath):
-        os.remove(spacy_binary_filepath)
+def delete_files_from_disk(project_full_path):
+    if os.path.exists(project_full_path):
+        shutil.rmtree(project_full_path)
 
 
 def get_paths(upload_folder, project_name):

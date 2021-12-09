@@ -65,7 +65,7 @@ const FileUploadForm = (props) => {
                 id={"contained-button-file"}
                 instructionText={title}
                 helpText={<p>No column {defaultColumns[0]} found in file. Read more in the <a  href={helpTextLink} target="_blank"> documentation</a>. Please select columns:</p>}
-                createProject={(selectedFile, defaultColumnNames) => props.createProject(selectedFile, defaultColumnNames, FILE_TYPE_DOCUMENTS, props.wikiData)}
+                createProject={({selectedFile, defaultColumnNames}) => {return (props.createProject({selectedFile: selectedFile, defaultColumnNames: defaultColumnNames, fileType: FILE_TYPE_DOCUMENTS, isWiki: props.wikiData}))}}
                 defaultColumnNames={defaultColumns}
                 setProjectName={props.setProjectName}
                 projectName={props.projectName}
@@ -437,10 +437,10 @@ class FileUploadMain extends React.Component{
         return false;
     }
 
-    createProject = (selectedFile, 
+    createProject = ({selectedFile, 
                     defaultColumnNames,
                     fileType="documents",
-                    isWiki=false) => {
+                    isWiki=false}) => {
 
         console.log("Inside createProject", defaultColumnNames, this.props, !this.props.filesUploaded, this.state.projectName, this.validateProjectSlug(getSlug(this.state.projectName)));
 

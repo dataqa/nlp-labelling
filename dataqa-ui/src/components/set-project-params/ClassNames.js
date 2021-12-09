@@ -98,8 +98,8 @@ class ClassNames extends React.Component{
         }
     }
 
-    uploadClassNamesFile = (selectedFile) => {
-        console.log("Inside uploadClassNamesFile", this.props);
+    uploadClassNamesFile = ({selectedFile}) => {
+        console.log("Inside uploadClassNamesFile", this.props, selectedFile);
 
         const selectedColumn = this.state.selectedInputColumns[DEFAULT_CLASS_NAME_COLUMN];
         if(typeof selectedColumn === 'undefined'){

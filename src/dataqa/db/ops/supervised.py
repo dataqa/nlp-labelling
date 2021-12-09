@@ -15,6 +15,7 @@ def delete_rule(project, rule_index_to_delete):
 
 def add_supervised_project_to_db(session,
                                  project_name,
+                                 project_full_path,
                                  project_type,
                                  filename,
                                  upload_id,
@@ -27,6 +28,7 @@ def add_supervised_project_to_db(session,
     Create a new project with empty attributes (class names)
     """
     supervised_params = {"name": project_name,
+                         "project_full_path": project_full_path,
                          "type": project_type,
                          "upload_id": upload_id,
                          "total_documents": total_documents,

@@ -59,13 +59,10 @@ def process_es_docs_ner(query, es_uri, index_name, rule_id):
         get_label = lambda hit: get_manual_label_if_exists_else_rule_labels(hit, rule_id)
 
     documents = [{"text": hit["_source"][ES_TEXT_FIELD_NAME],
-                  "is_table": hit["_source"].get("is_table") == 'true',
-                  TABLE_COLUMN_NAMES_FIELD_NAME: hit["_source"][TABLE_COLUMN_NAMES_FIELD_NAME]
-                  if hit["_source"].get("is_table") == 'true' else [],
-                  TABLE_ROWS_FIELD_NAME: hit["_source"][TABLE_ROWS_FIELD_NAME]
-                  if hit["_source"].get("is_table") == 'true' else [],
-                  TABLE_ROWS_CHAR_STARTS_FIELD_NAME: hit["_source"][TABLE_ROWS_CHAR_STARTS_FIELD_NAME]
-                  if hit["_source"].get("is_table") == 'true' else [],
+                  "is_table": hit["_source"].get("is_table", False),
+                  TABLE_COLUMN_NAMES_FIELD_NAME: hit["_source"].get(TABLE_COLUMN_NAMES_FIELD_NAME, []),
+                  TABLE_ROWS_FIELD_NAME: hit["_source"].get(TABLE_ROWS_FIELD_NAME, []),
+                  TABLE_ROWS_CHAR_STARTS_FIELD_NAME: hit["_source"].get(TABLE_ROWS_CHAR_STARTS_FIELD_NAME, []),
                   "label": get_label(hit["_source"]),
                   "rules": get_flattened_rule_spans(hit["_source"].get("rules", []))}
                  for hit in response_json["hits"]["hits"]]

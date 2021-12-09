@@ -152,6 +152,7 @@ SETTINGS_KB = {
 
 ABSTAIN = -1
 
+# mapping_columns are not the required columns, it's the name mapping
 MAPPINGS = {PROJECT_TYPE_CLASSIFICATION:
                 {FILE_TYPE_DOCUMENTS: {"mapping_es": MAPPING_CLASSIFICATION,
                                        "mapping_columns": {
