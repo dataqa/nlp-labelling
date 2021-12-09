@@ -13,7 +13,6 @@ import Select from '@material-ui/core/Select';
 import Alert from '@material-ui/lab/Alert';
 import Button from '@material-ui/core/Button';
 
-
 const styles = theme => ({
     button: {
         marginTop: 10
@@ -193,6 +192,23 @@ const MultiColumnSelector = (props) => {
     }
 }
 
+const FileInput = (props) => {
+    return (
+        <input
+            accept=".csv"
+            style={{ display: 'none' }}
+            id={props.id}
+            type="file"
+            onChange={(e) => {
+                            console.log("Inside onChange of form");
+                            e.preventDefault();
+                            props.uploadFile(e.target.files[0]); 
+                            e.target.value = null;
+                        }}
+        />
+    )
+}
+
 
 class SingleFileUploadForm extends React.Component{
 
@@ -206,7 +222,7 @@ class SingleFileUploadForm extends React.Component{
         if(selectedFile){
             this.setState( {selectedFile } );
         }
-        const flag = this.props.createProject(selectedFile, this.props.defaultColumnNames);
+        const flag = this.props.createProject({selectedFile: selectedFile, defaultColumnNames: this.props.defaultColumnNames});
         console.log("flag is ", flag, flag && this.props.setSelectedFile);
 
         if(flag && this.props.setSelectedFile){
@@ -236,17 +252,9 @@ class SingleFileUploadForm extends React.Component{
                                     disabled={this.props.loading || !!this.props.fileUploaded}
                                 />
                             }
-                            <input
-                                accept=".csv"
-                                style={{ display: 'none' }}
+                            <FileInput
                                 id={this.props.id}
-                                type="file"
-                                onChange={(e) => {
-                                                console.log("Inside onChange of form");
-                                                e.preventDefault();
-                                                this.uploadFile(e.target.files[0]); 
-                                                e.target.value = null;
-                                            }}
+                                uploadFile={this.uploadFile}
                             />
                         </Item>
                         <Item>

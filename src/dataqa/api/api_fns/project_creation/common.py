@@ -35,7 +35,8 @@ class UploadedFile(ABC):
         self.mapping_specs = MAPPINGS[project_type][file_type]
         self.project_type = project_type
         self.input_data = input_data
-        self.filename = Path(input_data.filename).name
+        if (type(input_data) != list):
+            self.filename = input_data.filename
         self.total_documents = 0
         self.file_type = file_type  # documents, kb or documents_wiki
         self.is_wiki = (file_type == FILE_TYPE_DOCUMENTS_WIKI)

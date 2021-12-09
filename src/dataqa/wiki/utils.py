@@ -156,13 +156,13 @@ def extract_wikipedia_paragraphs(url):
                TABLE_ROWS_FIELD_NAME: table[TABLE_ROWS_FIELD_NAME],
                TABLE_ROWS_CHAR_STARTS_FIELD_NAME: table[TABLE_ROWS_CHAR_STARTS_FIELD_NAME],
                "url": url,
-               "is_table": "true"}
+               "is_table": True}
 
     for p_ind, paragraph in enumerate(get_paragraphs(soup)):
         yield {"paragraph_id": p_ind + table_ind + 1,
                TEXT_COLUMN_NAME: paragraph,
                "url": url,
-               "is_table": "false"}
+               "is_table": False}
 
 
 def main(input_filepath, output_filepath):

@@ -493,7 +493,7 @@ class EDLabelPage extends React.Component{
 
     getSuggestions = (suggestions, validatedLabel) => {
         const kbIds = suggestions.map((x) => x.label);
-        if(validatedLabel && validatedLabel.label && (!kbIds.includes(validatedLabel.label))){
+        if(validatedLabel && (!kbIds.includes(validatedLabel.label))){
             suggestions = suggestions.concat(validatedLabel);
         }
         return suggestions;
