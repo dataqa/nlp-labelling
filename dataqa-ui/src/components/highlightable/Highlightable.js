@@ -102,12 +102,17 @@ export default class Highlightable extends Component {
   }
 
   getLetterNode(charIndex, range) {
+    var letter = this.props.text[charIndex];
+    if(letter == "\n"){
+      letter = <br/>
+    }
+
     return (<Node id={this.props.id}
       range={range}
       charIndex={charIndex}
       key={`${this.props.id}-${charIndex}`}
       highlightStyle={this.props.highlightStyle}>
-      {this.props.text[charIndex]}
+        {letter}
     </Node>);
   }
 
