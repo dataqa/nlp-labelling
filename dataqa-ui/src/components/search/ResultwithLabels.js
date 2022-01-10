@@ -1,103 +1,38 @@
 import React from 'react';
 import Result from "./Result";
-import * as colors from '@material-ui/core/colors';
-import $ from 'jquery';
-import Grid from '@material-ui/core/Grid';
-import Button from '@material-ui/core/Button';
-import ClassDefinitionBox from '../rules/rule-forms/base/ClassDefinitionBox';
-import { makeStyles } from '@material-ui/core/styles';
+import getSearchTextComponent from './getSearchTextComponent';
+import LabelComponent from './LabelComponent';
+import { PROJECT_TYPES } from '../constants';
 
 
-const useStyles = makeStyles(theme => ({
-    label_component: {
-        padding: 24
-    }
-  }))
-
-
-const Container = (props) => {
-    return (<Grid container 
-                    spacing={2} 
-                    direction="row"
-                    justify="flex-start"
-                    {...props}/>)
-}
-
-const Item = props => {
-    return(<Grid item {...props}/>)
-}
-
-const EntityButton = (props) => {
-    if(props.selected){
-        return (
-            <Button 
-                onClick={props.selectEntity}
-                style={{color: colors[props.colour][500], borderColor: colors[props.colour][500]}}
-                variant="outlined"
-            >
-                {props.entityName}
-            </Button>
-        )
-    }else{
-        return (
-            <Button 
-                onClick={props.selectEntity}
-                style={{backgroundColor: colors[props.colour][500]}}
-            >
-                {props.entityName}
-            </Button>
-        )
-    }
-}
-
-const LabelComponent = (props) => {
-    const classes = useStyles();
-
-    return <Container className={classes.label_component}>
-                {props.entities.map((item, ind) => {
-                        return (
-                            <Item key={`entity-${ind}`}>
-                                <EntityButton 
-                                    entityName={item.name}
-                                    colour={item.colour}
-                                    selected={props.currentSelectedEntity && props.currentSelectedEntity.id == item.id}
-                                    selectEntity={() => props.selectEntity(item)}
-                                />
-                            </Item>
-                        )
-                    })}
-                <Item>
-                    <ClassDefinitionBox 
-                        classNames={props.classNames}
-                        setClass={props.setClass}
-                        inputValue={props.inputValue}
-                        onInputChange={props.onInputChange}
-                        value={props.selectedValue}
-                        id={props.docId}
-                    />
-                </Item>
-            </Container>
-}
-
-
-const getManualLabel = (classNames, result) => {
-    if(result["manual_label"]){
+const getcurrentDisplayedLabels = (classNames, result) => {
+    // will return the validated spans for NER or label for classification
+    if(result["manualLabel"]){
         try{
-            const manualLabelId = result["manual_label"]["raw"]["label"];
-            console.log("Result has manual label", manualLabelId);
-            console.log(classNames[manualLabelId]);
-
-            // all the entities that are not in the text and will populate the search
-            const otherEntities = classNames.filter(x => x.id != manualLabelId);
-            console.log("Other entities:", otherEntities);
-
-            return {entities: [classNames[manualLabelId]], otherEntities};
+            const manualLabel = result["manualLabel"]["raw"]["label"];
+            if(Array.isArray(manualLabel)){
+                // for NER
+                const spans = manualLabel;
+                return spans;
+            }else{
+                // for classification
+                const entities = [classNames[manualLabel]];
+                return entities;
+            }            
         }
         catch(error){
-            console.log("Error getting manual label field from document in ES.")
+            console.log("Error getting manual label field from document in ES.", error)
         }
     }else{
-        return {entities: [], otherEntities: classNames};
+        return [];
+    }
+}
+
+function getcurrentSelectedEntityId(projectType, entities) {
+    if(projectType == PROJECT_TYPES.classification){
+        return entities.length == 0? undefined : entities[0].id
+    }else{
+        return undefined;
     }
 }
 
@@ -106,69 +41,57 @@ class ResultWithLabels extends React.Component {
     constructor(props) {
         super(props);
 
-        const entities = getManualLabel(this.props.classNames, this.props.result);
+        const currentDisplayedLabels = getcurrentDisplayedLabels(this.props.classNames, this.props.result);
+        console.log("Constructor of ResultWithLabels", this.props.classNames, currentDisplayedLabels);
 
         this.state = {
-            entities: entities.entities,
-            otherEntities: entities.otherEntities,
-            manualLabel: undefined,
-            inputValue: '',
-            selectedValue: null,
-            currentSelectedEntity: entities.entities && entities.entities[0]
+            currentDisplayedLabels: currentDisplayedLabels, // for classification - the labels suggested to user (includes validated label if it exists, otherwise nothing). for NER - the current selection of spans (not necessarily confirmed) shown to user.
+            currentSelectedEntityId: getcurrentSelectedEntityId(props.projectType, currentDisplayedLabels), //for NER & classification, the currently selected entity id
+            isCurrentlyDisplayedValidated: currentDisplayedLabels.length > 0
         }
     }
 
-    updateLabel = (label_id, doc_id) => {
-        const data = new FormData();
-        data.append('project_name', this.props.projectName);
-        data.append('manual_label', JSON.stringify({"label": label_id}));
-        data.append('doc_id', doc_id);
-        data.append('session_id', this.props.sessionId);
-        console.log("Sending label ", label_id);
-
-        $.ajax({
-            url : '/api/label-doc',
-            type : 'POST',
-            data : data,
-            processData: false,  // tell jQuery not to process the data
-            contentType: false,  // tell jQuery not to set contentType,
-            success : function(data) {
-                console.log(`Label modified for doc id ${doc_id}`);
-            }.bind(this),
-            error: function (error) {
-                alert(`Error updating manual label for doc id ${doc_id}`);
-            }
+    selectEntity = (entity) => {
+        this.setState((prevState) => {
+            console.log("Inside ResultWithLabels selectEntity", prevState.currentSelectedEntityId, entity);
+            return {currentSelectedEntityId: (entity.id==prevState.currentSelectedEntityId)? undefined: entity.id}
         });
     }
 
-    setClass = (event, input, reason, docId) => {
-        if(reason == "select-option"){
-
-            this.updateLabel(input.id, docId);
-
-            this.setState((prevState) => {
-                console.log("Setting otherEntities", prevState.otherEntities, input);
-                return { entities: prevState.entities.concat(input),
-                         currentSelectedEntity: input,
-                         otherEntities: prevState.otherEntities.filter(x => x.id != input.id),
-                         inputValue: '',
-                         selectedValue: null}
-            });
-        }
-        if(reason == 'clear'){
-            this.setState( {inputValue: ''} );
+    updateIndexAfterLabelling = ({label, spans}) => {
+        if(typeof(spans)!="undefined"){
+            this.setState(() => {
+                return { currentDisplayedLabels: spans,
+                         isCurrentlyDisplayedValidated: true}
+            })
         }
     }
 
-    onClassInputChange = (event, inputValue, reason) => {
-        if(reason == 'input'){
-            this.setState( {inputValue: inputValue} );
-        }
+    addTextSpan = (span) => {
+        console.log("Inside addTextSpan ", span);
+        this.setState((prevState) => {
+            let currentDisplayedLabels = prevState.currentDisplayedLabels;
+            if(currentDisplayedLabels){
+                currentDisplayedLabels = currentDisplayedLabels.concat(span);
+            }
+            else{
+                currentDisplayedLabels = [span]
+            }
+          return { currentDisplayedLabels, isCurrentlyDisplayedValidated: false }
+        })
+    }
+
+    deleteTextSpan = (spanToDelete) => {
+        this.setState((prevState) => {
+            const currentDisplayedLabels = prevState.currentDisplayedLabels.filter(span => (span.id != spanToDelete.id));
+            return { currentDisplayedLabels,
+                     currentSelectedEntityId: undefined,
+                     isCurrentlyDisplayedValidated: false };
+        })
     }
 
     render = () => {
         const result = this.props.result;
-        console.log("render is ", result, result.manual_label, this.state);
         delete result.manual_label;
 
         return(
@@ -176,19 +99,28 @@ class ResultWithLabels extends React.Component {
                 <Result 
                     result={result}
                     onClickLink={() => {}}
-                    labelComponent={this.props.disableLabelling && 
+                    labelComponent={this.props.enableLabelling && 
                                         <LabelComponent 
-                                            entities={this.state.entities}
-                                            classNames={this.state.otherEntities}
-                                            currentSelectedEntity={this.state.currentSelectedEntity}
-                                            selectEntity={(item) => {console.log(item)}}
-                                            setClass={(event, input, reason) => this.setClass(event, input, reason, result.id.raw)}
-                                            inputValue={this.state.inputValue}
-                                            onInputChange={this.onClassInputChange}
-                                            selectedValue={this.state.selectedValue}
                                             docId={result.id.raw}
+                                            projectName={this.props.projectName}
+                                            sessionId={undefined}
+                                            currentDisplayedLabels={this.state.currentDisplayedLabels}
+                                            updateIndexAfterLabelling={this.updateIndexAfterLabelling}
+                                            currentSelectedEntityId={this.state.currentSelectedEntityId}
+                                            selectEntity={this.selectEntity}
+                                            projectType={this.props.projectType}
+                                            classNames={this.props.classNames}
+                                            isCurrentlyDisplayedValidated={this.state.isCurrentlyDisplayedValidated}
                                         />
                                     }
+                    getSearchTextComponent={(fieldValue) => 
+                        getSearchTextComponent(fieldValue, 
+                                               this.props.projectType,
+                                               this.props.classNames,
+                                               this.state.currentSelectedEntityId,
+                                               this.state.currentDisplayedLabels,
+                                               this.addTextSpan,
+                                               this.deleteTextSpan)}
                 />
                 
             </React.Fragment>

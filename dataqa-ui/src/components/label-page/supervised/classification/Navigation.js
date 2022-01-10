@@ -4,6 +4,7 @@ import TextNavigation from '../../common/TextNavigation';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import { withStyles } from '@material-ui/core/styles';
+import { FormatColorResetTwoTone } from '@material-ui/icons';
 
 
 const styles = theme => ({
@@ -59,6 +60,8 @@ const Navigation = (props) => {
                     otherEntities={props.otherEntities}
                     currentSelectedEntityId={props.currentSelectedEntityId}
                     selectEntity={props.selectEntity}
+                    simpleLabelNavigation={false}
+                    isCurrentlyDisplayedValidated={props.isCurrentlyDisplayedValidated}
                 />
             </Item>
         </Container>

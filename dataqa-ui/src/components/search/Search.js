@@ -1,5 +1,4 @@
 import React from "react";
-import { PROJECT_TYPES } from '../constants';
 
 import {
   ErrorBoundary,
@@ -80,7 +79,7 @@ const Search = (props) => {
   }
 
   searchConfig['onSearch'] = functionCreator(props.projectName);
-  const disableLabelling = props.projectType==PROJECT_TYPES.classification;
+  const enableLabelling = true;
 
   return (
     <div className={classes.main_container}>
@@ -113,7 +112,8 @@ const Search = (props) => {
                             key={result.id.raw}
                             result={result}
                             sessionId={sessionId}
-                            disableLabelling={disableLabelling}
+                            enableLabelling={enableLabelling}
+                            projectType={props.projectType}
                           />
                         ))}
                       </div>

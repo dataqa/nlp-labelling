@@ -223,7 +223,7 @@ export default class Highlightable extends Component {
     const newText = this.getRanges();
 
     return (
-      <div style={this.props.style}
+      <div style={{'display': 'inline'}}
         onMouseUp={this.onMouseUp.bind(this)}
         onDoubleClick={this.onDoubleClick.bind(this)}>
         {newText}

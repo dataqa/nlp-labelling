@@ -200,6 +200,7 @@ class LabelNavigation extends React.Component {
         return (
             <Container>
                     {this.state.entities.map((item, ind) => {
+                        console.log("Rendering entity button ", this.state.entities, item, ind);
                         return (
                             <Item key={`entity-${ind}`}>
                                 <EntityButton 
@@ -222,7 +223,7 @@ class LabelNavigation extends React.Component {
                 </Item>
                 <Item>
                     <SendButton 
-                        selected={this.props.hasDocBeenLabelledInThisSession}
+                        selected={(this.props.isCurrentlyDisplayedValidated)}
                         onClick={this.sendEntities}
                     />
                 </Item>

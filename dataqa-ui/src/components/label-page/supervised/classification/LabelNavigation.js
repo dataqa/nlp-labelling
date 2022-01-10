@@ -105,15 +105,15 @@ class LabelNavigation extends React.Component {
         };
     };
 
-    updateLabel = () => {
-        console.log("Updating label for ", this.props.docId, this.state.currentSelectedEntityId);
+    updateLabel = (currentSelectedEntityId) => {
+        console.log("Updating label for ", this.props.docId, currentSelectedEntityId);
 
-        if(!this.state.currentSelectedEntityId && this.state.currentSelectedEntityId!=0){
+        if(!currentSelectedEntityId && currentSelectedEntityId!=0){
             alert("Need to select a class");
         }else{
             const data = new FormData();
             data.append('project_name', this.props.projectName);
-            data.append('manual_label', JSON.stringify({"label": this.state.currentSelectedEntityId}));
+            data.append('manual_label', JSON.stringify({"label": currentSelectedEntityId}));
             data.append('doc_id', this.props.docId);
             data.append('session_id', this.props.sessionId);
 
@@ -125,7 +125,7 @@ class LabelNavigation extends React.Component {
                 contentType: false,  // tell jQuery not to set contentType,
                 success : function(data) {
                     console.log(`Label modified for doc id ${this.props.docId}`);
-                    this.props.updateIndexAfterLabelling({label: this.state.currentSelectedEntityId});
+                    this.props.updateIndexAfterLabelling({label: currentSelectedEntityId});
                 }.bind(this),
                 error: function (error) {
                     alert(`Error updating manual label for doc id ${this.props.docId}`);
@@ -139,12 +139,11 @@ class LabelNavigation extends React.Component {
             this.setState((prevState) => {
                 console.log("Setting otherEntities", prevState.otherEntities, input);
                 return { entities: prevState.entities.concat(input),
-                         currentSelectedEntityId: input.id,
                          otherEntities: prevState.otherEntities.filter(x => x.id != input.id),
                          inputValue: '',
                          selectedValue: null}
             });
-            this.props.selectEntity(input);
+            this.selectEntity(input);
         }
         if(reason == 'clear'){
             this.setState( {inputValue: ''} );
@@ -163,6 +162,10 @@ class LabelNavigation extends React.Component {
         });
 
         this.props.selectEntity(entity);
+
+        if(this.props.simpleLabelNavigation){
+            this.updateLabel(entity.id);
+        }
     }
 
     render() {
@@ -191,12 +194,14 @@ class LabelNavigation extends React.Component {
                     />
                 </Item>
 
-                <Item>
-                    <SendButton 
-                        selected={this.props.hasDocBeenLabelledInThisSession}
-                        onClick={this.updateLabel}
-                    />
-                </Item>
+                {!this.props.simpleLabelNavigation &&
+                    <Item>
+                        <SendButton 
+                            selected={this.props.isCurrentlyDisplayedValidated}
+                            onClick={() => this.updateLabel(this.state.currentSelectedEntityId)}
+                        />
+                    </Item>
+                }
             </Container>
         )
     }

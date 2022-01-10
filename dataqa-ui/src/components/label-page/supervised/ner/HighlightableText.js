@@ -55,6 +55,7 @@ class HighlightableText extends React.Component{
           entityId={this.props.currentSelectedEntityId}
           id={"myuniqueid"}
           text={this.props.content}
+          isHtml={this.props.isHtml}
           enabled={true}
           onTextHighlighted={(range) => this.addTextSpan(range)}
           onDeleteRange={(range) => this.deleteTextSpan(range)}

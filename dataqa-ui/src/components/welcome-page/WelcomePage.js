@@ -41,7 +41,7 @@ const projectTypes = [
     {'type': PROJECT_TYPES.ner,
     'explanation': 'I want to extract entities from Wikipedia pages.',
     'needParams': true,
-    'isNew': true,
+    'isNew': false,
     'wikiData': true}
 ];
 
