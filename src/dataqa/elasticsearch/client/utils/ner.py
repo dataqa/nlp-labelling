@@ -26,9 +26,16 @@ def get_flattened_rule_spans(rules_field):
     return all_rule_spans
 
 
-def get_manual_label_if_exists_else_rule_labels(hit, rule_id=None):
+def get_manual_label(hit):
     if "manual_label" in hit:
-        return hit["manual_label"].get("label", [])
+        return hit["manual_label"].get("label", []) # has been manually labelled but there are no spans
+    return None
+
+
+def get_manual_label_if_exists_else_rule_labels(hit, rule_id=None):
+    manual_label = get_manual_label(hit)
+    if manual_label is not None:
+        return manual_label
     if rule_id:
         return extract_label_from_rule(hit, rule_id)
     return hit["predicted_label"]
@@ -50,10 +57,10 @@ def process_es_docs_ner(query, es_uri, index_name, rule_id):
         get_label = lambda hit: get_manual_label_if_exists_else_rule_labels(hit)
     elif rule_id == -2:
         # no rules
-        get_label = lambda hit: hit.get("manual_label", {}).get("label", [])
+        get_label = get_manual_label
     elif rule_id == -3:
         # read unlabelled docs
-        get_label = lambda hit: hit.get("manual_label", {}).get("label", [])
+        get_label = get_manual_label
     else:
         # get results from specific rule_id
         get_label = lambda hit: get_manual_label_if_exists_else_rule_labels(hit, rule_id)
@@ -64,6 +71,7 @@ def process_es_docs_ner(query, es_uri, index_name, rule_id):
                   TABLE_ROWS_FIELD_NAME: hit["_source"].get(TABLE_ROWS_FIELD_NAME, []),
                   TABLE_ROWS_CHAR_STARTS_FIELD_NAME: hit["_source"].get(TABLE_ROWS_CHAR_STARTS_FIELD_NAME, []),
                   "label": get_label(hit["_source"]),
+                  "manual_label": get_manual_label(hit["_source"]),
                   "rules": get_flattened_rule_spans(hit["_source"].get("rules", []))}
                  for hit in response_json["hits"]["hits"]]
 

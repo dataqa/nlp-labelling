@@ -7,7 +7,15 @@ import _ from 'lodash'
 
 const LabelComponent = (props) => {
     if(props.projectType == PROJECT_TYPES.classification){
-        const entities = props.currentDisplayedLabels.map((x, ind) => props.classNames[x.id]);
+        let entities;
+        if(props.currentDisplayedLabels){
+            entities = props.currentDisplayedLabels.map((x, ind) => props.classNames[x.id]);
+            console.log("Inside MainArea,", entities);
+            entities =  _.uniqBy(entities, 'id');
+        }else{
+            entities = [];
+        }
+
         const EntitySet = new Set(entities.map((x, ind) => x.id))
 
         // all the entities that are not in the text and will populate the search
@@ -32,9 +40,15 @@ const LabelComponent = (props) => {
     if(props.projectType == PROJECT_TYPES.ner){
         console.log("Inside LabelComponent", props);
 
-        let entities = props.currentDisplayedLabels.map((x, ind) => x && props.classNames[x.entityId]);
-        console.log("Inside MainArea,", entities);
-        entities =  _.uniqBy(entities, 'id');
+        let entities;
+        if(props.currentDisplayedLabels){
+            entities = props.currentDisplayedLabels.map((x, ind) => x && props.classNames[x.entityId]);
+            console.log("Inside MainArea,", entities);
+            entities =  _.uniqBy(entities, 'id');
+        }else{
+            entities = [];
+        }
+        
         console.log("Inside MainArea,", entities);
         const EntitySet = new Set(entities.map((x, ind) => x.id))
     

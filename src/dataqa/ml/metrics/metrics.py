@@ -392,6 +392,9 @@ def get_merged_accuracy_stats_from_diff_classification(project,
     """
     entity_ids = [supervised_class.id for supervised_class in project.classes]
 
+    if len(manual_labels) == 0:
+        return {"merged": {}, "merged_all": {}}
+
     new_entity_metrics, new_global_metrics = get_merged_accuracy_from_mats(new_merged,
                                                                            manual_labels,
                                                                            entity_ids)
