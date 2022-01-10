@@ -223,7 +223,7 @@ class LabelNavigation extends React.Component {
                 </Item>
                 <Item>
                     <SendButton 
-                        selected={(this.props.isCurrentlyDisplayedValidated)}
+                        selected={this.props.isCurrentlyDisplayedValidated}
                         onClick={this.sendEntities}
                     />
                 </Item>

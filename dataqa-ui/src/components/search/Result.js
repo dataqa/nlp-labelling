@@ -1,5 +1,5 @@
-import React from "react";
 import PropTypes from "prop-types";
+import React from "react";
 
 import { appendClassName, getUrlSanitizer } from "@elastic/react-search-ui-views/lib/view-helpers";
 import { isFieldValueWrapper } from "@elastic/react-search-ui-views/lib/types/FieldValueWrapper";

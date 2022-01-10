@@ -133,7 +133,7 @@ class SupervisedLabelPage extends React.Component{
                         validatedLabels: undefined, // labels received from the server (plus validated in current session)
                         currentDisplayedLabels: [], // for classification - the labels suggested to user (includes validated label if it exists, and rules if not). for NER - the current selection of spans (not necessarily confirmed) shown to user.
                         currentSelectedEntityId: undefined, //for NER & classification, the currently selected entity id
-                        isCurrentlyDisplayedValidated: undefined, // NER: are the currently displayed spans validated?
+                        isCurrentlyDisplayedValidated: undefined, // NER: are the currently displayed spans validated?, classification: is the currently selected label validated?
                         groundTruth: [],
                         numDocs: 0,
                         docs: [],
@@ -305,7 +305,7 @@ class SupervisedLabelPage extends React.Component{
 
         const updateIndexAfterAdding = (prevState, newState) => {
             const newIndex = prevState.index == (this.pageSize - 1)? 0: prevState.index + 1;
-            const currentDisplayedLabels = this.getcurrentDisplayedLabels(newState.         validatedLabels, 
+            const currentDisplayedLabels = this.getcurrentDisplayedLabels(newState.validatedLabels, 
                 newState.docs, 
                 newIndex);
             const isCurrentlyDisplayedValidated = typeof newState.validatedLabels[newIndex] !== 'undefined' && newState.validatedLabels[newIndex] !== null;
