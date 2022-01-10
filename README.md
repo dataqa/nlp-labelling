@@ -41,7 +41,7 @@ DataQA is a tool to label and explore unstructured documents. It uses rules-base
 * Python 3.6, 3.7, 3.8 and 3.9
 * (Recommended) start a new python virtual environment
 * Update your pip `pip install -U pip`
-* Tested on backend: MacOSX, Ubuntu. Tested on browser: Chrome.
+* Tested on backend: MacOSX, Ubuntu. Tested on browser: Chrome, Firefox.
 
 ## Installing from pypi
 
