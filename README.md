@@ -45,17 +45,7 @@ DataQA is a tool to label and explore unstructured documents. It uses rules-base
 
 ## Installing from pypi
 
-To install the package from pypi:
-
-### Python versions 3.6, 3.7, 3.8
-
 * `pip install dataqa`
-
-### Python version 3.9
-
-* `pip install dataqa --use-deprecated=legacy-resolver`
-
-* This is due to an error in snorkel's dependencies, which uses a low version of the `networkx` package incompatible with python 3.9 ([issue in github](https://github.com/snorkel-team/snorkel/issues/1667)). The latest dependency resolver shipped with pip throws an error when a package has incompatible requirements (read more [here](https://pip.pypa.io/en/latest/user_guide/#changes-to-the-pip-dependency-resolver-in-20-3-2020)).
 
 ## To run with Docker
 
