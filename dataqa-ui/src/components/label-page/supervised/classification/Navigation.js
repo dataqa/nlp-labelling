@@ -59,6 +59,8 @@ const Navigation = (props) => {
                     otherEntities={props.otherEntities}
                     currentSelectedEntityId={props.currentSelectedEntityId}
                     selectEntity={props.selectEntity}
+                    simpleLabelNavigation={false}
+                    isCurrentlyDisplayedValidated={props.isCurrentlyDisplayedValidated}
                 />
             </Item>
         </Container>

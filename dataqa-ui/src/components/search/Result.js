@@ -4,6 +4,9 @@ import React from "react";
 import { appendClassName, getUrlSanitizer } from "@elastic/react-search-ui-views/lib/view-helpers";
 import { isFieldValueWrapper } from "@elastic/react-search-ui-views/lib/types/FieldValueWrapper";
 
+
+const DISPLAYED_FIELDS = ["id", "text"]
+
 function getFieldType(result, field, type) {
   if (result[field]) return result[field][type];
 }
@@ -35,6 +38,14 @@ function getEscapedField(result, field) {
   return Array.isArray(safeField) ? safeField.join(", ") : safeField;
 }
 
+function getField(result, field) {
+  // Fallback to raw values here, because non-string fields
+  // will not have a snippet fallback. Raw values MUST be html escaped.
+  const safeField =
+    getSnippet(result, field) || getRaw(result, field);
+  return Array.isArray(safeField) ? safeField.join(", ") : `${safeField}`;
+}
+
 function getEscapedFields(result) {
   return Object.keys(result).reduce((acc, field) => {
     // If we receive an arbitrary value from the response, we may not properly
@@ -45,7 +56,8 @@ function getEscapedFields(result) {
     // vs.
     // FieldValueWrapper: "_metaField: {raw: '1939191'}"
     if (!isFieldValueWrapper(result[field])) return acc;
-    return { ...acc, [field]: getEscapedField(result, field) };
+    // return { ...acc, [field]: getEscapedField(result, field) };
+    return { ...acc, [field]: getField(result, field) };
   }, {});
 }
 
@@ -56,9 +68,11 @@ function Result({
   titleField,
   urlField,
   labelComponent,
+  getSearchTextComponent,
   ...rest
 }) {
-  const fields = getEscapedFields(result);
+  const fields = Object.fromEntries(DISPLAYED_FIELDS.map(k => [k, getEscapedFields(result)[k]]));
+  console.log("Inside Result", result, fields);
   const title = getEscapedField(result, titleField);
   const url = getUrlSanitizer(URL, location)(getRaw(result, urlField));
 
@@ -86,11 +100,8 @@ function Result({
         <ul className="sui-result__details">
           {Object.entries(fields).map(([fieldName, fieldValue]) => (
             <li key={fieldName}>
-              <span className="sui-result__key">{fieldName}</span>{" "}
-              <span
-                className="sui-result__value"
-                dangerouslySetInnerHTML={{ __html: fieldValue }}
-              />
+              <span className="sui-result__key">{fieldName}</span>{" "} 
+              {getSearchTextComponent(fieldValue)}
             </li>
           ))}
         </ul>

@@ -118,6 +118,7 @@ const MainArea = (props) => {
                     otherEntities={otherEntities}
                     currentSelectedEntityId={props.currentSelectedEntityId}
                     selectEntity={props.selectEntity}
+                    isCurrentlyDisplayedValidated={props.isCurrentlyDisplayedValidated}
                 />
             </Item>
         </Container>

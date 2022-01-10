@@ -52,9 +52,9 @@ const Navigation = (props) => {
                     entities={props.entities}
                     otherEntities={props.otherEntities}
                     currentTextSpans={props.currentDisplayedLabels}
-                    hasDocBeenLabelledInThisSession={props.label}
                     currentSelectedEntityId={props.currentSelectedEntityId}
                     selectEntity={props.selectEntity}
+                    isCurrentlyDisplayedValidated={props.isCurrentlyDisplayedValidated}
                 />
             </Item>
         </Container>

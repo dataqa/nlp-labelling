@@ -102,7 +102,8 @@ const MainArea = (props) => {
                     projectName: props.projectName,
                     classNames: props.classNames,
                     currentSelectedEntityId: props.currentSelectedEntityId,
-                    selectEntity: props.selectEntity}
+                    selectEntity: props.selectEntity,
+                    isCurrentlyDisplayedValidated: props.isCurrentlyDisplayedValidated}
     
 
     if(props.projectType == PROJECT_TYPES.classification){
@@ -130,8 +131,9 @@ class SupervisedLabelPage extends React.Component{
                         disableNext: false,
                         disablePrev: true,
                         validatedLabels: undefined, // labels received from the server (plus validated in current session)
-                        currentDisplayedLabels: [], // for classification - initial server results loaded for current label page (the one shown to user is not kept here). for NER - the current selection of spans (not necessarily confirmed) shown to user.
-                        currentSelectedEntityId: undefined, //for NER, the currently selected entity
+                        currentDisplayedLabels: [], // for classification - the labels suggested to user (includes validated label if it exists, and rules if not). for NER - the current selection of spans (not necessarily confirmed) shown to user.
+                        currentSelectedEntityId: undefined, //for NER & classification, the currently selected entity id
+                        isCurrentlyDisplayedValidated: undefined, // NER: are the currently displayed spans validated?, classification: is the currently selected label validated?
                         groundTruth: [],
                         numDocs: 0,
                         docs: [],
@@ -200,7 +202,7 @@ class SupervisedLabelPage extends React.Component{
             else{
                 currentDisplayedLabels = [span]
             }
-          return { currentDisplayedLabels }
+          return { currentDisplayedLabels, isCurrentlyDisplayedValidated: false }
         })
     }
 
@@ -208,7 +210,8 @@ class SupervisedLabelPage extends React.Component{
         this.setState((prevState) => {
             const currentDisplayedLabels = prevState.currentDisplayedLabels.filter(span => (span.id != spanToDelete.id));
             return { currentDisplayedLabels,
-                     currentSelectedEntityId: undefined };
+                     currentSelectedEntityId: undefined,
+                     isCurrentlyDisplayedValidated: false };
         })
     }
 
@@ -259,6 +262,8 @@ class SupervisedLabelPage extends React.Component{
         const callBack = (prevState, newState) => {
             const currentDisplayedLabels = this.getcurrentDisplayedLabels(newState.validatedLabels, newState.docs, 0);
 
+            const isCurrentlyDisplayedValidated = typeof newState.validatedLabels[0] !== 'undefined' && newState.validatedLabels[0] !== null;
+
             const currentSelectedEntityId = this.getCurrentSelectEntityId(newState.validatedLabels[0]);
 
             console.log("(projectNameWasSet) Setting currentDisplayedLabels to ", currentDisplayedLabels,
@@ -266,7 +271,8 @@ class SupervisedLabelPage extends React.Component{
             return ({   index: 0, 
                         fromDoc: 0,
                         currentDisplayedLabels,
-                        currentSelectedEntityId});
+                        currentSelectedEntityId,
+                        isCurrentlyDisplayedValidated });
         }
 
         this.updateProjectState(0, callBack);
@@ -302,6 +308,7 @@ class SupervisedLabelPage extends React.Component{
             const currentDisplayedLabels = this.getcurrentDisplayedLabels(newState.validatedLabels, 
                 newState.docs, 
                 newIndex);
+            const isCurrentlyDisplayedValidated = typeof newState.validatedLabels[newIndex] !== 'undefined' && newState.validatedLabels[newIndex] !== null;
             const currentSelectedEntityId = this.getCurrentSelectEntityId(newState.validatedLabels[newIndex]);
 
             return { 
@@ -310,7 +317,8 @@ class SupervisedLabelPage extends React.Component{
                 disableNext: prevState.fromDoc + 1 >= this.state.numDocs - 1,
                 disablePrev: false,
                 currentDisplayedLabels,
-                currentSelectedEntityId
+                currentSelectedEntityId,
+                isCurrentlyDisplayedValidated
             };
         };
 
@@ -330,6 +338,7 @@ class SupervisedLabelPage extends React.Component{
             const currentDisplayedLabels = this.getcurrentDisplayedLabels(newState.validatedLabels, 
                 newState.docs, 
                 newIndex);
+            const isCurrentlyDisplayedValidated = typeof newState.validatedLabels[newIndex] !== 'undefined' && newState.validatedLabels[newIndex] !== null;
             const currentSelectedEntityId = this.getCurrentSelectEntityId(newState.validatedLabels[newIndex]);
 
             return {
@@ -338,7 +347,8 @@ class SupervisedLabelPage extends React.Component{
                 disableNext: false,
                 disablePrev: prevState.fromDoc === 1,
                 currentDisplayedLabels, 
-                currentSelectedEntityId
+                currentSelectedEntityId,
+                isCurrentlyDisplayedValidated
             };
         };
 
@@ -357,7 +367,7 @@ class SupervisedLabelPage extends React.Component{
             this.setState((prevState) => {
                 let validatedLabels = prevState.validatedLabels;
                 validatedLabels[prevState.index] = label;
-                return ({ validatedLabels });
+                return ({ validatedLabels, isCurrentlyDisplayedValidated: true });
             });
         }
 
@@ -368,7 +378,7 @@ class SupervisedLabelPage extends React.Component{
                 validatedLabels[prevState.index] = spans;
                 const currentDisplayedLabels = spans;
                 console.log("Setting currentDisplayedLabels to", currentDisplayedLabels, " and validatedLabels to ", validatedLabels)
-                return { validatedLabels, currentDisplayedLabels}
+                return { validatedLabels, currentDisplayedLabels, isCurrentlyDisplayedValidated: true}
             })
         }
 
@@ -380,7 +390,8 @@ class SupervisedLabelPage extends React.Component{
     selectEntity = (entity) => {
         this.setState((prevState) => {
             console.log("Inside SUpervisedLabelPage selectEntity", prevState.currentSelectedEntityId, entity);
-            return {currentSelectedEntityId: (entity.id==prevState.currentSelectedEntityId)? undefined: entity.id}
+            return {currentSelectedEntityId: (entity.id==prevState.currentSelectedEntityId)? undefined: entity.id,
+                    isCurrentlyDisplayedValidated: (entity.id==prevState.currentSelectedEntityId)? prevState.isCurrentlyDisplayedValidated: false}
         });
     }
 

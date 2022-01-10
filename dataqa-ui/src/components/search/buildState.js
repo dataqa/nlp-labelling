@@ -1,3 +1,6 @@
+import { renameKeysToCamelCase } from '../utils';
+
+
 function buildTotalPages(resultsPerPage, totalResults) {
   if (!resultsPerPage) return 0;
   if (totalResults === 0) return 1;
@@ -37,7 +40,7 @@ function buildResults(hits) {
         toObject(fieldValue, getHighlight(record, fieldName))
       ])
       .reduce(addEachKeyValueToObject, {});
-  });
+    });
 }
 
 /*
@@ -52,11 +55,17 @@ function buildResults(hits) {
 */
 export default function buildState(response, resultsPerPage) {
   const results = buildResults(response.hits.hits);
+  const modifiedResults = renameKeysToCamelCase(results);
+  const modifiedResultsArray = Object.keys(modifiedResults).map(function (key) { return modifiedResults[key]; });
+  
   const totalResults = buildTotalResults(response.hits);
   const totalPages = buildTotalPages(resultsPerPage, totalResults);
 
+  console.log("Running renameKeysToCamelCase, ", results, modifiedResults, modifiedResultsArray, totalResults,
+  totalPages);
+
   return {
-    results,
+    results: modifiedResultsArray,
     totalPages,
     totalResults
   };
