@@ -122,6 +122,9 @@ def get_specific_docs(es_uri, index_name, doc_ids):
     """
     Returns rules and merged_label of specific doc_ids.
     """
+    if len(doc_ids) == 0:
+        return []
+
     query = queries.specific_doc_ids_query(doc_ids)
     response = requests.post(f"{es_uri}/{index_name}/_mget",
                              headers={"Content-type": "application/json"},

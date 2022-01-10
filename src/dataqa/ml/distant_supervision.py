@@ -118,7 +118,16 @@ def apply_lfs(df, lfs):
 
 
 def merge_labels(L_mat, total_classes):
-    _, num_lfs = L_mat.shape
+    num_docs, num_lfs = L_mat.shape
+
+    if num_docs == 0:
+        if num_lfs <= 1:
+            return np.empty(shape=(0, num_lfs)), NO_MERGE_METHOD
+        elif num_lfs >= 3:
+            return np.empty(shape=(0, num_lfs)), MODEL_MERGE_METHOD
+        if num_lfs <= 1:
+            return np.empty(shape=(0, num_lfs)), MAJORITY_VOTE_MERGE_METHOD
+
     if num_lfs <= 1:
         merged_labels = np.reshape(L_mat, -1)
         merged_method = NO_MERGE_METHOD

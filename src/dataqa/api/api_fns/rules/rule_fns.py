@@ -176,6 +176,8 @@ def index_spans(es_uri,
 
 
 def get_rule_matrix_from_es_rules(docs, rule_ids):
+    if len(docs) == 0:
+        return np.empty(shape=(0, len(rule_ids)))
     rules = [[doc["rules"].get(rule_id, ABSTAIN) for rule_id in rule_ids] for doc in docs]
     mat = np.array(rules)
     return mat
@@ -401,7 +403,10 @@ def apply_update_rules_classification(project, es_uri, df, rules):
     # get the new rules
     rule_labels_mat = get_new_rule_labels_mat(df, rules)
     doc_ids = sorted(set(np.where(rule_labels_mat != ABSTAIN)[0].tolist()))
-    rule_labels_mat = rule_labels_mat[doc_ids, :]
+    if len(doc_ids) == 0:
+        rule_labels_mat = np.empty(shape=(0, 1))
+    else:
+        rule_labels_mat = rule_labels_mat[doc_ids, :]
 
     # download the old rules from ES
     (old_rule_labels_mat,

@@ -130,7 +130,8 @@ class SupervisedLabelPage extends React.Component{
                         fromDoc: 0,
                         disableNext: false,
                         disablePrev: true,
-                        validatedLabels: undefined, // labels received from the server (plus validated in current session)
+                        manuallyValidatedLabels: undefined,
+                        validatedLabels: undefined, // labels received from the server (plus validated in current session) - they can be labels from rules, they do not need to have been validated manually
                         currentDisplayedLabels: [], // for classification - the labels suggested to user (includes validated label if it exists, and rules if not). for NER - the current selection of spans (not necessarily confirmed) shown to user.
                         currentSelectedEntityId: undefined, //for NER & classification, the currently selected entity id
                         isCurrentlyDisplayedValidated: undefined, // NER: are the currently displayed spans validated?, classification: is the currently selected label validated?
@@ -164,11 +165,13 @@ class SupervisedLabelPage extends React.Component{
                 const docIds = json['docIds'];
                 const numDocs = json['total'];
                 const validatedLabels = docs.map((obj) => obj["label"]);
+                const manuallyValidatedLabels = docs.map((obj) => obj["manualLabel"]);
                 const disableNext = numDocs == 1? true: null;
 
                 this.setState((prevState) => {
                     let newState = {docs, 
                         validatedLabels,
+                        manuallyValidatedLabels,
                         numDocs, 
                         docIds,
                         groundTruth,
@@ -262,12 +265,12 @@ class SupervisedLabelPage extends React.Component{
         const callBack = (prevState, newState) => {
             const currentDisplayedLabels = this.getcurrentDisplayedLabels(newState.validatedLabels, newState.docs, 0);
 
-            const isCurrentlyDisplayedValidated = typeof newState.validatedLabels[0] !== 'undefined' && newState.validatedLabels[0] !== null;
+            const isCurrentlyDisplayedValidated = typeof newState.manuallyValidatedLabels[0] !== 'undefined' && newState.manuallyValidatedLabels[0] != null;
 
             const currentSelectedEntityId = this.getCurrentSelectEntityId(newState.validatedLabels[0]);
 
             console.log("(projectNameWasSet) Setting currentDisplayedLabels to ", currentDisplayedLabels,
-            "and currentSelectedEntityId to ", currentSelectedEntityId);
+            "and currentSelectedEntityId to ", currentSelectedEntityId, newState.manuallyValidatedLabels, newState.manuallyValidatedLabels[0], typeof newState.manuallyValidatedLabels[0]);
             return ({   index: 0, 
                         fromDoc: 0,
                         currentDisplayedLabels,
@@ -308,7 +311,7 @@ class SupervisedLabelPage extends React.Component{
             const currentDisplayedLabels = this.getcurrentDisplayedLabels(newState.validatedLabels, 
                 newState.docs, 
                 newIndex);
-            const isCurrentlyDisplayedValidated = typeof newState.validatedLabels[newIndex] !== 'undefined' && newState.validatedLabels[newIndex] !== null;
+            const isCurrentlyDisplayedValidated = typeof newState.manuallyValidatedLabels[newIndex] !== 'undefined' && newState.manuallyValidatedLabels[newIndex] != null;
             const currentSelectedEntityId = this.getCurrentSelectEntityId(newState.validatedLabels[newIndex]);
 
             return { 
@@ -338,7 +341,7 @@ class SupervisedLabelPage extends React.Component{
             const currentDisplayedLabels = this.getcurrentDisplayedLabels(newState.validatedLabels, 
                 newState.docs, 
                 newIndex);
-            const isCurrentlyDisplayedValidated = typeof newState.validatedLabels[newIndex] !== 'undefined' && newState.validatedLabels[newIndex] !== null;
+            const isCurrentlyDisplayedValidated = typeof newState.manuallyValidatedLabels[newIndex] !== 'undefined' && newState.manuallyValidatedLabels[newIndex] != null;
             const currentSelectedEntityId = this.getCurrentSelectEntityId(newState.validatedLabels[newIndex]);
 
             return {
@@ -367,7 +370,11 @@ class SupervisedLabelPage extends React.Component{
             this.setState((prevState) => {
                 let validatedLabels = prevState.validatedLabels;
                 validatedLabels[prevState.index] = label;
-                return ({ validatedLabels, isCurrentlyDisplayedValidated: true });
+                let manuallyValidatedLabels = prevState.manuallyValidatedLabels;
+                manuallyValidatedLabels[prevState.index] = label;
+                return ({ validatedLabels, 
+                          manuallyValidatedLabels,
+                          isCurrentlyDisplayedValidated: true });
             });
         }
 
@@ -376,9 +383,14 @@ class SupervisedLabelPage extends React.Component{
                 console.log("Inside setSpans", spans, prevState)
                 let validatedLabels = prevState.validatedLabels;
                 validatedLabels[prevState.index] = spans;
+                let manuallyValidatedLabels = prevState.manuallyValidatedLabels;
+                manuallyValidatedLabels[prevState.index] = spans;
                 const currentDisplayedLabels = spans;
                 console.log("Setting currentDisplayedLabels to", currentDisplayedLabels, " and validatedLabels to ", validatedLabels)
-                return { validatedLabels, currentDisplayedLabels, isCurrentlyDisplayedValidated: true}
+                return { validatedLabels, 
+                        manuallyValidatedLabels,
+                        currentDisplayedLabels, 
+                        isCurrentlyDisplayedValidated: true}
             })
         }
 
