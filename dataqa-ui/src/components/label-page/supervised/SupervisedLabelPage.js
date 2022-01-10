@@ -10,7 +10,6 @@ import { PROJECT_TYPES } from '../../constants';
 import ClassificationLabelPage from './classification/MainArea';
 import NERLabelPage from './ner/MainArea';
 import { renameKeysToCamelCase } from '../../utils';
-import { truncate } from 'lodash';
 
 
 const PAGESIZE = 10;
