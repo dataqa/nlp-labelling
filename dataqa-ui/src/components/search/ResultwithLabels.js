@@ -13,18 +13,18 @@ const getcurrentDisplayedLabels = (classNames, result) => {
             if(Array.isArray(manualLabel)){
                 // for NER
                 const spans = manualLabel;
-                return spans;
+                return {entities: spans, haveBeenValidated: true};
             }else{
                 // for classification
                 const entities = [classNames[manualLabel]];
-                return entities;
+                return {entities: entities, haveBeenValidated: true};
             }            
         }
         catch(error){
             console.log("Error getting manual label field from document in ES.", error)
         }
     }else{
-        return undefined;
+        return {entities: [], haveBeenValidated: false};
     }
 }
 
@@ -45,9 +45,9 @@ class ResultWithLabels extends React.Component {
         console.log("Constructor of ResultWithLabels", this.props.classNames, currentDisplayedLabels);
 
         this.state = {
-            currentDisplayedLabels: currentDisplayedLabels, // for classification - the labels suggested to user (includes validated label if it exists, otherwise nothing). for NER - the current selection of spans (not necessarily confirmed) shown to user.
+            currentDisplayedLabels: currentDisplayedLabels.entities, // for classification - the labels suggested to user (includes validated label if it exists, otherwise nothing). for NER - the current selection of spans (not necessarily confirmed) shown to user.
             currentSelectedEntityId: getcurrentSelectedEntityId(props.projectType, currentDisplayedLabels), //for NER & classification, the currently selected entity id
-            isCurrentlyDisplayedValidated: typeof currentDisplayedLabels !== "undefined"
+            isCurrentlyDisplayedValidated: currentDisplayedLabels.haveBeenValidated
         }
     }
 
