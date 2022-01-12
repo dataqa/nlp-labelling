@@ -7,12 +7,52 @@ function buildFrom(current, resultsPerPage) {
 function buildMatch(searchTerm) {
   return searchTerm
     ? {
-        multi_match: {
-          query: searchTerm,
-          fields: ["text"]
+      multi_match: {
+        query: searchTerm,
+        fields: ["text"]
+      }
+    }
+    : { match_all: {} };
+}
+
+
+function buildRuleFilter(appliedRuleFilters) {
+  return appliedRuleFilters.map((rule) => {
+    return ({
+      "nested": {
+        "path": "rules",
+        "query": {
+          "bool": {
+            "must": [
+              {
+                "match": {
+                  "rules.rule_id": rule.id
+                }
+              }
+            ]
+          }
         }
       }
-    : { match_all: {} };
+    })
+  })
+}
+
+function buildTableFilter() {
+  return {
+    "match": {
+      "is_table": {
+        "query": "true"
+      }
+    }
+  }
+}
+
+function buildFilters(appliedRuleFilters, filterTables){
+  let ruleFilters = buildRuleFilter(appliedRuleFilters);
+  if(filterTables){
+    return ruleFilters.concat(buildTableFilter())
+  }
+  return ruleFilters;
 }
 
 /*
@@ -32,10 +72,13 @@ export default function buildRequest(state) {
   const {
     current,
     resultsPerPage,
-    searchTerm
+    searchTerm,
+    appliedRuleFilters,
+    filterTables
   } = state;
 
   const match = buildMatch(searchTerm);
+  const filters = buildFilters(appliedRuleFilters, filterTables);
   const size = resultsPerPage;
   const from = buildFrom(current, resultsPerPage);
 
@@ -57,13 +100,15 @@ export default function buildRequest(state) {
     // https://www.elastic.co/guide/en/elasticsearch/reference/7.x/full-text-queries.html
     query: {
       bool: {
-        must: [match]
+        must: filters.concat(match)
       }
     },
     // https://www.elastic.co/guide/en/elasticsearch/reference/7.x/search-request-from-size.html
     ...(size && { size }),
     ...(from && { from })
   };
+
+  console.log("Inside buildRequest", state, body, filters);
 
   return body;
 }

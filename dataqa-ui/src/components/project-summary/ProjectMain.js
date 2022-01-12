@@ -13,6 +13,7 @@ const ProjectMain = (props) => {
                 projectType={props.projectType}
                 classNames={props.classNames}
                 deleteProject={props.deleteProject}
+                setRules={props.setRules}
             />
         )
     }else{

@@ -86,6 +86,7 @@ class SupervisedProjectMain extends React.Component{
                     }
                 }else{
                     this.setState({docs, rules, loading: false});
+                    this.props.setRules(rules);
                 }
 
             }.bind(this),
@@ -139,11 +140,12 @@ class SupervisedProjectMain extends React.Component{
             processData: false,
             contentType: false,
             success : function(data) {
-                console.log("success of delete rule")
+                console.log("success of delete rule", data);
                 const json = renameKeysToCamelCase(JSON.parse(data));
                 const rules = json['rules'];
                 const docs = json['docs'];
                 this.setState({docs, rules, loading: false, disableDeletingRules: false});
+                this.props.setRules(rules);
             }.bind(this),
             error: function (error) {
                 alert("Error deleting the rule");

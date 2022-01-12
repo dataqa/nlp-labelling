@@ -70,6 +70,12 @@ def get_project_list(db):
     with session_scope(db) as session:
         for project in session.query(models.Project).order_by(models.Project.id):
             if project.type in [PROJECT_TYPE_CLASSIFICATION, PROJECT_TYPE_NER]:
+
+                if project.type in PROJECT_TYPE_CLASSIFICATION:
+                    rule_schema = schemas.ClassificationRuleSchema()
+                else:
+                    rule_schema = schemas.NERRuleSchema()
+
                 all_projects.append({"project_id": project.id,
                                      "project_name": project.name,
                                      "project_type": project.type,
@@ -77,9 +83,11 @@ def get_project_list(db):
                                                       "name": class_name.name,
                                                       "colour": class_name.colour}
                                                      for class_name in project.classes],
+                                     "rules": [rule_schema.dump(rule) for rule in project.rules],
                                      "project_upload_finished": project.index_name is not None,
                                      "project_params_finished": len(project.classes)>0,
-                                     "filenames": {FILE_TYPE_DOCUMENTS: project.filename}})
+                                     "filenames": {FILE_TYPE_DOCUMENTS: project.filename},
+                                     "wiki_data": project.is_wiki})
             else:
                 all_projects.append({"project_id": project.id,
                                      "project_name": project.name,
