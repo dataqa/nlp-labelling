@@ -175,7 +175,7 @@ class Search extends React.Component {
                         inputView={({ getAutocomplete, getButtonProps, getInputProps }) => SearchInput({
                           getAutocomplete, getButtonProps, getInputProps, appliedFilters: <RuleFilters
                             rules={this.state.appliedRuleFilters}
-                            wikiData={this.props.wikiData}
+                            hasTables={this.props.wikiData}
                             filterTables={!this.state.filterTables}
                             addFilterTable={(() => this.setFilterTables(true))}
                             removeFilterTable={(() => this.setFilterTables(false))}
@@ -186,7 +186,7 @@ class Search extends React.Component {
                     </Item>
                     <RuleFilters
                       rules={this.state.rules}
-                      wikiData={this.props.wikiData}
+                      hasTables={this.props.wikiData}
                       filterTables={this.state.filterTables}
                       addFilterTable={(() => this.setFilterTables(true))}
                       disabled={(this.state.appliedRuleFilters.length + this.state.filterTables) >= MAX_APPLIED_FILTERS}

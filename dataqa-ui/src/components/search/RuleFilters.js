@@ -31,10 +31,10 @@ const RuleFilters = (props) => {
     const { classes, ...rest } = props;
 
     return (
-        (props.rules.length + props.wikiData) > 0 &&
+        (props.rules.length + props.hasTables) > 0 &&
         <div className={classes.main_container}>
             {props.withText && <p>{"Filters:"}</p>}
-            {props.wikiData && !props.filterTables && <Chip
+            {props.hasTables && !props.filterTables && <Chip
                     disabled={props.disabled}
                     className={classes.chip}
                     color="primary"
