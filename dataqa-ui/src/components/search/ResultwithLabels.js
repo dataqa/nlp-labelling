@@ -30,7 +30,7 @@ const getcurrentDisplayedLabels = (classNames, result) => {
 
 function getcurrentSelectedEntityId(projectType, entities) {
     if(projectType == PROJECT_TYPES.classification){
-        return entities && entities[0].id
+        return entities.length > 0 && entities[0].id
     }else{
         return undefined;
     }

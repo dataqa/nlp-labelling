@@ -1,6 +1,8 @@
+from itertools import cycle
+
 from dataqa.api.api_fns.rules import rule_fns
 from dataqa.api.api_fns.label.supervised import get_labelled_docs
-from dataqa.constants import PROJECT_TYPE_CLASSIFICATION
+from dataqa.constants import (COLOURS, PROJECT_TYPE_CLASSIFICATION)
 from dataqa.db.ops import supervised as db_ops
 from dataqa.elasticsearch.client.utils import ner as ner_es
 from dataqa.ml.metrics import ner as ner_metrics
@@ -73,3 +75,7 @@ def update_rule_stats(project, es_uri, update_id):
         update_rule_stats_classification(project, es_uri, rule_ids, entity_ids, update_id)
     else:
         update_accuracy_stats_ner(project, es_uri, rule_ids, entity_ids, update_id)
+
+    # Update rule colours
+    for class_colour, rule in zip(cycle(COLOURS), project.rules):
+        rule.colour = class_colour

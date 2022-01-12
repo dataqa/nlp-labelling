@@ -217,6 +217,7 @@ class Rule(Base):
     coverage = Column(Integer)  # in terms of num docs (for entities, num docs with at least 1 entity)
     overlaps = Column(Integer)  # in terms of docs
     accuracy = Column(String)  # in terms of docs for classification, and entities for NER
+    colour = Column(String) # for display in the search
 
     __mapper_args__ = {
         'polymorphic_identity': 'rule',

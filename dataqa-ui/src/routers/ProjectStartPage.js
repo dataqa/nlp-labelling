@@ -30,6 +30,7 @@ class ProjectStartPage extends React.Component {
                         projectType={this.props.projectType}
                         classNames={this.props.classNames}
                         deleteProject={this.props.deleteProject}
+                        setRules={this.props.setRules}
                     />
         }
         

@@ -41,6 +41,7 @@ export default class AppRouter extends React.Component {
         projectType: undefined,
         wikiData: undefined,
         classNames : undefined,
+        rules: undefined,
         projectUploadFinished: false,
         projectParamsFinished: false,
         projects: [],
@@ -74,6 +75,7 @@ export default class AppRouter extends React.Component {
             const projectType = localStorage.getItem('projectType');
             const wikiData = localStorage.getItem('wikiData');
             const classNames = localStorage.getItem('classNames');
+            const rules = localStorage.getItem('rules');
             const projectUploadFinished = localStorage.getItem('projectUploadFinished');
             const projectParamsFinished = localStorage.getItem('projectParamsFinished');
 
@@ -96,6 +98,10 @@ export default class AppRouter extends React.Component {
 
             if  (classNames && (classNames != "undefined")){
                 this.setState(() => ({classNames: JSON.parse(classNames)}));
+            }
+
+            if  (rules && (rules != "undefined")){
+                this.setState(() => ({rules: JSON.parse(rules)}));
             }
 
             if(projectUploadFinished != "undefined"){
@@ -143,6 +149,12 @@ export default class AppRouter extends React.Component {
                         prevState.classNames, 
                         this.state.classNames);
             localStorage.setItem('classNames', JSON.stringify(this.state.classNames));
+        }
+        if(!compareClassNames(prevState.rules, this.state.rules)) {
+            console.log(`Rules have changed from `, 
+                        prevState.rules, 
+                        this.state.rules);
+            localStorage.setItem('rules', JSON.stringify(this.state.rules));
         }
     }
 
@@ -198,6 +210,7 @@ export default class AppRouter extends React.Component {
                         projectType: undefined,
                         wikiData: undefined,
                         classNames: undefined,
+                        rules: undefined,
                         projectUploadFinished: false,
                         projectParamsFinished: false,
                         filenames: {}});
@@ -221,8 +234,14 @@ export default class AppRouter extends React.Component {
                                                 projects: this.getUpdatedProjectsCopy('classNames', classNames, prevState)}});
     };
 
+    setRules = (rules) => {
+        this.setState((prevState) =>  { return {rules,
+                                                projects: this.getUpdatedProjectsCopy('rules', rules, prevState)}});
+    };
+
     setProjectUploadFinished = ( flag=true ) => {
         this.setState((prevState) =>  { return {projectUploadFinished: flag,
+                                                rules: [],
                                                 projects: this.getUpdatedProjectsCopy('projectUploadFinished', flag, prevState)}});
     }
 
@@ -265,6 +284,7 @@ export default class AppRouter extends React.Component {
                 this.setProjectUploadFinished(currentProject.projectUploadFinished);
                 this.setProjectParamsFinished(currentProject.projectParamsFinished);
                 this.setState( {filenames: currentProject.filenames });
+                this.setState( {rules: currentProject.rules });
                 // This did not work in ComponentDidUpdate
                 localStorage.setItem('filenames', JSON.stringify(currentProject.filenames));
                 return;
@@ -325,9 +345,12 @@ export default class AppRouter extends React.Component {
                             path="/search"
                             render={() => <Search
                                             projectName={this.state.projectName}
+                                            wikiData={this.state.wikiData}
                                             projectNameSlug={this.state.projectNameSlug}
                                             projectType={this.state.projectType}
-                                            classNames={this.state.classNames}/>}
+                                            classNames={this.state.classNames}
+                                            rules={this.state.rules || []}
+                                          />}
                         />
                         <Route 
                             path="/ordered" 
@@ -345,10 +368,10 @@ export default class AppRouter extends React.Component {
                             path="/noun-phrase" 
                             render={() =>   <NounPhraseRule {...this.state}/>}/>   
 
-                        <Route 
+                        {/* <Route 
                             path="/sentiment"
                             render={()=>    <SentimentRule {...this.state}/>}
-                        />
+                        /> */}
 
                         <Route 
                             path="/projects/:name" 
@@ -373,6 +396,7 @@ export default class AppRouter extends React.Component {
                                             filenames={this.state.filenames}
                                             classNames={this.state.classNames}
                                             setClassNames={this.setClassNames}
+                                            setRules={this.setRules}
                                         />
                                     )
                                 }
