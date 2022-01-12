@@ -46,7 +46,7 @@ class ResultWithLabels extends React.Component {
 
         this.state = {
             currentDisplayedLabels: currentDisplayedLabels.entities, // for classification - the labels suggested to user (includes validated label if it exists, otherwise nothing). for NER - the current selection of spans (not necessarily confirmed) shown to user.
-            currentSelectedEntityId: getcurrentSelectedEntityId(props.projectType, currentDisplayedLabels), //for NER & classification, the currently selected entity id
+            currentSelectedEntityId: getcurrentSelectedEntityId(props.projectType, currentDisplayedLabels.entities), //for NER & classification, the currently selected entity id
             isCurrentlyDisplayedValidated: currentDisplayedLabels.haveBeenValidated
         }
     }
