@@ -279,10 +279,9 @@ export default class AppRouter extends React.Component {
                 console.log("Doing currentProject", currentProject);
 
                 this.setProjectName(currentProject.projectName);
-                this.setProjectType(currentProject.projectType, currentProject.wikiData);
+                this.setProjectType(currentProject.projectType, currentProject.projectParamsFinished, currentProject.wikiData);
                 this.setClassNames(currentProject.classNames);
                 this.setProjectUploadFinished(currentProject.projectUploadFinished);
-                this.setProjectParamsFinished(currentProject.projectParamsFinished);
                 this.setState( {filenames: currentProject.filenames });
                 this.setState( {rules: currentProject.rules });
                 // This did not work in ComponentDidUpdate

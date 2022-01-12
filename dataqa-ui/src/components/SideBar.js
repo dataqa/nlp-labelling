@@ -14,12 +14,12 @@ const styles = theme => ({
     drawer: {
         width: drawerWidth,
         flexShrink: 0
-      },
-    drawerPaper: {width: drawerWidth},
-  });
+    },
+    drawerPaper: { width: drawerWidth },
+});
 
-const CurrentProjectSideBar = ({projectName, projectNameSlug, projectType}) => {
-    const showRules = projectType != PROJECT_TYPES.entity_disambiguation;
+const CurrentProjectSideBar = ({ projectName, projectNameSlug, projectType }) => {
+    const showRulesorSearch = projectType != PROJECT_TYPES.entity_disambiguation;
     return (
         <React.Fragment>
             <ListItem
@@ -32,16 +32,18 @@ const CurrentProjectSideBar = ({projectName, projectNameSlug, projectType}) => {
                     Summary table
                 </ListItemText>
             </ListItem>
-            <ListItem
-                button
-                component={Link}
-                to="/search"
-            >
-                <ListItemText>
-                    Search
+            {showRulesorSearch &&
+                <ListItem
+                    button
+                    component={Link}
+                    to="/search"
+                >
+                    <ListItemText>
+                        Search
                 </ListItemText>
-            </ListItem>
-            {showRules &&
+                </ListItem>
+            }
+            {showRulesorSearch &&
                 <ListItem
                     button
                     component={Link}
@@ -52,7 +54,7 @@ const CurrentProjectSideBar = ({projectName, projectNameSlug, projectType}) => {
                     </ListItemText>
                 </ListItem>
             }
-            <Divider/>
+            <Divider />
         </React.Fragment>
     )
 }
@@ -60,9 +62,9 @@ const CurrentProjectSideBar = ({projectName, projectNameSlug, projectType}) => {
 const SideBarContent = (props) => {
     return (
         <List>
-            {props.projectName && 
-                <CurrentProjectSideBar 
-                    projectName={props.projectName} 
+            {props.projectName &&
+                <CurrentProjectSideBar
+                    projectName={props.projectName}
                     projectNameSlug={props.projectNameSlug}
                     projectType={props.projectType}
                 />
@@ -79,16 +81,16 @@ const SideBarContent = (props) => {
     )
 }
 
-class SideBar extends React.Component{
+class SideBar extends React.Component {
 
-    render(){
+    render() {
         const { classes, ...rest } = this.props;
 
         return (
             <nav className={classes.drawer}>
                 <Drawer
                     variant="permanent"
-                    classes={{paper: classes.drawerPaper}}
+                    classes={{ paper: classes.drawerPaper }}
                 >
                     <SideBarContent
                         projectName={this.props.projectName}

@@ -86,7 +86,8 @@ def get_project_list(db):
                                      "rules": [rule_schema.dump(rule) for rule in project.rules],
                                      "project_upload_finished": project.index_name is not None,
                                      "project_params_finished": len(project.classes)>0,
-                                     "filenames": {FILE_TYPE_DOCUMENTS: project.filename}})
+                                     "filenames": {FILE_TYPE_DOCUMENTS: project.filename},
+                                     "wiki_data": project.is_wiki})
             else:
                 all_projects.append({"project_id": project.id,
                                      "project_name": project.name,
