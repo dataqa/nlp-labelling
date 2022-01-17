@@ -101,7 +101,7 @@ function Result({
           {Object.entries(fields).map(([fieldName, fieldValue]) => (
             <li key={fieldName}>
               <span className="sui-result__key">{fieldName}</span>{" "} 
-              {getSearchTextComponent(fieldValue)}
+              {getSearchTextComponent(fieldName, fieldValue)}
             </li>
           ))}
         </ul>
