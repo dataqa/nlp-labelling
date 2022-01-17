@@ -300,11 +300,13 @@ def export_spans(es_uri, index_name, is_wiki):
                  export_text_or_table(hit),
                  hit["is_table"],
                  hit.get("manual_label", {}).get("label"),
+                 hit.get("predicted_label"),
                  dict((rule["rule_id"], rule["label"]) for rule in hit.get("rules", {})))
                 for hit in hits]
     else:
         docs = [(hit["id"],
                  hit.get("manual_label", {}).get("label"),
+                 hit.get("predicted_label"),
                  dict((rule["rule_id"], rule["label"]) for rule in hit.get("rules", {})))
                 for hit in hits]
 
