@@ -1,5 +1,24 @@
-from spacy.tokens import DocBin
+from spacy.attrs import ORTH
+from spacy.tokens import Doc, DocBin
 import dataqa.nlp.spacy_nlp as spacy_nlp
+
+
+class ModifiedDocBin(DocBin):
+
+    def get_doc(self, doc_id, vocab):
+        for string in self.strings:
+            vocab[string]
+        orth_col = self.attrs.index(ORTH)
+        try:
+            tokens = self.tokens[doc_id]
+            spaces = self.spaces[doc_id]
+            words = [vocab.strings[orth] for orth in tokens[:, orth_col]]
+            doc = Doc(vocab, words=words, spaces=spaces)
+            doc = doc.from_array(self.attrs, tokens)
+            doc.cats = self.cats[doc_id]
+            return doc
+        except:
+            return None
 
 
 class SpacySerialiser:
@@ -53,11 +72,10 @@ def deserialise_spacy_docs(spacy_binary_filepath):
 def deserialise_spacy_doc_id(spacy_binary_filepath, doc_id):
     with open(spacy_binary_filepath, "rb") as file:
         bytes_data = file.read()
-        doc_bin = DocBin().from_bytes(bytes_data)
-        for ind, doc in enumerate(doc_bin.get_docs(spacy_nlp.nlp.vocab)):
-            if ind == doc_id:
-                return doc
-
-    raise Exception(f"Could not find document with id {doc_id}")
+        doc_bin = ModifiedDocBin().from_bytes(bytes_data)
+        doc = doc_bin.get_doc(doc_id, spacy_nlp.nlp.vocab)
+        if doc is None:
+            raise Exception(f"Could not find document with id {doc_id}")
+        return doc
 
 

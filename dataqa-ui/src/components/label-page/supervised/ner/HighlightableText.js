@@ -9,7 +9,7 @@ class HighlightableText extends React.Component{
     };
 
     compareSpan = (span1, span2) => {
-      return (span1.start == span2.start) && (span1.end == span2.end);
+      return (span1.start == span2.start) && (span1.end == span2.end) && (span1.id == span2.id);
     }
 
     compareSpans = (x, y) => {
