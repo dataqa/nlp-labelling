@@ -113,8 +113,9 @@ class ResultWithLabels extends React.Component {
                                             isCurrentlyDisplayedValidated={this.state.isCurrentlyDisplayedValidated}
                                         />
                                     }
-                    getSearchTextComponent={(fieldValue) => 
-                        getSearchTextComponent(fieldValue, 
+                    getSearchTextComponent={(fieldName, fieldValue) => 
+                        getSearchTextComponent(fieldName, 
+                                               fieldValue, 
                                                this.props.projectType,
                                                this.props.classNames,
                                                this.state.currentSelectedEntityId,

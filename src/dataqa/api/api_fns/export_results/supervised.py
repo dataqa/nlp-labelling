@@ -32,18 +32,7 @@ def export_labels_classification(project, es_uri, rules, writer):
         writer.writerow([row_id, manual_label, merged_label] + rule_row)
 
 
-def json_dump_rule_spans(rules_array):
-    if not rules_array:
-        return None
-    spans = []
-    for span in rules_array:
-        spans.append({"start": span["start"],
-                      "end": span["end"],
-                      "text": span["text"]})
-    return json.dumps(spans)
-
-
-def json_dump_manual_spans(manual_array, entity_names):
+def json_dump_spans(manual_array, entity_names):
     if manual_array is None:
         return None
     spans = []
@@ -62,16 +51,17 @@ def export_spans(project, es_uri, rules, writer):
     es_results = ner_es.export_spans(es_uri, project.index_name, project.is_wiki)
     for results_row in es_results:
         if project.is_wiki:
-            row_id, url, text, is_table, manual_spans, rule_spans = results_row
+            row_id, url, text, is_table, manual_spans, merged_spans, rule_spans = results_row
         else:
-            row_id, manual_spans, rule_spans = results_row
+            row_id, manual_spans, merged_spans, rule_spans = results_row
             url, text, is_table = None, None, None
-        rule_row = [json_dump_rule_spans(rule_spans.get(rule_id)) for rule_id, _ in rules]
-        json_manual_spans = json_dump_manual_spans(manual_spans, entity_names)
+        rule_row = [json_dump_spans(rule_spans.get(rule_id), entity_names) for rule_id, _ in rules]
+        json_manual_spans = json_dump_spans(manual_spans, entity_names)
+        json_merged_spans = json_dump_spans(merged_spans, entity_names)
         if project.is_wiki:
-            writer.writerow([row_id, url, text, is_table, json_manual_spans] + rule_row)
+            writer.writerow([row_id, url, text, is_table, json_manual_spans, json_merged_spans] + rule_row)
         else:
-            writer.writerow([row_id, json_manual_spans] + rule_row)
+            writer.writerow([row_id, json_manual_spans, json_merged_spans] + rule_row)
 
 
 def export_rules(project):
