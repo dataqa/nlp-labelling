@@ -105,3 +105,5 @@ node_modules/
 scrap.py
 original_images
 
+db.sqlite3
+env_variables

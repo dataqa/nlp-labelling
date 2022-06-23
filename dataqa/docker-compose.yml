@@ -1,0 +1,14 @@
+version: "3.3"
+
+services:
+  web:
+    env_file:
+      - env_variables
+    build: .
+    command: poetry run python root/manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    stdin_open: true
+    tty: true

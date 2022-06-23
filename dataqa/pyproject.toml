@@ -1,0 +1,37 @@
+[tool.poetry]
+name = "root"
+version = "0.1.0"
+description = ""
+authors = ["Stuart <stuart@dataqa.ai>"]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+Django = "^4.0.4"
+djangorestframework = "^3.13.1"
+django-filter = "^21.1"
+gunicorn = "^20.1.0"
+model-bakery = "^1.5.0"
+nltk = "^3.7"
+django-types = "^0.15.0"
+
+[tool.poetry.dev-dependencies]
+mypy = "^0.950"
+black = "^22.3.0"
+
+[tool.pyright]
+include = ["root"]
+exclude = []
+
+reportMissingImports = true
+reportMissingTypeStubs = false
+
+pythonVersion = "3.9"
+pythonPlatform = "Linux"
+
+executionEnvironments = [
+  { root = "root" }
+]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
