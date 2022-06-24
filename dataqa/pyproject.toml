@@ -13,6 +13,7 @@ gunicorn = "^20.1.0"
 model-bakery = "^1.5.0"
 nltk = "^3.7"
 django-types = "^0.15.0"
+django-environ = "^0.9.0"
 
 [tool.poetry.dev-dependencies]
 mypy = "^0.950"
